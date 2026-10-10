@@ -52,10 +52,13 @@ interface CostumeStoreState {
   // Filters for Archive
   filters: {
     ethnicGroup: string;
+    subgroup: string;
     region: string;
     category: GarmentCategory | 'all';
     slot: CostumeSlot | 'all';
     ritualLevel: string;
+    verificationStatus: string;
+    outfitId: string;
     searchQuery: string;
   };
   setFilter: (key: string, value: string) => void;
@@ -79,11 +82,11 @@ interface CostumeStoreState {
 // Initial default outfit (Nhật Bình set)
 const initialItemsMap = new Map(MOCK_HERITAGE_ITEMS.map((item) => [item.id, item]));
 
-const defaultHead = initialItemsMap.get('nb-head-01') || null;
-const defaultTop = initialItemsMap.get('nb-top-01') || null;
-const defaultBottom = initialItemsMap.get('nb-bottom-01') || null;
-const defaultFoot = initialItemsMap.get('nb-foot-01') || null;
-const defaultAcc = initialItemsMap.get('nb-acc-01') || null;
+const defaultHead = initialItemsMap.get('item-khan-vanh-nhat-binh') || initialItemsMap.get('nb-head-01') || null;
+const defaultTop = initialItemsMap.get('item-ao-nhat-binh') || initialItemsMap.get('nb-top-01') || null;
+const defaultBottom = initialItemsMap.get('item-xiem-trang-nhat-binh') || initialItemsMap.get('nb-bottom-01') || null;
+const defaultFoot = initialItemsMap.get('item-quan-trang-nhat-binh') || null;
+const defaultAcc = initialItemsMap.get('item-tram-hoa-nhat-binh') || initialItemsMap.get('nb-acc-01') || null;
 
 const defaultOutfit: CurrentOutfitState = {
   gender: 'nu',
@@ -278,6 +281,72 @@ export const useCostumeStore = create<CostumeStoreState>((set, get) => ({
     const allItems = [...get().heritageItems, ...get().customClosetItems];
     const findItem = (id?: string) => (id ? allItems.find((i) => i.id === id) || null : null);
 
+    if (col.normalized_outfit && col.normalized_outfit.components && col.normalized_outfit.components.length > 0) {
+      const newSlots = {
+        ao: null as CostumeItem | null,
+        quan: null as CostumeItem | null,
+        vay: null as CostumeItem | null,
+        khan: null as CostumeItem | null,
+        mu: null as CostumeItem | null,
+        giay: null as CostumeItem | null,
+        trang_suc: [] as CostumeItem[],
+        phu_kien: [] as CostumeItem[],
+        head: null as CostumeItem | null,
+        top: null as CostumeItem | null,
+        bottom: null as CostumeItem | null,
+        footwear: null as CostumeItem | null,
+        accessories: [] as CostumeItem[]
+      };
+
+      for (const comp of col.normalized_outfit.components) {
+        const item = findItem(comp.item_id);
+        if (!item) continue;
+        const slot = item.slot;
+        const cslot = comp.slot.toLowerCase();
+
+        if ((slot === 'ao' || cslot.includes('áo')) && !newSlots.ao) {
+          newSlots.ao = item;
+          newSlots.top = item;
+        } else if ((slot === 'vay' || cslot.includes('váy')) && !newSlots.vay) {
+          newSlots.vay = item;
+          if (!newSlots.bottom) newSlots.bottom = item;
+        } else if ((slot === 'quan' || cslot.includes('quần') || cslot.includes('thân dưới')) && !newSlots.quan) {
+          newSlots.quan = item;
+          if (!newSlots.bottom) newSlots.bottom = item;
+        } else if ((slot === 'khan' || cslot.includes('khăn')) && !newSlots.khan) {
+          newSlots.khan = item;
+          if (!newSlots.head) newSlots.head = item;
+        } else if ((slot === 'mu' || cslot.includes('mũ')) && !newSlots.mu) {
+          newSlots.mu = item;
+          if (!newSlots.head) newSlots.head = item;
+        } else if (slot === 'giay' && !newSlots.giay) {
+          newSlots.giay = item;
+          newSlots.footwear = item;
+        } else if (slot === 'trang_suc' || cslot.includes('trang sức')) {
+          if (!newSlots.trang_suc.some((t) => t.id === item.id)) {
+            newSlots.trang_suc.push(item);
+            newSlots.accessories.push(item);
+          }
+        } else {
+          if (!newSlots.phu_kien.some((p) => p.id === item.id)) {
+            newSlots.phu_kien.push(item);
+            newSlots.accessories.push(item);
+          }
+        }
+      }
+
+      set((state) => ({
+        outfit: {
+          ...state.outfit,
+          slots: newSlots,
+          locked_slots: ['ao', 'top']
+        },
+        activeTab: 'studio',
+        aiAdvisoryResult: null
+      }));
+      return;
+    }
+
     const top = findItem(col.sample_outfit.top_id);
     const bottom = findItem(col.sample_outfit.bottom_id);
     const head = findItem(col.sample_outfit.head_id);
@@ -286,8 +355,8 @@ export const useCostumeStore = create<CostumeStoreState>((set, get) => ({
       .map((id) => findItem(id))
       .filter(Boolean) as CostumeItem[];
 
-    const isVay = bottom?.category === 'Váy';
-    const isMu = head?.category === 'Mũ';
+    const isVay = bottom?.category === 'Váy' || bottom?.slot === 'vay';
+    const isMu = head?.category === 'Mũ' || head?.slot === 'mu';
 
     set((state) => ({
       outfit: {
@@ -354,10 +423,13 @@ export const useCostumeStore = create<CostumeStoreState>((set, get) => ({
 
   filters: {
     ethnicGroup: 'all',
+    subgroup: 'all',
     region: 'all',
     category: 'all',
     slot: 'all',
     ritualLevel: 'all',
+    verificationStatus: 'all',
+    outfitId: 'all',
     searchQuery: ''
   },
 
@@ -373,10 +445,13 @@ export const useCostumeStore = create<CostumeStoreState>((set, get) => ({
     set({
       filters: {
         ethnicGroup: 'all',
+        subgroup: 'all',
         region: 'all',
         category: 'all',
         slot: 'all',
         ritualLevel: 'all',
+        verificationStatus: 'all',
+        outfitId: 'all',
         searchQuery: ''
       }
     }),

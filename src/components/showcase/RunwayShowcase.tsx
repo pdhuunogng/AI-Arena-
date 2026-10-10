@@ -24,23 +24,25 @@ export const RunwayShowcase: React.FC = () => {
 
   const [activeCollectionIndex, setActiveCollectionIndex] = useState(0);
 
-  const currentCollection = MOCK_COLLECTIONS[activeCollectionIndex];
+  const currentCollection = MOCK_COLLECTIONS[activeCollectionIndex] || MOCK_COLLECTIONS[0];
 
   // Resolve collection sample items
-  const collectionTop = MOCK_HERITAGE_ITEMS.find((i) => i.id === currentCollection.sample_outfit.top_id);
-  const collectionBottom = MOCK_HERITAGE_ITEMS.find((i) => i.id === currentCollection.sample_outfit.bottom_id);
-  const collectionHead = MOCK_HERITAGE_ITEMS.find((i) => i.id === currentCollection.sample_outfit.head_id);
-  const collectionFoot = MOCK_HERITAGE_ITEMS.find((i) => i.id === currentCollection.sample_outfit.footwear_id);
+  const collectionTop = currentCollection ? MOCK_HERITAGE_ITEMS.find((i) => i.id === currentCollection.sample_outfit.top_id) : null;
+  const collectionBottom = currentCollection ? MOCK_HERITAGE_ITEMS.find((i) => i.id === currentCollection.sample_outfit.bottom_id) : null;
+  const collectionHead = currentCollection ? MOCK_HERITAGE_ITEMS.find((i) => i.id === currentCollection.sample_outfit.head_id) : null;
+  const collectionFoot = currentCollection ? MOCK_HERITAGE_ITEMS.find((i) => i.id === currentCollection.sample_outfit.footwear_id) : null;
 
   // Standout individual garments for Visual Discovery
   const featuredGarments: CostumeItem[] = [
-    MOCK_HERITAGE_ITEMS.find((i) => i.id === 'nb-top-01')!,
-    MOCK_HERITAGE_ITEMS.find((i) => i.id === 'thai-trang-ao-com-001')!,
-    MOCK_HERITAGE_ITEMS.find((i) => i.id === 'tac-top-01')!,
-    MOCK_HERITAGE_ITEMS.find((i) => i.id === 'kinh-hat-non-ba-tam-001')!,
-    MOCK_HERITAGE_ITEMS.find((i) => i.id === 'hm-bottom-01')!,
-    MOCK_HERITAGE_ITEMS.find((i) => i.id === 'cham-top-01')!
-  ].filter(Boolean);
+    MOCK_HERITAGE_ITEMS.find((i) => i.id === 'item-ao-nhat-binh'),
+    MOCK_HERITAGE_ITEMS.find((i) => i.id === 'item-ao-ngu-than'),
+    MOCK_HERITAGE_ITEMS.find((i) => i.id === 'item-ao-tu-than'),
+    MOCK_HERITAGE_ITEMS.find((i) => i.id === 'item-ao-com-thai-trang'),
+    MOCK_HERITAGE_ITEMS.find((i) => i.id === 'item-ao-dai-dao-do'),
+    MOCK_HERITAGE_ITEMS.find((i) => i.id === 'item-ao-nu-cham'),
+    MOCK_HERITAGE_ITEMS.find((i) => i.id === 'item-ao-ba-ba'),
+    MOCK_HERITAGE_ITEMS.find((i) => i.id === 'item-ao-ede')
+  ].filter(Boolean) as CostumeItem[];
 
   const handleSelectCollection = (index: number) => {
     setActiveCollectionIndex(index);

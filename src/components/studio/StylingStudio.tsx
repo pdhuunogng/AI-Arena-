@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useCostumeStore } from '../../store/useCostumeStore';
 import { CostumeItem, GarmentCategory } from '../../types/costume';
+import { evaluateEquippedOutfitCompatibility } from '../../data/mockHeritageData';
 import {
   Sparkles,
   Wand2,
@@ -20,7 +21,8 @@ import {
   Plus,
   Trash2,
   Search,
-  Filter
+  Filter,
+  ShieldAlert
 } from 'lucide-react';
 
 export const StylingStudio: React.FC = () => {
@@ -80,9 +82,25 @@ export const StylingStudio: React.FC = () => {
     }
   ];
 
+  const isMatchingSlot = (item: CostumeItem, slot: GarmentCategory | null) => {
+    if (!slot) return true;
+    if (item.category === slot) return true;
+    const s = item.slot;
+    const cat = (item.category || '').toLowerCase();
+    if (slot === 'Áo' && (s === 'ao' || cat.includes('áo'))) return true;
+    if (slot === 'Quần' && (s === 'quan' || cat.includes('quần') || cat.includes('thân dưới'))) return true;
+    if (slot === 'Váy' && (s === 'vay' || cat.includes('váy'))) return true;
+    if (slot === 'Khăn' && (s === 'khan' || cat.includes('khăn'))) return true;
+    if (slot === 'Mũ' && (s === 'mu' || cat.includes('mũ'))) return true;
+    if (slot === 'Giày' && (s === 'giay' || cat.includes('giày'))) return true;
+    if (slot === 'Trang sức' && (s === 'trang_suc' || cat.includes('trang sức'))) return true;
+    if (slot === 'Phụ kiện' && (s === 'phu_kien' || cat.includes('phụ kiện') || cat.includes('bộ phận'))) return true;
+    return false;
+  };
+
   // Filter items compatible with current active drawer slot
   const drawerItems = catalog.filter((item) => {
-    if (activeDrawerSlot && item.category !== activeDrawerSlot) {
+    if (activeDrawerSlot && !isMatchingSlot(item, activeDrawerSlot)) {
       return false;
     }
     if (drawerSourceFilter === 'heritage' && item.is_personal) return false;
@@ -91,10 +109,12 @@ export const StylingStudio: React.FC = () => {
     if (drawerSearch.trim()) {
       const q = drawerSearch.toLowerCase();
       const match =
+        item.id.toLowerCase().includes(q) ||
         item.name.toLowerCase().includes(q) ||
         item.ethnic_group.toLowerCase().includes(q) ||
-        item.material.toLowerCase().includes(q) ||
-        item.pattern_description.toLowerCase().includes(q);
+        (item.subgroup && item.subgroup.toLowerCase().includes(q)) ||
+        (item.material && item.material.toLowerCase().includes(q)) ||
+        (item.pattern_description && item.pattern_description.toLowerCase().includes(q));
       if (!match) return false;
     }
     return true;
@@ -117,14 +137,15 @@ export const StylingStudio: React.FC = () => {
 
   // Handle selecting an item into the outfit
   const handleSelectItem = (item: CostumeItem) => {
-    if (item.category === 'Áo') setSlotItem('ao', item);
-    else if (item.category === 'Quần') setSlotItem('quan', item);
-    else if (item.category === 'Váy') setSlotItem('vay', item);
-    else if (item.category === 'Khăn') setSlotItem('khan', item);
-    else if (item.category === 'Mũ') setSlotItem('mu', item);
-    else if (item.category === 'Giày') setSlotItem('giay', item);
-    else if (item.category === 'Trang sức') setSlotItem('trang_suc', item);
-    else if (item.category === 'Phụ kiện') setSlotItem('phu_kien', item);
+    const s = item.slot;
+    if (s === 'ao') setSlotItem('ao', item);
+    else if (s === 'quan') setSlotItem('quan', item);
+    else if (s === 'vay') setSlotItem('vay', item);
+    else if (s === 'khan') setSlotItem('khan', item);
+    else if (s === 'mu') setSlotItem('mu', item);
+    else if (s === 'giay') setSlotItem('giay', item);
+    else if (s === 'trang_suc') setSlotItem('trang_suc', item);
+    else setSlotItem('phu_kien', item);
   };
 
   // AI Advisor Call: Hoàn thiện từ slot đang chọn (Cơ chế 1)
@@ -189,8 +210,8 @@ export const StylingStudio: React.FC = () => {
     setTimeout(() => setSaveSuccessMsg(false), 2500);
   };
 
-  // Equipped items count
-  const equippedCount = [
+  // Equipped items list & compatibility evaluation
+  const equippedList = [
     outfit.slots.ao,
     outfit.slots.quan,
     outfit.slots.vay,
@@ -199,7 +220,10 @@ export const StylingStudio: React.FC = () => {
     outfit.slots.giay,
     ...outfit.slots.trang_suc,
     ...outfit.slots.phu_kien
-  ].filter(Boolean).length;
+  ].filter(Boolean) as CostumeItem[];
+
+  const equippedCount = equippedList.length;
+  const compatibility = evaluateEquippedOutfitCompatibility(equippedList);
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
@@ -311,6 +335,38 @@ export const StylingStudio: React.FC = () => {
             <span className="text-[11px] font-label-sm text-[#755b00] bg-[#D8B454]/20 px-2.5 py-0.5 rounded-full border border-[#D8B454]/40 font-semibold">
               {equippedCount}/8 vị trí trang phục
             </span>
+          </div>
+
+          {/* Cultural Compatibility Banner based on 168 Scoped Rules */}
+          <div className={`p-4 rounded-2xl border text-xs space-y-2 ${compatibility.badgeClass}`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 shrink-0" />
+                <span className="font-bold font-serif text-sm">
+                  {compatibility.badgeTitle}
+                </span>
+              </div>
+              <span className="text-[10px] font-mono font-semibold uppercase px-2 py-0.5 rounded bg-black/10">
+                168 Quy tắc tương thích
+              </span>
+            </div>
+
+            <p className="leading-relaxed opacity-90">
+              {compatibility.explanation}
+            </p>
+
+            {compatibility.ruleMessages.length > 0 && (
+              <div className="space-y-1 pt-1.5 border-t border-black/10">
+                {compatibility.ruleMessages.map((rm, idx) => (
+                  <div key={idx} className="flex items-start gap-1.5 text-[11px]">
+                    <span className="shrink-0 font-bold">
+                      {rm.type === 'conflict' ? '⚠️' : rm.type === 'condition' ? 'ℹ️' : '✓'}
+                    </span>
+                    <span>{rm.message}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Slots Grid: 8 Modular Garment Slots */}
@@ -595,11 +651,18 @@ export const StylingStudio: React.FC = () => {
                             : 'bg-[#fbf9f4] border-[#e9e8e3] hover:border-[#2d533f]/50'
                         }`}
                       >
-                        <img
-                          src={item.image_url}
-                          alt={item.name}
-                          className="w-16 h-16 rounded-xl object-cover bg-white border border-[#e9e8e3] shrink-0"
-                        />
+                        {(item.image_url || item.imageUrl) ? (
+                          <img
+                            src={(item.image_url || item.imageUrl)!}
+                            alt={item.name}
+                            className="w-16 h-16 rounded-xl object-cover bg-white border border-[#e9e8e3] shrink-0"
+                          />
+                        ) : (
+                          <div className="w-16 h-16 rounded-xl bg-stone-100 border border-[#e9e8e3] shrink-0 flex flex-col items-center justify-center text-stone-400 p-1 text-center">
+                            <Layers className="w-5 h-5 text-stone-300" />
+                            <span className="text-[8px] text-stone-400 mt-0.5">Tư liệu</span>
+                          </div>
+                        )}
 
                         <div className="min-w-0 flex-1 space-y-1">
                           <div className="flex items-center gap-1.5">
@@ -841,12 +904,20 @@ const GarmentSlotCard: React.FC<GarmentSlotCardProps> = ({
         {/* Card Body Image & Info */}
         {item ? (
           <div className="space-y-2">
-            <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-[#f5f4ef] border border-[#e9e8e3]">
-              <img
-                src={item.image_url}
-                alt={item.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
+            <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-[#f5f4ef] border border-[#e9e8e3] flex items-center justify-center">
+              {(item.image_url || item.imageUrl) ? (
+                <img
+                  src={(item.image_url || item.imageUrl)!}
+                  alt={item.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center bg-stone-100 text-stone-400 p-2 text-center">
+                  <Layers className="w-6 h-6 mb-1 text-stone-300" />
+                  <span className="text-[10px] text-stone-500 line-clamp-1 font-serif">{item.name}</span>
+                  <span className="text-[9px] text-stone-400">Chưa nạp ảnh</span>
+                </div>
+              )}
               {item.color_hex && (
                 <span
                   className="absolute bottom-2 right-2 w-3.5 h-3.5 rounded-full border border-white shadow-xs"

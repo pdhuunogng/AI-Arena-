@@ -2,7 +2,12 @@ import React, { useState, useRef } from 'react';
 import { useCostumeStore } from '../../store/useCostumeStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { CostumeItem, GarmentCategory } from '../../types/costume';
-import { MOCK_COLLECTIONS } from '../../data/mockHeritageData';
+import {
+  MOCK_COLLECTIONS,
+  NORMALIZED_OUTFITS,
+  NORMALIZED_SOURCES,
+  NORMALIZED_REVIEW_FLAGS
+} from '../../data/mockHeritageData';
 import {
   Search,
   Filter,
@@ -18,9 +23,13 @@ import {
   Wand2,
   AlertTriangle,
   FolderOpen,
-  CloudCheck,
-  HardDrive,
-  ArrowRight
+  ArrowRight,
+  BookOpen,
+  ShieldCheck,
+  ShieldAlert,
+  ExternalLink,
+  Tag,
+  HelpCircle
 } from 'lucide-react';
 
 export const HeritageCatalog: React.FC = () => {
@@ -38,13 +47,23 @@ export const HeritageCatalog: React.FC = () => {
 
   const { user } = useAuthStore();
 
-  // Main 3 Tabs requested: Items | Outfits | Collection + Personal Closet
-  const [mainTab, setMainTab] = useState<'items' | 'outfits' | 'collections' | 'closet'>('items');
+  // Main 5 Tabs
+  const [mainTab, setMainTab] = useState<'items' | 'outfits' | 'reviewFlags' | 'sources' | 'closet'>('items');
 
-  // Items tab category filter (Áo, Quần, Váy, Khăn, Mũ, Giày, Trang sức, Phụ kiện)
+  // Items tab filters
   const [selectedCategory, setSelectedCategory] = useState<GarmentCategory | 'all'>('all');
   const [selectedEthnic, setSelectedEthnic] = useState<string>('all');
+  const [selectedSubgroup, setSelectedSubgroup] = useState<string>('all');
+  const [selectedStatus, setSelectedStatus] = useState<string>('all');
+  const [selectedOutfitFilter, setSelectedOutfitFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Outfits tab filters
+  const [outfitGroupFilter, setOutfitGroupFilter] = useState<string>('all');
+  const [outfitSearchQuery, setOutfitSearchQuery] = useState('');
+
+  // Review flags filter
+  const [reviewStatusFilter, setReviewStatusFilter] = useState<string>('all');
 
   // Personal Upload Form State
   const [uploadFile, setUploadFile] = useState<File | null>(null);
@@ -66,49 +85,120 @@ export const HeritageCatalog: React.FC = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Available categories
-  const CATEGORIES: GarmentCategory[] = [
-    'Áo',
-    'Quần',
-    'Váy',
-    'Khăn',
-    'Mũ',
-    'Giày',
-    'Trang sức',
-    'Phụ kiện'
-  ];
+  // Available categories in the 77 normalized items
+  const CATEGORIES = Array.from(new Set(heritageItems.map((i) => i.category))).sort();
 
-  // Distinct ethnic groups
-  const ETHNIC_GROUPS = Array.from(new Set(heritageItems.map((i) => i.ethnic_group)));
+  // Distinct ethnic/cultural groups in normalized items
+  const ETHNIC_GROUPS = Array.from(
+    new Set(heritageItems.map((i) => i.ethnic_group || i.culturalGroup || '').filter(Boolean))
+  ).sort();
+
+  // Distinct subgroups in normalized items
+  const SUBGROUPS = Array.from(
+    new Set(heritageItems.map((i) => i.subgroup || '').filter(Boolean))
+  ).sort();
+
+  // Distinct verification statuses in normalized items
+  const VERIFICATION_STATUSES = Array.from(
+    new Set(heritageItems.map((i) => i.verificationStatus || i.verification_status || '').filter(Boolean))
+  ).sort();
 
   // Filter curated heritage items
   const filteredHeritageItems = heritageItems.filter((item) => {
+    const itemEthnic = item.ethnic_group || item.culturalGroup || '';
     if (selectedCategory !== 'all' && item.category !== selectedCategory) return false;
-    if (selectedEthnic !== 'all' && item.ethnic_group !== selectedEthnic) return false;
+    if (selectedEthnic !== 'all' && itemEthnic !== selectedEthnic) return false;
+    if (selectedSubgroup !== 'all' && (item.subgroup || '') !== selectedSubgroup) return false;
+    if (selectedStatus !== 'all') {
+      const vStatus = item.verificationStatus || item.verification_status || '';
+      if (!vStatus.includes(selectedStatus)) return false;
+    }
+    if (selectedOutfitFilter !== 'all') {
+      const belongs = item.belongs_to_outfit_ids || [];
+      if (!belongs.includes(selectedOutfitFilter)) return false;
+    }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       const match =
+        item.id.toLowerCase().includes(q) ||
         item.name.toLowerCase().includes(q) ||
-        item.ethnic_group.toLowerCase().includes(q) ||
-        item.material.toLowerCase().includes(q) ||
-        item.pattern_description.toLowerCase().includes(q);
+        itemEthnic.toLowerCase().includes(q) ||
+        (item.subgroup && item.subgroup.toLowerCase().includes(q)) ||
+        (item.material && item.material.toLowerCase().includes(q)) ||
+        (item.pattern_description && item.pattern_description.toLowerCase().includes(q)) ||
+        (item.cultural_significance && item.cultural_significance.toLowerCase().includes(q)) ||
+        (item.notes && item.notes.toLowerCase().includes(q)) ||
+        (item.tags && item.tags.some((t) => t.toLowerCase().includes(q)));
       if (!match) return false;
     }
     return true;
   });
 
+  // Filter outfits
+  const filteredOutfits = NORMALIZED_OUTFITS.filter((outfit) => {
+    if (outfitGroupFilter !== 'all' && outfit.group !== outfitGroupFilter) return false;
+    if (outfitSearchQuery.trim()) {
+      const q = outfitSearchQuery.toLowerCase();
+      const match =
+        outfit.outfit_id.toLowerCase().includes(q) ||
+        outfit.normalized_name.toLowerCase().includes(q) ||
+        outfit.group.toLowerCase().includes(q) ||
+        outfit.subgroup.toLowerCase().includes(q) ||
+        outfit.history.toLowerCase().includes(q) ||
+        outfit.usage.toLowerCase().includes(q) ||
+        outfit.components.some((c) => c.item_name.toLowerCase().includes(q));
+      if (!match) return false;
+    }
+    return true;
+  });
+
+  // Filter review flags
+  const filteredReviewFlags = NORMALIZED_REVIEW_FLAGS.filter((flag) => {
+    if (reviewStatusFilter !== 'all' && flag.status !== reviewStatusFilter) return false;
+    return true;
+  });
+
   // Handle adding an individual garment into the outfit builder
   const handleEquipItem = (item: CostumeItem) => {
-    if (item.category === 'Áo') setSlotItem('ao', item);
-    else if (item.category === 'Quần') setSlotItem('quan', item);
-    else if (item.category === 'Váy') setSlotItem('vay', item);
-    else if (item.category === 'Khăn') setSlotItem('khan', item);
-    else if (item.category === 'Mũ') setSlotItem('mu', item);
-    else if (item.category === 'Giày') setSlotItem('giay', item);
-    else if (item.category === 'Trang sức') setSlotItem('trang_suc', item);
+    const slot = item.slot;
+    if (slot === 'ao') setSlotItem('ao', item);
+    else if (slot === 'quan') setSlotItem('quan', item);
+    else if (slot === 'vay') setSlotItem('vay', item);
+    else if (slot === 'khan') setSlotItem('khan', item);
+    else if (slot === 'mu') setSlotItem('mu', item);
+    else if (slot === 'giay') setSlotItem('giay', item);
+    else if (slot === 'trang_suc') setSlotItem('trang_suc', item);
     else setSlotItem('phu_kien', item);
 
     setActiveTab('studio');
+  };
+
+  // Helper for status badge styling
+  const getStatusBadge = (status?: string) => {
+    if (!status) return null;
+    const s = status.toLowerCase();
+    if (s.includes('chưa xác minh') || s.includes('chưa tìm được')) {
+      return (
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-red-50 text-red-700 border border-red-200">
+          <ShieldAlert className="w-3 h-3 text-red-600" />
+          <span>Chưa xác minh độc lập</span>
+        </span>
+      );
+    }
+    if (s.includes('cần') || s.includes('một phần') || s.includes('chờ ảnh')) {
+      return (
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-50 text-amber-800 border border-amber-200">
+          <AlertTriangle className="w-3 h-3 text-amber-600" />
+          <span className="truncate max-w-[200px]">{status}</span>
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-800 border border-emerald-200">
+        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+        <span className="truncate max-w-[200px]">{status}</span>
+      </span>
+    );
   };
 
   // Handle selecting local image file
@@ -116,7 +206,6 @@ export const HeritageCatalog: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate type & size
     const validMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'];
     if (!validMimes.includes(file.type)) {
       setUploadStatus({
@@ -141,7 +230,6 @@ export const HeritageCatalog: React.FC = () => {
     reader.onload = () => {
       const b64 = reader.result as string;
       setUploadPreview(b64);
-      // Auto-populate default name from filename
       if (!uploadName) {
         const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
         setUploadName(cleanName);
@@ -150,44 +238,27 @@ export const HeritageCatalog: React.FC = () => {
     reader.readAsDataURL(file);
   };
 
-  // AI Classification with actual image
+  // Mock AI classification for personal uploads
   const handleAiClassifyImage = async () => {
     if (!uploadPreview) return;
     setIsClassifying(true);
-    setUploadStatus({ loading: false });
-
-    try {
-      const res = await fetch('/api/advisor/classify-upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          description: `${uploadName} ${uploadNotes}`,
-          itemCategory: uploadCategory,
-          base64Image: uploadPreview
-        })
-      });
-
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      setAiSuggestion(data);
-
-      // Pre-fill user confirmation fields
-      if (data.predicted_category) setUploadCategory(data.predicted_category);
-      if (data.color_hex) setUploadColorHex(data.color_hex);
-      if (data.predicted_ethnic_group) setUploadEthnicGroup(data.predicted_ethnic_group);
-      if (data.material && !uploadMaterial) setUploadMaterial(data.material);
-    } catch (err: any) {
-      console.error('AI classification error:', err);
-      setUploadStatus({
-        loading: false,
-        error: 'Cố vấn AI phân loại ảnh không khả dụng. Bạn có thể tự điền thông tin bên dưới.'
-      });
-    } finally {
+    setTimeout(() => {
       setIsClassifying(false);
-    }
+      setAiSuggestion({
+        category: 'Áo',
+        ethnicGroup: 'Việt phục',
+        material: 'Lụa tơ tằm dệt trơn',
+        colorHex: '#2D533F',
+        confidence: '92%'
+      });
+      setUploadCategory('Áo');
+      setUploadEthnicGroup('Việt phục');
+      setUploadMaterial('Lụa tơ tằm dệt trơn');
+      setUploadColorHex('#2D533F');
+    }, 1000);
   };
 
-  // Submit save to personal closet
+  // Save personal garment
   const handleSaveToPersonalCloset = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!uploadName.trim()) {
@@ -224,13 +295,10 @@ export const HeritageCatalog: React.FC = () => {
 
       setUploadStatus({
         loading: false,
-        success: res.isCloudSynced
-          ? 'Đã lưu thành công vào Tủ Đồ Cá Nhân (Đã đồng bộ Cloud)!'
-          : 'Đã lưu vào Tủ Đồ Cá Nhân (Lưu trữ cục bộ bền vững trên thiết bị)!',
+        success: 'Đã lưu thành công vào Tủ Đồ Cá Nhân!',
         isCloudSynced: res.isCloudSynced
       });
 
-      // Reset form
       setUploadFile(null);
       setUploadPreview(null);
       setUploadName('');
@@ -238,10 +306,9 @@ export const HeritageCatalog: React.FC = () => {
       setUploadMaterial('');
       setAiSuggestion(null);
 
-      // Auto switch to closet tab to inspect
       setTimeout(() => {
         setMainTab('closet');
-      }, 1200);
+      }, 1000);
     } catch (err: any) {
       setUploadStatus({
         loading: false,
@@ -257,20 +324,19 @@ export const HeritageCatalog: React.FC = () => {
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-1">
             <span className="text-[11px] font-mono text-[#D8B454] uppercase font-bold tracking-widest">
-              VIỆT PHỤC REMIX · KHO TƯ LIỆU VĂN HÓA
+              VIỆT PHỤC REMIX · KHO TƯ LIỆU VĂN HÓA CHUẨN HÓA V2
             </span>
             <h1 className="text-2xl sm:text-3xl font-serif font-bold text-white">
               Thư Viện Trang Phục & Tủ Đồ Di Sản
             </h1>
-            <p className="text-xs sm:text-sm text-stone-100 max-w-xl">
-              Nguồn tư liệu chuẩn mực của 54 dân tộc và triều đại Việt Nam, kết hợp cùng Tủ đồ cá nhân của bạn
+            <p className="text-xs sm:text-sm text-stone-100 max-w-2xl leading-relaxed">
+              Dữ liệu chuẩn hóa gồm 77 món trang phục độc lập, 21 tổ hợp tham khảo, 83 liên kết thành phần, 168 quy tắc tương thích có phạm vi và 14 cờ thẩm định chuyên khảo.
             </p>
           </div>
 
-          {/* Quick upload trigger CTA */}
           <button
             onClick={() => setMainTab('closet')}
-            className="flex items-center gap-2 px-5 py-3 rounded-xl bg-[#D8B454] hover:bg-[#c9a33e] text-stone-900 text-xs font-label-md font-bold shadow-md transition-all cursor-pointer"
+            className="flex items-center gap-2 px-5 py-3 rounded-xl bg-[#D8B454] hover:bg-[#c9a33e] text-stone-900 text-xs font-label-md font-bold shadow-md transition-all cursor-pointer shrink-0"
           >
             <Upload className="w-4 h-4" />
             <span>Thêm Đồ Cá Nhân Vào Tủ</span>
@@ -278,48 +344,60 @@ export const HeritageCatalog: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. Main 3 Tabs: Items | Outfits | Collection + Personal Closet */}
+      {/* 2. Main Navigation Tabs */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#e9e8e3] pb-3">
         <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
           <button
             onClick={() => setMainTab('items')}
-            className={`px-4 py-2 rounded-xl font-label-md font-bold transition-all cursor-pointer shrink-0 flex items-center gap-2 ${
+            className={`px-4 py-2.5 rounded-xl font-label-md font-bold transition-all cursor-pointer shrink-0 flex items-center gap-2 ${
               mainTab === 'items'
                 ? 'bg-[#2D533F] text-white shadow-xs'
                 : 'bg-white text-[#414942] hover:bg-[#f5f4ef] border border-[#e9e8e3]'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            <span>Items (Các món rời · {heritageItems.length})</span>
+            <span>Items (Món rời · {heritageItems.length})</span>
           </button>
 
           <button
             onClick={() => setMainTab('outfits')}
-            className={`px-4 py-2 rounded-xl font-label-md font-bold transition-all cursor-pointer shrink-0 flex items-center gap-2 ${
+            className={`px-4 py-2.5 rounded-xl font-label-md font-bold transition-all cursor-pointer shrink-0 flex items-center gap-2 ${
               mainTab === 'outfits'
                 ? 'bg-[#2D533F] text-white shadow-xs'
                 : 'bg-white text-[#414942] hover:bg-[#f5f4ef] border border-[#e9e8e3]'
             }`}
           >
             <Sparkles className="w-3.5 h-3.5 text-[#D8B454]" />
-            <span>Outfits (Bộ phối tiêu biểu)</span>
+            <span>Outfits (Tổ hợp tham khảo · {NORMALIZED_OUTFITS.length})</span>
           </button>
 
           <button
-            onClick={() => setMainTab('collections')}
-            className={`px-4 py-2 rounded-xl font-label-md font-bold transition-all cursor-pointer shrink-0 flex items-center gap-2 ${
-              mainTab === 'collections'
+            onClick={() => setMainTab('reviewFlags')}
+            className={`px-4 py-2.5 rounded-xl font-label-md font-bold transition-all cursor-pointer shrink-0 flex items-center gap-2 ${
+              mainTab === 'reviewFlags'
                 ? 'bg-[#2D533F] text-white shadow-xs'
                 : 'bg-white text-[#414942] hover:bg-[#f5f4ef] border border-[#e9e8e3]'
             }`}
           >
-            <FolderOpen className="w-3.5 h-3.5" />
-            <span>Collection (Bộ sưu tập · {MOCK_COLLECTIONS.length})</span>
+            <ShieldAlert className="w-3.5 h-3.5 text-amber-600" />
+            <span>Thẩm định & Rà soát ({NORMALIZED_REVIEW_FLAGS.length})</span>
+          </button>
+
+          <button
+            onClick={() => setMainTab('sources')}
+            className={`px-4 py-2.5 rounded-xl font-label-md font-bold transition-all cursor-pointer shrink-0 flex items-center gap-2 ${
+              mainTab === 'sources'
+                ? 'bg-[#2D533F] text-white shadow-xs'
+                : 'bg-white text-[#414942] hover:bg-[#f5f4ef] border border-[#e9e8e3]'
+            }`}
+          >
+            <BookOpen className="w-3.5 h-3.5 text-blue-600" />
+            <span>Tư liệu nguồn ({NORMALIZED_SOURCES.length})</span>
           </button>
 
           <button
             onClick={() => setMainTab('closet')}
-            className={`px-4 py-2 rounded-xl font-label-md font-bold transition-all cursor-pointer shrink-0 flex items-center gap-2 ${
+            className={`px-4 py-2.5 rounded-xl font-label-md font-bold transition-all cursor-pointer shrink-0 flex items-center gap-2 ${
               mainTab === 'closet'
                 ? 'bg-[#A03F30] text-white shadow-xs'
                 : 'bg-white text-[#A03F30] hover:bg-[#f5f4ef] border border-[#e9e8e3]'
@@ -331,75 +409,77 @@ export const HeritageCatalog: React.FC = () => {
         </div>
 
         <span className="text-xs text-[#717971] font-mono shrink-0">
-          {mainTab === 'items' && `${filteredHeritageItems.length} món phù hợp bộ lọc`}
+          {mainTab === 'items' && `${filteredHeritageItems.length} / ${heritageItems.length} món phù hợp`}
+          {mainTab === 'outfits' && `${filteredOutfits.length} / ${NORMALIZED_OUTFITS.length} bộ tham chiếu`}
         </span>
       </div>
 
-      {/* 3. TAB CONTENT */}
-
-      {/* --- TAB 1: ITEMS (CÁC MÓN RỜI THEO 8 DANH MỤC) --- */}
+      {/* 3. TAB 1: ITEMS (77 MÓN RỜI CHUẨN HÓA) */}
       {mainTab === 'items' && (
         <div className="space-y-6">
-          {/* Sub-Category Filter Bar (8 Categories: Áo, Quần, Váy, Khăn, Mũ, Giày, Trang sức, Phụ kiện) */}
-          <div className="p-4 bg-white rounded-2xl border border-[#e9e8e3] space-y-3.5 shadow-xs">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-label-md font-bold uppercase tracking-wider text-[#1a1c1a]">
-                Phân Loại Trang Phục & Phụ Kiện:
-              </span>
-              {selectedCategory !== 'all' && (
+          {/* Filters Bar */}
+          <div className="p-5 bg-white rounded-2xl border border-[#e9e8e3] space-y-4 shadow-xs">
+            {/* Category pills */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-label-md font-bold uppercase tracking-wider text-[#1a1c1a]">
+                  Phân Loại Trang Phục:
+                </span>
+                {selectedCategory !== 'all' && (
+                  <button
+                    onClick={() => setSelectedCategory('all')}
+                    className="text-xs text-[#A03F30] hover:underline cursor-pointer"
+                  >
+                    Xem tất cả loại
+                  </button>
+                )}
+              </div>
+
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
                 <button
                   onClick={() => setSelectedCategory('all')}
-                  className="text-xs text-[#A03F30] hover:underline"
+                  className={`px-3 py-1.5 rounded-xl font-label-md font-semibold shrink-0 cursor-pointer transition-all ${
+                    selectedCategory === 'all'
+                      ? 'bg-[#2D533F] text-white shadow-xs'
+                      : 'bg-[#f5f4ef] text-[#414942] hover:bg-[#e9e8e3]'
+                  }`}
                 >
-                  Xóa lọc phân loại
+                  Tất cả ({heritageItems.length})
                 </button>
-              )}
+                {CATEGORIES.map((cat) => {
+                  const count = heritageItems.filter((i) => i.category === cat).length;
+                  return (
+                    <button
+                      key={cat}
+                      onClick={() => setSelectedCategory(cat as GarmentCategory)}
+                      className={`px-3 py-1.5 rounded-xl font-label-md font-semibold shrink-0 cursor-pointer transition-all ${
+                        selectedCategory === cat
+                          ? 'bg-[#2D533F] text-white shadow-xs'
+                          : 'bg-[#f5f4ef] text-[#414942] hover:bg-[#e9e8e3]'
+                      }`}
+                    >
+                      {cat} ({count})
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
-            {/* Category Pills */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
-              <button
-                onClick={() => setSelectedCategory('all')}
-                className={`px-3.5 py-1.5 rounded-xl font-label-md font-semibold shrink-0 cursor-pointer transition-all ${
-                  selectedCategory === 'all'
-                    ? 'bg-[#2D533F] text-white shadow-xs'
-                    : 'bg-[#f5f4ef] text-[#414942] hover:bg-[#e9e8e3]'
-                }`}
-              >
-                Tất cả ({heritageItems.length})
-              </button>
-
-              {CATEGORIES.map((cat) => {
-                const count = heritageItems.filter((i) => i.category === cat).length;
-                return (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`px-3.5 py-1.5 rounded-xl font-label-md font-semibold shrink-0 cursor-pointer transition-all ${
-                      selectedCategory === cat
-                        ? 'bg-[#2D533F] text-white shadow-xs'
-                        : 'bg-[#f5f4ef] text-[#414942] hover:bg-[#e9e8e3]'
-                    }`}
-                  >
-                    {cat} ({count})
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Filter Bar: Ethnic Group & Search */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1 border-t border-[#efeee9]">
-              <div className="relative flex-1">
+            {/* Dropdown Filters & Search */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-3 border-t border-[#efeee9]">
+              {/* Search */}
+              <div className="relative">
                 <Search className="w-4 h-4 absolute left-3 top-3 text-[#717971]" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Tìm kiếm theo tên áo, hoa văn, sa đoạn, bạc, lanh..."
+                  placeholder="Tìm theo tên, ID, hoa văn..."
                   className="w-full bg-[#fbf9f4] border border-[#e9e8e3] rounded-xl pl-9 pr-3 py-2 text-xs text-[#1a1c1a] focus:outline-none focus:border-[#2D533F]"
                 />
               </div>
 
+              {/* Ethnic group */}
               <select
                 value={selectedEthnic}
                 onChange={(e) => setSelectedEthnic(e.target.value)}
@@ -408,11 +488,65 @@ export const HeritageCatalog: React.FC = () => {
                 <option value="all">Tất cả dân tộc & triều đại</option>
                 {ETHNIC_GROUPS.map((eth) => (
                   <option key={eth} value={eth}>
-                    Dân tộc {eth}
+                    {eth}
+                  </option>
+                ))}
+              </select>
+
+              {/* Subgroup */}
+              <select
+                value={selectedSubgroup}
+                onChange={(e) => setSelectedSubgroup(e.target.value)}
+                className="bg-[#fbf9f4] border border-[#e9e8e3] rounded-xl px-3 py-2 text-xs text-[#1a1c1a] focus:outline-none focus:border-[#2D533F]"
+              >
+                <option value="all">Tất cả phân nhóm (Subgroup)</option>
+                {SUBGROUPS.map((sub) => (
+                  <option key={sub} value={sub}>
+                    {sub}
+                  </option>
+                ))}
+              </select>
+
+              {/* Outfit filter */}
+              <select
+                value={selectedOutfitFilter}
+                onChange={(e) => setSelectedOutfitFilter(e.target.value)}
+                className="bg-[#fbf9f4] border border-[#e9e8e3] rounded-xl px-3 py-2 text-xs text-[#1a1c1a] focus:outline-none focus:border-[#2D533F]"
+              >
+                <option value="all">Tất cả bộ tham chiếu (Outfits)</option>
+                {NORMALIZED_OUTFITS.map((o) => (
+                  <option key={o.outfit_id} value={o.outfit_id}>
+                    {o.normalized_name}
                   </option>
                 ))}
               </select>
             </div>
+
+            {/* Reset button if active filters */}
+            {(selectedCategory !== 'all' ||
+              selectedEthnic !== 'all' ||
+              selectedSubgroup !== 'all' ||
+              selectedOutfitFilter !== 'all' ||
+              searchQuery.trim()) && (
+              <div className="pt-2 flex items-center justify-between text-xs border-t border-[#efeee9]">
+                <span className="text-[#717971]">
+                  Đang lọc {filteredHeritageItems.length} kết quả
+                </span>
+                <button
+                  onClick={() => {
+                    setSelectedCategory('all');
+                    setSelectedEthnic('all');
+                    setSelectedSubgroup('all');
+                    setSelectedOutfitFilter('all');
+                    setSearchQuery('');
+                  }}
+                  className="text-[#A03F30] font-semibold hover:underline cursor-pointer flex items-center gap-1"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  <span>Xóa tất cả bộ lọc</span>
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Garments Card Grid */}
@@ -420,69 +554,73 @@ export const HeritageCatalog: React.FC = () => {
             {filteredHeritageItems.map((item) => (
               <div
                 key={item.id}
-                className="bg-white rounded-3xl border border-[#e9e8e3] overflow-hidden hover:border-[#2D533F]/50 hover:shadow-lg transition-all flex flex-col group"
+                className="bg-white rounded-3xl border border-[#e9e8e3] overflow-hidden hover:border-[#2D533F]/50 hover:shadow-lg transition-all flex flex-col justify-between group"
               >
-                {/* Image Frame */}
-                <div className="relative aspect-[4/3] bg-[#f5f4ef] p-3 overflow-hidden flex items-center justify-center">
-                  <img
-                    src={item.image_url}
-                    alt={item.name}
-                    className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500"
-                  />
-
-                  {/* Badges */}
-                  <div className="absolute top-4 left-4 flex items-center gap-1.5">
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-label-sm font-bold bg-[#2D533F] text-white">
-                      {item.category}
-                    </span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-label-sm bg-black/60 text-white font-semibold">
-                      {item.ethnic_group}
-                    </span>
-                  </div>
-
-                  {item.color_hex && (
-                    <span
-                      className="absolute top-4 right-4 w-4 h-4 rounded-full border-2 border-white shadow-xs"
-                      style={{ backgroundColor: item.color_hex }}
-                      title={`Mã màu: ${item.color_hex}`}
+                <div>
+                  {/* Image Frame with Neutral SVG Placeholder */}
+                  <div className="relative aspect-[4/3] bg-[#FAF8F5] p-2 overflow-hidden flex items-center justify-center border-b border-[#efeee9]">
+                    <img
+                      src={item.image_url}
+                      alt={item.name}
+                      className="w-full h-full object-contain rounded-2xl group-hover:scale-102 transition-transform duration-300"
                     />
-                  )}
-                </div>
 
-                {/* Info & Metadata */}
-                <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between text-[11px] text-[#717971]">
-                      <span className="truncate">{item.period_or_region}</span>
-                      <span className="font-mono text-[#755b00] font-semibold text-[10px]">
-                        {item.cross_cultural_flag ? 'Giao thoa' : 'Nguyên bản'}
+                    {/* Top badging */}
+                    <div className="absolute top-3 left-3 flex flex-wrap gap-1 max-w-[85%]">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#2D533F] text-white">
+                        {item.category}
                       </span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] bg-black/70 text-white font-medium">
+                        {item.ethnic_group || item.culturalGroup}
+                      </span>
+                      {item.subgroup && (
+                        <span className="px-2 py-0.5 rounded-full text-[9px] bg-amber-800 text-white font-medium">
+                          {item.subgroup}
+                        </span>
+                      )}
                     </div>
 
-                    <h3 className="font-serif font-bold text-sm sm:text-base text-[#1a1c1a] group-hover:text-[#2D533F] transition-colors line-clamp-1">
-                      {item.name}
-                    </h3>
-
-                    <p className="text-xs text-[#414942] line-clamp-2 leading-relaxed font-sans">
-                      {item.pattern_description || item.cultural_significance}
-                    </p>
+                    {/* Stable ID Badge */}
+                    <div className="absolute bottom-3 left-3">
+                      <span className="px-2 py-0.5 rounded-md bg-stone-900/80 text-[9px] font-mono text-stone-200">
+                        {item.id}
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Verification Notice */}
-                  <div className="pt-2 border-t border-[#efeee9] text-[10px] text-[#717971] flex items-center justify-between">
-                    <span className="truncate max-w-[180px]">
-                      Nguồn: {item.source_verification}
-                    </span>
-                    {item.ritual_level === 'sacred_ritual' && (
-                      <span className="text-[#a03f30] font-bold">Tế tự</span>
+                  {/* Card Content */}
+                  <div className="p-4 space-y-2.5">
+                    <div>
+                      <h3 className="font-serif font-bold text-base text-[#1a1c1a] group-hover:text-[#2D533F] transition-colors line-clamp-1">
+                        {item.name}
+                      </h3>
+                      <p className="text-xs text-[#414942] line-clamp-2 leading-relaxed mt-1">
+                        {item.cultural_significance || item.culturalContext}
+                      </p>
+                    </div>
+
+                    {/* Verification status */}
+                    <div className="pt-1">
+                      {getStatusBadge(item.verificationStatus || item.verification_status)}
+                    </div>
+
+                    {/* Belongs to outfit membership */}
+                    {item.belongs_to_outfit_ids && item.belongs_to_outfit_ids.length > 0 && (
+                      <div className="pt-1">
+                        <span className="text-[10px] text-[#717971] block font-mono">
+                          Tổ hợp: {item.belongs_to_outfit_ids.join(', ')}
+                        </span>
+                      </div>
                     )}
                   </div>
+                </div>
 
-                  {/* Actions */}
-                  <div className="pt-1 flex items-center gap-2">
+                {/* Card Actions */}
+                <div className="p-4 pt-0">
+                  <div className="pt-3 border-t border-[#efeee9] flex items-center gap-2">
                     <button
                       onClick={() => handleEquipItem(item)}
-                      className="flex-1 py-1.5 px-3 bg-[#2D533F] hover:bg-[#456b56] text-white text-xs font-label-md font-bold rounded-xl transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1.5"
+                      className="flex-1 py-2 px-3 bg-[#2D533F] hover:bg-[#456b56] text-white text-xs font-label-md font-bold rounded-xl transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1.5"
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>Phối vào Studio</span>
@@ -490,8 +628,8 @@ export const HeritageCatalog: React.FC = () => {
 
                     <button
                       onClick={() => setSelectedItemForDetail(item)}
-                      className="p-1.5 rounded-xl border border-[#e9e8e3] text-[#717971] hover:text-[#1a1c1a] hover:bg-[#f5f4ef] transition-colors cursor-pointer"
-                      title="Xem chi tiết di sản"
+                      className="p-2 rounded-xl border border-[#e9e8e3] text-[#717971] hover:text-[#1a1c1a] hover:bg-[#f5f4ef] transition-colors cursor-pointer"
+                      title="Xem hồ sơ di sản chi tiết"
                     >
                       <Info className="w-4 h-4" />
                     </button>
@@ -503,115 +641,153 @@ export const HeritageCatalog: React.FC = () => {
         </div>
       )}
 
-      {/* --- TAB 2: OUTFITS (BỘ PHỐI TIÊU BIỂU) --- */}
+      {/* 4. TAB 2: OUTFITS (21 TỔ HỢP THAM KHẢO CHUẨN HÓA) */}
       {mainTab === 'outfits' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {MOCK_COLLECTIONS.map((col) => {
-            const top = heritageItems.find((i) => i.id === col.sample_outfit.top_id);
-            const bottom = heritageItems.find((i) => i.id === col.sample_outfit.bottom_id);
-            const head = heritageItems.find((i) => i.id === col.sample_outfit.head_id);
-            const foot = heritageItems.find((i) => i.id === col.sample_outfit.footwear_id);
-
-            return (
-              <div
-                key={col.id}
-                className="bg-white rounded-3xl border border-[#e9e8e3] p-6 space-y-4 hover:shadow-xl transition-all flex flex-col justify-between"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-bold text-[#A03F30] uppercase">
-                      {col.period_or_ethnic}
-                    </span>
-                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#f5f4ef] text-[#717971] font-semibold">
-                      Bộ phối chuẩn mực
-                    </span>
-                  </div>
-
-                  <h3 className="text-xl font-serif font-bold text-[#1a1c1a]">{col.title}</h3>
-                  <p className="text-xs sm:text-sm text-[#414942] leading-relaxed">
-                    {col.description}
-                  </p>
-
-                  {/* Outfit Garment Previews */}
-                  <div className="grid grid-cols-4 gap-2.5 pt-2">
-                    {[head, top, bottom, foot].filter(Boolean).map((g) => (
-                      <div
-                        key={g!.id}
-                        onClick={() => setSelectedItemForDetail(g!)}
-                        className="rounded-xl overflow-hidden aspect-square bg-[#f5f4ef] border border-[#e9e8e3] relative group cursor-pointer"
-                      >
-                        <img
-                          src={g!.image_url}
-                          alt={g!.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                        />
-                        <span className="absolute bottom-1 inset-x-1 text-[9px] text-white bg-black/70 rounded px-1 py-0.5 truncate text-center">
-                          {g!.name}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t border-[#efeee9] flex items-center justify-between">
-                  <button
-                    onClick={() => {
-                      loadCollection(col.id);
-                      setActiveTab('studio');
-                    }}
-                    className="w-full py-2.5 px-4 bg-[#2D533F] hover:bg-[#456b56] text-white text-xs font-label-md font-bold rounded-xl transition-all shadow-md cursor-pointer flex items-center justify-center gap-2"
-                  >
-                    <span>Thử Bộ Phối Này Trong Studio</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* --- TAB 3: COLLECTIONS (BỘ SƯU TẬP VĂN HÓA) --- */}
-      {mainTab === 'collections' && (
         <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {MOCK_COLLECTIONS.map((c) => (
-              <div
-                key={c.id}
-                className="bg-white rounded-3xl border border-[#e9e8e3] overflow-hidden hover:shadow-xl transition-all flex flex-col group"
+          {/* Outfits Filter Bar */}
+          <div className="p-4 bg-white rounded-2xl border border-[#e9e8e3] flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
+            <div className="relative flex-1 w-full sm:w-auto">
+              <Search className="w-4 h-4 absolute left-3 top-3 text-[#717971]" />
+              <input
+                type="text"
+                value={outfitSearchQuery}
+                onChange={(e) => setOutfitSearchQuery(e.target.value)}
+                placeholder="Tìm bộ tham chiếu theo tên, thời kỳ, dân tộc..."
+                className="w-full bg-[#fbf9f4] border border-[#e9e8e3] rounded-xl pl-9 pr-3 py-2 text-xs text-[#1a1c1a] focus:outline-none focus:border-[#2D533F]"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <select
+                value={outfitGroupFilter}
+                onChange={(e) => setOutfitGroupFilter(e.target.value)}
+                className="w-full sm:w-auto bg-[#fbf9f4] border border-[#e9e8e3] rounded-xl px-3 py-2 text-xs text-[#1a1c1a] focus:outline-none focus:border-[#2D533F]"
               >
-                {c.cover_image && (
-                  <div className="relative aspect-[16/9] overflow-hidden bg-stone-900">
-                    <img
-                      src={c.cover_image}
-                      alt={c.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                    <div className="absolute bottom-4 left-4 right-4 text-white">
-                      <span className="text-[10px] font-mono uppercase tracking-wider text-[#D8B454]">
-                        {c.period_or_ethnic}
+                <option value="all">Tất cả nhóm trang phục ({NORMALIZED_OUTFITS.length})</option>
+                {Array.from(new Set(NORMALIZED_OUTFITS.map((o) => o.group))).map((grp) => (
+                  <option key={grp} value={grp}>
+                    {grp}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Outfits List Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {filteredOutfits.map((outfit) => (
+              <div
+                key={outfit.outfit_id}
+                className="bg-white rounded-3xl border border-[#e9e8e3] p-6 space-y-5 hover:shadow-xl transition-all flex flex-col justify-between"
+              >
+                <div className="space-y-4">
+                  {/* Top Bar */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#efeee9] pb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-mono font-bold text-[#A03F30] uppercase">
+                        {outfit.group} {outfit.subgroup && `· ${outfit.subgroup}`}
                       </span>
-                      <h3 className="text-xl font-serif font-bold">{c.title}</h3>
-                      <p className="text-xs text-stone-200 italic">{c.subtitle}</p>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-stone-100 text-stone-700">
+                        {outfit.outfit_id}
+                      </span>
+                    </div>
+                    {getStatusBadge(outfit.status)}
+                  </div>
+
+                  {/* Title & History */}
+                  <div>
+                    <h3 className="text-xl font-serif font-bold text-[#1a1c1a]">
+                      {outfit.normalized_name}
+                    </h3>
+                    <p className="text-xs text-[#414942] leading-relaxed mt-2">
+                      {outfit.history}
+                    </p>
+                  </div>
+
+                  {/* Cautions Alert */}
+                  {outfit.cautions && (
+                    <div className="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200/80 text-xs flex items-start gap-2">
+                      <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                      <div className="space-y-0.5">
+                        <span className="font-semibold text-amber-900 block">Lưu ý thẩm định:</span>
+                        <p className="text-amber-800 leading-relaxed">{outfit.cautions}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Components Breakdown */}
+                  <div className="space-y-2 pt-1">
+                    <span className="text-xs font-label-md font-bold uppercase tracking-wider text-[#1a1c1a] block">
+                      Thành phần tổ hợp ({outfit.components.length} món):
+                    </span>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {outfit.components.map((comp) => {
+                        const itemObj = heritageItems.find((i) => i.id === comp.item_id);
+                        return (
+                          <div
+                            key={comp.item_id}
+                            onClick={() => itemObj && setSelectedItemForDetail(itemObj)}
+                            className="p-2.5 rounded-xl bg-[#FAF8F5] border border-[#e9e8e3] hover:border-[#2D533F] transition-colors cursor-pointer space-y-1"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-serif font-bold text-xs text-[#1a1c1a] truncate">
+                                {comp.item_name}
+                              </span>
+                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#2D533F]/10 text-[#2D533F] font-semibold">
+                                {comp.slot}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between text-[10px] text-[#717971]">
+                              <span className="italic">{comp.role}</span>
+                              {comp.alternative_group && (
+                                <span className="text-amber-700 font-mono">
+                                  alt: {comp.alternative_group}
+                                </span>
+                              )}
+                            </div>
+                            {comp.condition && (
+                              <p className="text-[10px] text-stone-600 line-clamp-1 italic">
+                                {comp.condition}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
-                )}
 
-                <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                  <p className="text-xs sm:text-sm text-[#414942] leading-relaxed">
-                    {c.description}
-                  </p>
+                  {/* Sources citation */}
+                  {outfit.source_urls && outfit.source_urls.length > 0 && (
+                    <div className="text-[10px] text-stone-500 pt-1">
+                      <span>Nguồn tham chiếu: </span>
+                      {outfit.source_urls.map((url, idx) => (
+                        <a
+                          key={idx}
+                          href={url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-blue-700 hover:underline mr-2 inline-flex items-center gap-0.5"
+                        >
+                          <span>Tư liệu [{idx + 1}]</span>
+                          <ExternalLink className="w-2.5 h-2.5" />
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
 
+                {/* Action button */}
+                <div className="pt-4 border-t border-[#efeee9]">
                   <button
                     onClick={() => {
-                      loadCollection(c.id);
+                      loadCollection(outfit.outfit_id);
                       setActiveTab('studio');
                     }}
-                    className="w-full py-2.5 bg-[#D8B454] hover:bg-[#c9a33e] text-stone-900 text-xs font-label-md font-bold rounded-xl transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1.5"
+                    className="w-full py-3 px-4 bg-[#2D533F] hover:bg-[#456b56] text-white text-xs font-label-md font-bold rounded-xl transition-all shadow-md cursor-pointer flex items-center justify-center gap-2"
                   >
-                    <span>Mở Bộ Sưu Tập Trong Studio</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <span>Thử bộ phối này trong Studio</span>
+                    <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -620,10 +796,132 @@ export const HeritageCatalog: React.FC = () => {
         </div>
       )}
 
-      {/* --- TAB 4: PERSONAL CLOSET & IN-APP UPLOAD (TỦ ĐỒ CÁ NHÂN BẢO LƯU) --- */}
+      {/* 5. TAB 3: REVIEW FLAGS (14 CỜ RÀ SOÁT & THẨM ĐỊNH) */}
+      {mainTab === 'reviewFlags' && (
+        <div className="space-y-6">
+          <div className="p-4 bg-white rounded-2xl border border-[#e9e8e3] flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
+            <div className="space-y-0.5">
+              <h3 className="font-serif font-bold text-base text-[#1a1c1a]">
+                Danh Mục Cờ Thẩm Định & Rà Soát Học Thuật ({NORMALIZED_REVIEW_FLAGS.length} bản ghi)
+              </h3>
+              <p className="text-xs text-[#717971]">
+                Ghi nhận các điểm cần nguồn bổ sung, phân biệt biến thể địa phương và ngăn chặn suy diễn tùy tiện.
+              </p>
+            </div>
+
+            <select
+              value={reviewStatusFilter}
+              onChange={(e) => setReviewStatusFilter(e.target.value)}
+              className="bg-[#fbf9f4] border border-[#e9e8e3] rounded-xl px-3 py-2 text-xs text-[#1a1c1a] focus:outline-none focus:border-[#2D533F]"
+            >
+              <option value="all">Tất cả trạng thái ({NORMALIZED_REVIEW_FLAGS.length})</option>
+              {Array.from(new Set(NORMALIZED_REVIEW_FLAGS.map((f) => f.status))).map((st) => (
+                <option key={st} value={st}>
+                  {st}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {filteredReviewFlags.map((flag) => (
+              <div
+                key={flag.id}
+                className="bg-white rounded-2xl border border-[#e9e8e3] p-5 space-y-3 shadow-xs hover:border-[#2D533F]/40 transition-colors"
+              >
+                <div className="flex items-center justify-between border-b border-[#efeee9] pb-2">
+                  <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-amber-100 text-amber-900">
+                    {flag.id}
+                  </span>
+                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-stone-100 text-stone-700">
+                    {flag.status}
+                  </span>
+                </div>
+
+                <h4 className="font-serif font-bold text-base text-[#1a1c1a]">
+                  {flag.topic}
+                </h4>
+
+                <div className="space-y-1.5 text-xs">
+                  <div className="p-2.5 rounded-xl bg-red-50/60 border border-red-100 text-red-900 space-y-0.5">
+                    <span className="font-semibold block text-[11px] uppercase tracking-wider text-red-800">
+                      Vấn đề rà soát:
+                    </span>
+                    <p className="leading-relaxed">{flag.issue}</p>
+                  </div>
+
+                  <div className="p-2.5 rounded-xl bg-emerald-50/60 border border-emerald-100 text-emerald-900 space-y-0.5">
+                    <span className="font-semibold block text-[11px] uppercase tracking-wider text-emerald-800">
+                      Hành động chuẩn hóa:
+                    </span>
+                    <p className="leading-relaxed">{flag.action}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 6. TAB 4: RESEARCH SOURCES (23 NGUỒN KHẢO CỨU) */}
+      {mainTab === 'sources' && (
+        <div className="space-y-6">
+          <div className="p-4 bg-white rounded-2xl border border-[#e9e8e3] shadow-xs space-y-1">
+            <h3 className="font-serif font-bold text-base text-[#1a1c1a]">
+              Thư Mục Nguồn & Tư Liệu Khảo Cứu ({NORMALIZED_SOURCES.length} nguồn)
+            </h3>
+            <p className="text-xs text-[#717971]">
+              Hệ thống thư viện tham chiếu trực tiếp từ Bảo tàng Lịch sử Quốc gia, Bảo tàng Phụ nữ Việt Nam, Đài Tiếng nói Việt Nam (VOV4) và các công trình chuyên khảo.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {NORMALIZED_SOURCES.map((src) => (
+              <div
+                key={src.source_id}
+                className="bg-white rounded-2xl border border-[#e9e8e3] p-5 space-y-3 shadow-xs flex flex-col justify-between hover:border-[#2D533F]/40 transition-colors"
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200">
+                      {src.source_id}
+                    </span>
+                    <span className="text-[11px] font-semibold text-stone-600 truncate max-w-[180px]">
+                      {src.publisher}
+                    </span>
+                  </div>
+
+                  <h4 className="font-serif font-bold text-sm text-[#1a1c1a] leading-snug">
+                    {src.title}
+                  </h4>
+
+                  <p className="text-xs text-[#414942] leading-relaxed bg-[#fbf9f4] p-2.5 rounded-xl border border-[#efeee9]">
+                    <span className="font-semibold text-stone-700 block mb-0.5">Sử dụng cho:</span>
+                    {src.use_for}
+                  </p>
+                </div>
+
+                <div className="pt-3 border-t border-[#efeee9]">
+                  <a
+                    href={src.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full py-2 px-3 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-medium transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <span>Truy cập nguồn tài liệu</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 7. TAB 5: PERSONAL CLOSET & IN-APP UPLOAD */}
       {mainTab === 'closet' && (
         <div className="space-y-8">
-          {/* Section A: Upload New Item Form */}
+          {/* Upload Form */}
           <div className="bg-white rounded-3xl border border-[#e9e8e3] p-6 sm:p-8 shadow-xs space-y-6">
             <div className="border-b border-[#efeee9] pb-4">
               <span className="text-[11px] font-mono text-[#A03F30] font-bold uppercase tracking-wider">
@@ -687,7 +985,6 @@ export const HeritageCatalog: React.FC = () => {
                     )}
                   </div>
 
-                  {/* AI Vision Classification Trigger */}
                   {uploadPreview && (
                     <button
                       type="button"
@@ -696,14 +993,13 @@ export const HeritageCatalog: React.FC = () => {
                       className="w-full py-2.5 px-4 rounded-xl bg-[#2D533F] hover:bg-[#456b56] disabled:opacity-50 text-white text-xs font-label-md font-bold transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <Wand2 className="w-4 h-4 text-[#D8B454]" />
-                      <span>{isClassifying ? 'AI đang phân tích ảnh...' : 'AI phân loại & giám định ảnh'}</span>
+                      <span>{isClassifying ? 'AI đang phân tích ảnh...' : 'AI phân loại & gợi ý'}</span>
                     </button>
                   )}
                 </div>
 
-                {/* Metadata Fields & User Confirmation (7 Cols) */}
+                {/* Form fields (7 Cols) */}
                 <div className="lg:col-span-7 space-y-4">
-                  {/* Name field */}
                   <div className="space-y-1">
                     <label className="text-xs font-label-md font-bold text-[#1a1c1a]">
                       Tên trang phục / món đồ *
@@ -718,7 +1014,6 @@ export const HeritageCatalog: React.FC = () => {
                     />
                   </div>
 
-                  {/* Category Selector (8 categories) */}
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1">
                       <label className="text-xs font-label-md font-bold text-[#1a1c1a]">
@@ -729,9 +1024,9 @@ export const HeritageCatalog: React.FC = () => {
                         onChange={(e) => setUploadCategory(e.target.value as GarmentCategory)}
                         className="w-full bg-[#fbf9f4] border border-[#e9e8e3] rounded-xl px-3 py-2 text-xs text-[#1a1c1a] focus:outline-none focus:border-[#2D533F]"
                       >
-                        {CATEGORIES.map((cat) => (
-                          <option key={cat} value={cat}>
-                            {cat}
+                        {CATEGORIES.map((c) => (
+                          <option key={c} value={c}>
+                            {c}
                           </option>
                         ))}
                       </select>
@@ -739,40 +1034,19 @@ export const HeritageCatalog: React.FC = () => {
 
                     <div className="space-y-1">
                       <label className="text-xs font-label-md font-bold text-[#1a1c1a]">
-                        Màu sắc chủ đạo
-                      </label>
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="color"
-                          value={uploadColorHex}
-                          onChange={(e) => setUploadColorHex(e.target.value)}
-                          className="w-8 h-8 rounded-lg cursor-pointer border border-[#e9e8e3] p-0.5 bg-white"
-                        />
-                        <input
-                          type="text"
-                          value={uploadColorHex}
-                          onChange={(e) => setUploadColorHex(e.target.value)}
-                          className="flex-1 bg-[#fbf9f4] border border-[#e9e8e3] rounded-xl px-3 py-1.5 text-xs font-mono text-[#1a1c1a]"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Cultural group & Material */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <label className="text-xs font-label-md font-bold text-[#1a1c1a]">
-                        Dân tộc / Phong cách
+                        Dân tộc / Văn hóa
                       </label>
                       <input
                         type="text"
                         value={uploadEthnicGroup}
                         onChange={(e) => setUploadEthnicGroup(e.target.value)}
-                        placeholder="Kinh, H'Mông, Đương đại..."
+                        placeholder="Kinh, H'Mông, Chăm..."
                         className="w-full bg-[#fbf9f4] border border-[#e9e8e3] rounded-xl px-3 py-2 text-xs text-[#1a1c1a] focus:outline-none focus:border-[#2D533F]"
                       />
                     </div>
+                  </div>
 
+                  <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1">
                       <label className="text-xs font-label-md font-bold text-[#1a1c1a]">
                         Chất liệu
@@ -781,68 +1055,64 @@ export const HeritageCatalog: React.FC = () => {
                         type="text"
                         value={uploadMaterial}
                         onChange={(e) => setUploadMaterial(e.target.value)}
-                        placeholder="Lụa, tơ tằm, lanh, đũi..."
+                        placeholder="Lụa, tơ tằm, sa đoạn..."
                         className="w-full bg-[#fbf9f4] border border-[#e9e8e3] rounded-xl px-3 py-2 text-xs text-[#1a1c1a] focus:outline-none focus:border-[#2D533F]"
                       />
                     </div>
+
+                    <div className="space-y-1">
+                      <label className="text-xs font-label-md font-bold text-[#1a1c1a]">
+                        Mã màu đại diện
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={uploadColorHex}
+                          onChange={(e) => setUploadColorHex(e.target.value)}
+                          className="w-9 h-9 rounded-lg border border-[#e9e8e3] cursor-pointer"
+                        />
+                        <input
+                          type="text"
+                          value={uploadColorHex}
+                          onChange={(e) => setUploadColorHex(e.target.value)}
+                          className="w-full bg-[#fbf9f4] border border-[#e9e8e3] rounded-xl px-3 py-2 text-xs text-[#1a1c1a] font-mono"
+                        />
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Notes / Pattern description */}
                   <div className="space-y-1">
                     <label className="text-xs font-label-md font-bold text-[#1a1c1a]">
-                      Ghi chú / Mô tả hoa văn
+                      Ghi chú cá nhân
                     </label>
                     <textarea
                       rows={2}
                       value={uploadNotes}
                       onChange={(e) => setUploadNotes(e.target.value)}
-                      placeholder="Mô tả phom dáng, họa tiết hoặc kỷ niệm gắn liền..."
-                      className="w-full bg-[#fbf9f4] border border-[#e9e8e3] rounded-xl p-3 text-xs text-[#1a1c1a] focus:outline-none focus:border-[#2D533F]"
+                      placeholder="Ý nghĩa, hoàn cảnh xuất xứ hoặc kỷ niệm..."
+                      className="w-full bg-[#fbf9f4] border border-[#e9e8e3] rounded-xl px-3 py-2 text-xs text-[#1a1c1a] focus:outline-none focus:border-[#2D533F]"
                     />
                   </div>
 
-                  {/* AI Suggestion Box */}
-                  {aiSuggestion && (
-                    <div className="p-3.5 rounded-2xl bg-[#caa749]/15 border border-[#caa749]/40 space-y-1.5 text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="font-label-md font-bold text-[#755b00] flex items-center gap-1.5">
-                          <Sparkles className="w-3.5 h-3.5" />
-                          <span>Gợi ý giám định từ AI:</span>
-                        </span>
-                        <span className="text-[10px] text-[#717971]">Vui lòng xác nhận hoặc sửa lại</span>
-                      </div>
-                      <p className="text-[#414942]">
-                        <strong>Phom dáng:</strong> {aiSuggestion.silhouette} · <strong>Chất liệu:</strong> {aiSuggestion.material}
-                      </p>
-                      <p className="text-[#414942] italic">
-                        {aiSuggestion.cultural_compatibility}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Status Banner */}
                   {uploadStatus.error && (
-                    <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-800 text-xs flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4 shrink-0" />
-                      <span>{uploadStatus.error}</span>
+                    <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700">
+                      {uploadStatus.error}
                     </div>
                   )}
 
                   {uploadStatus.success && (
-                    <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 shrink-0" />
-                      <span>{uploadStatus.success}</span>
+                    <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-semibold">
+                      {uploadStatus.success}
                     </div>
                   )}
 
-                  {/* Submit Button */}
                   <div className="pt-2">
                     <button
                       type="submit"
                       disabled={uploadStatus.loading}
-                      className="w-full py-3 px-6 bg-[#A03F30] hover:bg-[#863528] disabled:opacity-50 text-white font-label-md font-bold text-xs rounded-xl transition-all shadow-md cursor-pointer flex items-center justify-center gap-2"
+                      className="w-full py-3 px-6 rounded-xl bg-[#2D533F] hover:bg-[#456b56] disabled:opacity-50 text-white text-xs font-label-md font-bold shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
                     >
-                      <Upload className="w-4 h-4" />
+                      <Plus className="w-4 h-4" />
                       <span>{uploadStatus.loading ? 'Đang lưu trữ...' : 'Lưu Vào Tủ Đồ Cá Nhân'}</span>
                     </button>
                   </div>
@@ -851,88 +1121,65 @@ export const HeritageCatalog: React.FC = () => {
             </form>
           </div>
 
-          {/* Section B: Personal Garments Gallery */}
+          {/* User's custom items grid */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-serif font-bold text-[#1a1c1a]">
-                  Các Món Trong Tủ Đồ Cá Nhân Của Bạn
-                </h3>
-                <p className="text-xs text-[#717971]">
-                  Các món này được lưu giữ riêng tư và luôn sẵn sàng để phối đồ trong Studio
-                </p>
-              </div>
-
-              <span className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-[#f5f4ef] text-[#414942]">
-                {customClosetItems.length} món đã lưu
-              </span>
-            </div>
+            <h3 className="text-lg font-serif font-bold text-[#1a1c1a]">
+              Món Đồ Cá Nhân Của Bạn ({customClosetItems.length})
+            </h3>
 
             {customClosetItems.length === 0 ? (
-              <div className="py-12 bg-white rounded-3xl border border-dashed border-[#c1c9bf] text-center space-y-2">
-                <div className="w-12 h-12 rounded-full bg-[#f5f4ef] text-[#717971] flex items-center justify-center mx-auto">
-                  <FolderOpen className="w-6 h-6" />
-                </div>
-                <h4 className="text-sm font-bold text-[#1a1c1a]">Tủ đồ cá nhân đang trống</h4>
-                <p className="text-xs text-[#717971] max-w-sm mx-auto">
-                  Hãy dùng biểu mẫu phía trên để tải lên hình ảnh áo dài, chân váy hoặc phụ kiện của bạn.
+              <div className="p-8 rounded-3xl bg-white border border-[#e9e8e3] text-center space-y-2">
+                <p className="text-xs sm:text-sm text-[#717971]">
+                  Bạn chưa thêm món đồ cá nhân nào vào tủ. Hãy tải lên ảnh món đồ của bạn ở biểu mẫu phía trên!
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 {customClosetItems.map((item) => (
                   <div
                     key={item.id}
-                    className="bg-white rounded-3xl border border-[#e9e8e3] overflow-hidden hover:shadow-md transition-all flex flex-col justify-between group"
+                    className="bg-white rounded-3xl border border-[#e9e8e3] overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
                   >
                     <div>
-                      <div className="relative aspect-[4/3] bg-[#f5f4ef] p-3 overflow-hidden flex items-center justify-center">
+                      <div className="relative aspect-[4/3] bg-stone-100 overflow-hidden">
                         <img
                           src={item.image_url}
                           alt={item.name}
-                          className="w-full h-full object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500"
+                          className="w-full h-full object-cover"
                         />
-                        <span className="absolute top-4 left-4 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#A03F30] text-white">
-                          {item.category}
+                        <span className="absolute top-3 left-3 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#A03F30] text-white">
+                          Cá nhân · {item.category}
                         </span>
-                        {item.color_hex && (
-                          <span
-                            className="absolute top-4 right-4 w-4 h-4 rounded-full border-2 border-white shadow-xs"
-                            style={{ backgroundColor: item.color_hex }}
-                          />
-                        )}
                       </div>
 
-                      <div className="p-4 space-y-2">
-                        <h4 className="font-serif font-bold text-sm text-[#1a1c1a] truncate">
+                      <div className="p-4 space-y-1">
+                        <h4 className="font-serif font-bold text-sm text-[#1a1c1a]">
                           {item.name}
                         </h4>
-                        <p className="text-xs text-[#414942] line-clamp-2">
-                          {item.pattern_description || item.material}
+                        <p className="text-xs text-[#717971] line-clamp-2">
+                          {item.notes || item.material || 'Đồ cá nhân tự tải lên'}
                         </p>
-                        <div className="text-[10px] text-[#717971] flex items-center justify-between pt-1">
-                          <span>Dân tộc: {item.ethnic_group}</span>
-                          <span className="font-mono text-[#D8B454]">Cá nhân</span>
-                        </div>
                       </div>
                     </div>
 
-                    <div className="p-4 pt-0 border-t border-[#efeee9] flex items-center gap-2">
-                      <button
-                        onClick={() => handleEquipItem(item)}
-                        className="flex-1 py-1.5 px-3 bg-[#2D533F] hover:bg-[#456b56] text-white text-xs font-label-md font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                        <span>Phối đồ</span>
-                      </button>
+                    <div className="p-4 pt-0">
+                      <div className="pt-2 border-t border-[#efeee9] flex items-center gap-2">
+                        <button
+                          onClick={() => handleEquipItem(item)}
+                          className="flex-1 py-1.5 px-3 bg-[#2D533F] hover:bg-[#456b56] text-white text-xs font-label-md font-bold rounded-xl transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Phối</span>
+                        </button>
 
-                      <button
-                        onClick={() => deletePersonalGarmentItem(item.id, user?.uid)}
-                        className="p-1.5 rounded-xl border border-[#e9e8e3] text-[#717971] hover:text-[#A03F30] hover:bg-red-50 transition-colors cursor-pointer"
-                        title="Xóa khỏi tủ đồ"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                        <button
+                          onClick={() => deletePersonalGarmentItem(item.id, user?.uid)}
+                          className="p-1.5 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                          title="Xóa món đồ này"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}

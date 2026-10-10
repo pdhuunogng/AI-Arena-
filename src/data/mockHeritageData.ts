@@ -1,700 +1,403 @@
-import { CostumeItem, HeritageCollection } from '../types/costume';
+import {
+  CostumeItem,
+  CostumeSlot,
+  HeritageCollection,
+  GarmentCategory,
+  NormalizedCatalog,
+  NormalizedOutfit,
+  ResearchSource,
+  ReviewFlag,
+  CompatibilityRule,
+  CompatibilityModel
+} from '../types/costume';
 
-export const MOCK_HERITAGE_ITEMS: CostumeItem[] = [
-  // --- TRIỀU NGUYỄN / KINH (HOÀNG TỘC & QUÝ TỘC) ---
-  {
-    id: 'nb-top-01',
-    name: 'Áo Nhật Bình Hoàng Tộc Triều Nguyễn',
-    slot: 'top',
-    category: 'Áo',
-    ethnic_group: 'Kinh',
-    period_or_region: 'Thời Nguyễn (Cung đình Huế)',
-    ritual_level: 'festive',
-    cross_cultural_flag: false,
-    color_hex: '#a03f30',
-    material: 'Sa đoạn dệt hoa tơ tằm thượng hạng kết chỉ vàng',
-    pattern_description: 'Cổ áo hình chữ nhật viền dải ngũ sắc (xanh, vàng, trắng, đỏ, đen), thêu phượng hoàng hàm thư, hoa cúc vạn thọ và thủy ba dập dềnh sóng nước.',
-    cultural_significance: 'Quy chế Nhật Bình định hình từ thời Gia Long, là thường phục tôn quý của Hoàng hậu, Công chúa và Cung tần trong các dịp triều hội, điển lễ lớn.',
-    source_verification: 'Khâm Định Đại Nam Hội Điển Sự Lệ & Bảo tàng Cổ vật Cung đình Huế',
-    image_url: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'Hoàng tộc Huế',
-    gender_affinity: 'nu'
-  },
-  {
-    id: 'nb-head-01',
-    name: 'Khăn Vành Dây Hoàng Hậu Gấp 30 Vòng',
-    slot: 'head',
-    category: 'Khăn',
-    ethnic_group: 'Kinh',
-    period_or_region: 'Thời Nguyễn (Cung đình Huế)',
-    ritual_level: 'festive',
-    cross_cultural_flag: false,
-    color_hex: '#F9CA24',
-    material: 'Lụa the vàng hoàng yến khổ hẹp quấn tròn thủ công',
-    pattern_description: 'Mặt the dệt vân mây chìm hoặc gấm hoa thảo, các vòng xếp chuẩn xác song song ôm trọn đỉnh đầu.',
-    cultural_significance: 'Biểu trưng quyền uy nội cung, nếp gấp thanh thoát thể hiện cốt cách đoan trang, nghiêm cẩn của phụ nữ cung đình xưa.',
-    source_verification: 'Ngàn Năm Áo Mũ (Trần Quang Đức, 2013)',
-    image_url: 'https://images.unsplash.com/photo-1611085583191-a3b181a88401?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'Hoàng tộc Huế',
-    gender_affinity: 'nu'
-  },
-  {
-    id: 'nb-bottom-01',
-    name: 'Váy Bạch Sa Đại Triều',
-    slot: 'bottom',
-    category: 'Váy',
-    ethnic_group: 'Kinh',
-    period_or_region: 'Thời Nguyễn (Cung đình Huế)',
-    ritual_level: 'festive',
-    cross_cultural_flag: false,
-    color_hex: '#F7F5F0',
-    material: 'Bạch sa tơ tằm dệt trơn lót lụa nõn chuối',
-    pattern_description: 'Vải lụa mỏng buông rủ phẳng phiu, gấu váy viền chỉ tơ vàng óng ánh.',
-    cultural_significance: 'Phối cùng áo Nhật Bình tạo nên nét tinh khiết, trang nhã, tương phản hài hòa với sắc đỏ son rực rỡ của tà áo ngoài.',
-    source_verification: 'Trang phục Triều Nguyễn (NXB Thuận Hóa, 2004)',
-    image_url: 'https://images.unsplash.com/photo-1582533561751-ef6f6ab93a2e?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'Hoàng tộc Huế',
-    gender_affinity: 'nu'
-  },
-  {
-    id: 'nb-foot-01',
-    name: 'Hài Thêu Phượng Hàm Thư Mũi Cong',
-    slot: 'footwear',
-    category: 'Giày',
-    ethnic_group: 'Kinh',
-    period_or_region: 'Thời Nguyễn (Cung đình Huế)',
-    ritual_level: 'festive',
-    cross_cultural_flag: false,
-    color_hex: '#6D214F',
-    material: 'Vải gấm nhung tím bọc đế gỗ trắc khâu da bò',
-    pattern_description: 'Mũi hài cong nhẹ thêu chỉ kim tuyến hình chim phượng ngậm giải lụa và đóa phù dung nở rộ.',
-    cultural_significance: 'Hài thêu chỉ dành riêng cho tầng lớp mệnh phụ hoàng gia, bước đi khoan thai phát ra phong thái tôn quý.',
-    source_verification: 'Bảo tàng Lịch sử Quốc gia Việt Nam',
-    image_url: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'Hoàng tộc Huế',
-    gender_affinity: 'nu'
-  },
-  {
-    id: 'nb-acc-01',
-    name: 'Kim Khánh & Kiềng Bạc Chạm Lộng Hoa Mai',
-    slot: 'accessories',
-    category: 'Trang sức',
-    ethnic_group: 'Kinh',
-    period_or_region: 'Thời Nguyễn (Cung đình Huế)',
-    ritual_level: 'festive',
-    cross_cultural_flag: true,
-    color_hex: '#E0E0E0',
-    material: 'Bạc ròng nguyên chất thếp vàng và đá mã não',
-    pattern_description: 'Chạm trổ hoa mai năm cánh, xâu chuỗi ngọc lục bảo và thẻ khánh ban thưởng khắc chữ Triều đình.',
-    cultural_significance: 'Tín vật ân sủng và trang sức hộ thân của giới quý tộc cung đình An Nam thế kỷ 19.',
-    source_verification: 'Cổ vật Huế (Trung tâm Bảo tồn Di tích Cố đô Huế)',
-    image_url: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'Hoàng tộc Huế',
-    gender_affinity: 'all'
-  },
+import rawCatalogJson from './viet_phuc_remix_normalized_catalog_v2.json';
 
-  // --- MŨ NÓN TRUYỀN THỐNG (CATEGORY: MŨ) ---
-  {
-    id: 'kinh-hat-non-ba-tam-001',
-    name: 'Nón Ba Tầm Quai Thao Dải Tơ Đen',
-    slot: 'head',
-    category: 'Mũ',
-    ethnic_group: 'Kinh',
-    period_or_region: 'Đồng bằng Bắc Bộ',
-    ritual_level: 'festive',
-    cross_cultural_flag: true,
-    color_hex: '#E5C378',
-    material: 'Lá cọ xâu chỉ cước, vành tre uốn tròn, dải quai thao tơ tằm đen đính tua rua đỏ',
-    pattern_description: 'Đường kính vành nón rộng phẳng phẳng phiu, mặt trong lọng chỉ ngũ sắc tinh xảo, dải quai thao buông rủ hai bên vai.',
-    cultural_significance: 'Biểu tượng kinh điển của người con gái Kinh Bắc và phụ nữ miền Bắc xưa trong hội làng, duyên dáng và thanh nhã.',
-    source_verification: 'Bảo tàng Phụ nữ Việt Nam',
-    image_url: '/assets/garments/kinh-hat-non-ba-tam-001.svg',
-    subgroup: 'Quan họ Kinh Bắc',
-    gender_affinity: 'nu'
-  },
-  {
-    id: 'kinh-hat-non-ngua-001',
-    name: 'Nón Ngựa Phú Gia Khảm Đồng',
-    slot: 'head',
-    category: 'Mũ',
-    ethnic_group: 'Kinh',
-    period_or_region: 'Bình Định (Nam Trung Bộ)',
-    ritual_level: 'festive',
-    cross_cultural_flag: true,
-    color_hex: '#C29B47',
-    material: 'Lá kè phơi sương, giang chẻ sợi mảnh, chóp nón bịt đồng chạm hoa văn chữ Thọ',
-    pattern_description: 'Sườn nón thêu chỉ màu chìm hoa sen và chim nhạn, chóp hình khối đúp đồng sáng bóng.',
-    cultural_significance: 'Di sản làng nghề 300 năm, thời Tây Sơn dùng cho nghĩa quân và giới quyền quý cưỡi ngựa.',
-    source_verification: 'Di sản Văn hóa Phi vật thể Quốc gia (Làng Nón Ngựa Phú Gia)',
-    image_url: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'Đất võ Bình Định',
-    gender_affinity: 'all'
-  },
-  {
-    id: 'kinh-hat-mu-ma-vi-001',
-    name: 'Mũ Mã Vĩ Đan Lông Đuôi Ngựa Cung Đình',
-    slot: 'head',
-    category: 'Mũ',
-    ethnic_group: 'Kinh',
-    period_or_region: 'Thời Nguyễn (Trung Bộ)',
-    ritual_level: 'festive',
-    cross_cultural_flag: true,
-    color_hex: '#1B1C19',
-    material: 'Lông đuôi ngựa tuyển chọn đan mắt lưới lục giác thông thoáng',
-    pattern_description: 'Phom trụ đứng hơi thu về đỉnh, mặt lưới mã vĩ bóng nhẹ màu đen mun thoát ẩm cực tốt.',
-    cultural_significance: 'Mũ đội thông dụng của văn quan, sĩ tử và tầng lớp nho sĩ triều Nguyễn vào mùa hạ oi ả.',
-    source_verification: 'Ngàn Năm Áo Mũ (Trần Quang Đức, 2013)',
-    image_url: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'Sĩ tộc Cố đô',
-    gender_affinity: 'nam'
-  },
+export const NORMALIZED_CATALOG = rawCatalogJson as unknown as NormalizedCatalog;
 
-  // --- ÁO TẤC & NGŨ THÂN (KINH BẮC BỘ & THỜI NGUYỄN) ---
-  {
-    id: 'tac-top-01',
-    name: 'Áo Tấc Ngũ Thân Tay Thụ Phẩm Lam',
-    slot: 'top',
-    category: 'Áo',
-    ethnic_group: 'Kinh',
-    period_or_region: 'Thời Nguyễn (Bắc Bộ & Trung Bộ)',
-    ritual_level: 'festive',
-    cross_cultural_flag: true,
-    color_hex: '#1E3799',
-    material: 'Lụa Vạn Phúc dệt chữ Thọ hoặc hoa văn Tứ Linh',
-    pattern_description: 'Áo năm thân cài năm khuy đồng bên hữu, tay thụng rộng một thước, cổ đứng cao 2 đốt ngón tay viền kép kín đáo.',
-    cultural_significance: 'Đại lễ phục của cả nam và nữ sĩ phu, quan viên và dân gian trong các nghi lễ trang trọng, cưới hỏi, tế tổ. Thể hiện đạo lý Tứ Thân Phụ Mẫu và ngũ thường.',
-    source_verification: 'Đại Nam Nhất Thống Chí & Nghiên cứu Trung tâm Văn hóa Tràng An',
-    image_url: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'Sĩ tộc Cố đô',
-    gender_affinity: 'all'
-  },
-  {
-    id: 'tac-head-01',
-    name: 'Khăn Đóng / Khăn Xếp Chữ Nhân',
-    slot: 'head',
-    category: 'Khăn',
-    ethnic_group: 'Kinh',
-    period_or_region: 'Bắc Bộ & Trung Bộ',
-    ritual_level: 'festive',
-    cross_cultural_flag: true,
-    color_hex: '#0C2461',
-    material: 'Vải the lụa đen hoặc xanh thẫm quấn trên cốt giấy bản',
-    pattern_description: 'Mặt trước khăn gập nếp tạo hình chữ "Nhân" (人) hoặc chữ "Nhất" (一), phía sau gập cân xứng.',
-    cultural_significance: 'Biểu tượng của nhân cách chính nhân quân tử, giữ gìn phong thái nho nhã mực thước của người Việt.',
-    source_verification: 'Trang phục Việt Nam (GS. Trần Lâm Biền, 2001)',
-    image_url: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'Văn hóa truyền thống',
-    gender_affinity: 'all'
-  },
-  {
-    id: 'tac-bottom-01',
-    name: 'Quần Bạch Sa Tơ Tằm Ống Rộng',
-    slot: 'bottom',
-    category: 'Quần',
-    ethnic_group: 'Kinh',
-    period_or_region: 'Bắc Bộ & Trung Bộ',
-    ritual_level: 'daily',
-    cross_cultural_flag: true,
-    color_hex: '#FFFFFF',
-    material: 'Lụa Bảo Lộc mềm nhẹ, dệt trơn tự nhiên',
-    pattern_description: 'Ống thụng rộng thanh thoát, cạp luồn dải rút chỉ tơ.',
-    cultural_significance: 'Trang phục mặc kèm quy chuẩn bắt buộc của áo dài năm thân, mang lại dáng đi mềm mại bay bổng.',
-    source_verification: 'Trang phục truyền thống Việt Nam qua tư liệu mỹ thuật',
-    image_url: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'Văn hóa truyền thống',
-    gender_affinity: 'all'
-  },
-  {
-    id: 'kinh-bottom-dui-001',
-    name: 'Quần Đũi Nhuộm Chàm Ống Đứng Tân Thời',
-    slot: 'bottom',
-    category: 'Quần',
-    ethnic_group: 'Kinh',
-    period_or_region: 'Đồng bằng Bắc Bộ',
-    ritual_level: 'daily',
-    cross_cultural_flag: true,
-    color_hex: '#2C3E50',
-    material: 'Sợi đũi tơ tằm thô mộc nhuộm chàm củ nâu tự nhiên',
-    pattern_description: 'Phom suông ống đứng phẳng phiu, mặt vải có độ nhăn mộc đặc trưng của sợi đũi truyền thống.',
-    cultural_significance: 'Biến tấu giao thoa giữa chất liệu đồng quê truyền thống và thẩm mỹ tối giản hiện đại.',
-    source_verification: 'Chưa có thông tin xác minh',
-    image_url: 'https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'Cách tân Đương đại',
-    gender_affinity: 'all'
-  },
-  {
-    id: 'tac-foot-01',
-    name: 'Guốc Mộc Gỗ Thông Dây Nhung Đen',
-    slot: 'footwear',
-    category: 'Giày',
-    ethnic_group: 'Kinh',
-    period_or_region: 'Bắc Bộ',
-    ritual_level: 'daily',
-    cross_cultural_flag: true,
-    color_hex: '#4A3728',
-    material: 'Gỗ thông già đẽo thủ công gọt đế cong, quai vải nhung the',
-    pattern_description: 'Đế đục nhẵn mộc mạc, quai ghim đinh đồng tròn.',
-    cultural_significance: 'Vật phẩm dân dã gắn bó hàng trăm năm với tiếng lách cách trên sân đình, ngõ gạch làng quê Việt.',
-    source_verification: 'Bảo tàng Phụ nữ Việt Nam',
-    image_url: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'Dân gian Bắc Bộ',
-    gender_affinity: 'all'
-  },
-  {
-    id: 'tac-acc-01',
-    name: 'Chuỗi Xà Tích Bạc Ba Tầng & Ống Vôi Chạm Hoa',
-    slot: 'accessories',
-    category: 'Trang sức',
-    ethnic_group: 'Kinh',
-    period_or_region: 'Bắc Bộ',
-    ritual_level: 'festive',
-    cross_cultural_flag: true,
-    color_hex: '#C0C0C0',
-    material: 'Bạc ta cán thủ công kết dây mắt xích xoắn đôi',
-    pattern_description: 'Dây đeo bên hông thắt lưng gồm dao găm nhỏ đúc bạc, quả đào, móng cọp và ống vôi chạm khắc tỉ mỉ.',
-    cultural_significance: 'Trang sức phong tục mừng cưới hỏi và lễ hội xuân làng quan họ Kinh Bắc, tượng trưng cho sự no ấm, thanh lịch.',
-    source_verification: 'Nghệ thuật Kim hoàn truyền thống Định Công',
-    image_url: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'Kinh Bắc',
-    gender_affinity: 'all'
-  },
-  {
-    id: 'kinh-acc-thatlung-001',
-    name: 'Dải Thắt Lưng Lụa Đa Sắc Ngũ Thân',
-    slot: 'accessories',
-    category: 'Phụ kiện',
-    ethnic_group: 'Kinh',
-    period_or_region: 'Thời Nguyễn (Cố Đô)',
-    ritual_level: 'festive',
-    cross_cultural_flag: true,
-    color_hex: '#D8B454',
-    material: 'Lụa tơ tằm hai mặt nhuộm sắc sen vàng và hoàng yến',
-    pattern_description: 'Dải lụa bản hẹp thắt nút hoa mai buông rủ hai đầu nơ trước vạt áo.',
-    cultural_significance: 'Phụ kiện điểm xuyết tạo điểm nhấn thắt đáy lưng ong thanh lịch cho phụ nữ quý tộc.',
-    source_verification: 'Trang phục Triều Nguyễn (NXB Thuận Hóa)',
-    image_url: 'https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'Cung đình Cố đô',
-    gender_affinity: 'nu'
-  },
+export const NORMALIZED_OUTFITS: NormalizedOutfit[] = NORMALIZED_CATALOG.outfits;
+export const NORMALIZED_SOURCES: ResearchSource[] = NORMALIZED_CATALOG.sources;
+export const NORMALIZED_REVIEW_FLAGS: ReviewFlag[] = NORMALIZED_CATALOG.reviewFlags;
+export const NORMALIZED_COMPATIBILITY_RULES: CompatibilityRule[] = NORMALIZED_CATALOG.compatibilityRules;
+export const COMPATIBILITY_MODEL: CompatibilityModel = NORMALIZED_CATALOG.compatibilityModel;
 
-  // --- THÁI TRẮNG (TÂY BẮC) — CURATED ASSETS ---
-  {
-    id: 'thai-trang-ao-com-001',
-    name: 'Áo Cóm Cổ Tim Hàng Khuy Bướm Bạc',
-    slot: 'top',
-    category: 'Áo',
-    ethnic_group: 'Thái',
-    subgroup: 'Thái Trắng',
-    period_or_region: 'Tây Bắc (Sơn La, Điện Biên)',
-    ritual_level: 'festive',
-    cross_cultural_flag: true,
-    color_hex: '#F5F0E8',
-    material: 'Lụa tơ tự nhiên, hàng khuy bạc chạm hình bướm tinh xảo',
-    pattern_description: 'Cổ tim khoét thanh thoát, hàng khuy bướm bạc đính dọc nẹp áo tượng trưng cho sự sinh sôi.',
-    cultural_significance: 'Y phục duyên dáng của phụ nữ Thái vùng Tây Bắc, ôm sát tôn nét thon thả và sự tinh tế.',
-    source_verification: 'Bảo tàng Dân tộc học Việt Nam & Di sản Văn hóa Thái',
-    image_url: '/assets/garments/thai-trang-ao-com-001.svg',
-    gender_affinity: 'nu'
-  },
-  {
-    id: 'thai-trang-vay-den-001',
-    name: 'Váy Đen Tơ Tằm Cạp Thổ Cẩm Thái',
-    slot: 'bottom',
-    category: 'Váy',
-    ethnic_group: 'Thái',
-    subgroup: 'Thái Trắng',
-    period_or_region: 'Tây Bắc',
-    ritual_level: 'daily',
-    cross_cultural_flag: true,
-    color_hex: '#1B1C19',
-    material: 'Vải lụa tơ tằm nhuộm củ nâu đen bóng, cạp váy dệt hoa văn hình thoi rực rỡ',
-    pattern_description: 'Váy ống buông thẳng tôn dáng, gấu váy viền vải màu kín đáo bước đi duyên dáng.',
-    cultural_significance: 'Phối chuẩn cùng áo cóm tạo nên dáng vóc "thắt đáy lưng ong" đặc trưng của thiếu nữ Tây Bắc.',
-    source_verification: 'Di sản Văn hóa Dân gian người Thái',
-    image_url: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=600&q=80',
-    gender_affinity: 'nu'
-  },
-  {
-    id: 'thai-head-pieu-001',
-    name: 'Khăn Piêu Thêu Chỉ Màu Thái Đen',
-    slot: 'head',
-    category: 'Khăn',
-    ethnic_group: 'Thái',
-    subgroup: 'Thái Đen',
-    period_or_region: 'Tây Bắc (Mường Lò, Sơn La)',
-    ritual_level: 'festive',
-    cross_cultural_flag: true,
-    color_hex: '#EB2F06',
-    material: 'Vải chàm tự dệt thêu chỉ tơ tằm đỏ, xanh, vàng, đính cút piêu tròn',
-    pattern_description: 'Hai đầu khăn thêu hoa văn móc ngoặc, dây leo và quả còn mang lời nguyện ước hạnh phúc lứa đôi.',
-    cultural_significance: 'Tín vật định tình và thước đo phẩm hạnh, sự khéo léo của người con gái Thái.',
-    source_verification: 'Viện Dân tộc học - Viện Hàn lâm KHXH Việt Nam',
-    image_url: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=600&q=80',
-    gender_affinity: 'nu'
-  },
-  {
-    id: 'thai-acc-xatich-001',
-    name: 'Xà Tích Bạc Bướm & Dây Lưng Xanh Xưa',
-    slot: 'accessories',
-    category: 'Trang sức',
-    ethnic_group: 'Thái',
-    subgroup: 'Thái Trắng',
-    period_or_region: 'Tây Bắc',
-    ritual_level: 'festive',
-    cross_cultural_flag: true,
-    color_hex: '#C0C0C0',
-    material: 'Bạc trắng đánh sáng bóng móc đôi kèm dây lụa xanh nõn chuối',
-    pattern_description: 'Đeo ngang hông nảy hạt leng keng theo từng điệu múa xòe hoa.',
-    cultural_significance: 'Điểm thắt tôn vinh eo thon và nét duyên mộc mạc vùng thung lũng Mường Thanh.',
-    source_verification: 'Bảo tàng Phụ nữ Việt Nam',
-    image_url: 'https://images.unsplash.com/photo-1611591475870-652309f8ce34?auto=format&fit=crop&w=600&q=80',
-    gender_affinity: 'nu'
-  },
+/**
+ * Tạo placeholder SVG trung tính, thanh nhã theo mỹ thuật di sản Việt Nam
+ * Dành riêng cho giai đoạn chưa nạp file ảnh thực tế theo quy chuẩn bảo tàng.
+ */
+export function createNeutralPlaceholder(
+  name: string,
+  category: string,
+  culturalGroup?: string,
+  subgroup?: string
+): string {
+  const safeName = (name || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+  const safeGroup = (subgroup ? `${culturalGroup} · ${subgroup}` : culturalGroup || 'Việt Phục Di Sản')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  const safeCat = (category || 'Trang phục')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 
-  // --- TRANG PHỤC H'MÔNG HOA / H'MÔNG ĐEN (TÂY BẮC) ---
-  {
-    id: 'hm-top-01',
-    name: 'Áo Vạt Chéo Xẻ Ngực Thêu Chỉ Màu H\'Mông',
-    slot: 'top',
-    category: 'Áo',
-    ethnic_group: 'H\'Mông',
-    period_or_region: 'Tây Bắc (Sa Pa, Mù Cang Chải)',
-    ritual_level: 'festive',
-    cross_cultural_flag: false,
-    color_hex: '#0A3D62',
-    material: 'Vải lanh tự dệt nhuộm chàm sâu thêu tơ tằm',
-    pattern_description: 'Cổ áo và nẹp ngực thêu dày đặc họa tiết hình thoi kỷ hà, dấu chữ thập (biểu tượng mặt trời) và xoắn ốc chuyển động.',
-    cultural_significance: 'Phụ nữ H\'Mông dành cả năm để se sợi lanh, dệt vải và thêu áo chuẩn bị đón hội Gầu Tào đầu xuân.',
-    source_verification: 'Họa tiết Thổ cẩm H\'Mông (NXB Văn hóa Dân tộc, 2012)',
-    image_url: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'H\'Mông Hoa',
-    gender_affinity: 'nu'
-  },
-  {
-    id: 'hm-head-01',
-    name: 'Khăn Xếp Cuộn Đính Hạt Cườm H\'Mông',
-    slot: 'head',
-    category: 'Khăn',
-    ethnic_group: 'H\'Mông',
-    period_or_region: 'Tây Bắc',
-    ritual_level: 'festive',
-    cross_cultural_flag: false,
-    color_hex: '#EB2F06',
-    material: 'Khăn lanh thổ cẩm dệt tay phối sợi len ngũ sắc và đồng xu bạc',
-    pattern_description: 'Dải thêu hoa văn chữ vạn và hạt cườm đỏ buông rủ hai bên thái dương.',
-    cultural_significance: 'Vừa giữ ấm bảo vệ mái tóc nơi đại ngàn, vừa là tín hiệu thẩm mỹ thể hiện sự khéo léo của người con gái trong bản làng.',
-    source_verification: 'Viện Dân tộc học - Viện Hàn lâm KHXH Việt Nam',
-    image_url: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'H\'Mông Hoa',
-    gender_affinity: 'nu'
-  },
-  {
-    id: 'hm-bottom-01',
-    name: 'Váy Xòe Xếp Ly Vẽ Sáp Ong Nhuộm Chàm',
-    slot: 'bottom',
-    category: 'Váy',
-    ethnic_group: 'H\'Mông',
-    period_or_region: 'Tây Bắc (Lào Cai, Hà Giang)',
-    ritual_level: 'festive',
-    cross_cultural_flag: false,
-    color_hex: '#1E272C',
-    material: 'Vải lanh dày vẽ sáp ong thủ công bằng bút đồng',
-    pattern_description: 'Hàng trăm nếp gấp ly dập tỉ mỉ, tầng chân váy đắp vải hoa văn kỷ hà rực rỡ xòe rộng như cánh hoa rừng.',
-    cultural_significance: 'Kỹ thuật vẽ sáp ong và dập ly bằng đá là di sản văn hóa phi vật thể quốc gia.',
-    source_verification: 'Di sản Kỹ thuật Dệt Lanh & Vẽ Sáp Ong H\'Mông (Bộ VHTT&DL)',
-    image_url: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'H\'Mông Hoa',
-    gender_affinity: 'nu'
-  },
-  {
-    id: 'hm-foot-01',
-    name: 'Xà Cạp Chàm Quấn Chân & Hài Vải Thêu Núi',
-    slot: 'footwear',
-    category: 'Giày',
-    ethnic_group: 'H\'Mông',
-    period_or_region: 'Tây Bắc',
-    ritual_level: 'daily',
-    cross_cultural_flag: false,
-    color_hex: '#182C61',
-    material: 'Dải vải chàm quấn bắp chân viền thổ cẩm, đế giày vải khâu chần',
-    pattern_description: 'Dải quấn ôm sát chân chống gai rừng, mũi giày thêu hoa văn ngọn núi nhỏ.',
-    cultural_significance: 'Giúp đôi chân leo dốc vượt đèo dẻo dai, giữ ấm trong sương muối mùa đông vùng cao cực bắc.',
-    source_verification: 'Bảo tàng Dân tộc học Việt Nam',
-    image_url: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'H\'Mông Hoa',
-    gender_affinity: 'all'
-  },
-  {
-    id: 'hm-acc-01',
-    name: 'Vòng Cổ Bạc Bách Khóa Xếp Chồng',
-    slot: 'accessories',
-    category: 'Trang sức',
-    ethnic_group: 'H\'Mông',
-    period_or_region: 'Tây Bắc',
-    ritual_level: 'festive',
-    cross_cultural_flag: false,
-    color_hex: '#E0E0E0',
-    material: 'Bạc trắng đúc thủ công nặng tay, chạm vảy rồng và dây xích nhỏ',
-    pattern_description: 'Bộ kiềng bạc 3-5 vòng từ nhỏ đến lớn lồng vào nhau, chạm nổi hoa văn thực vật và bùa hộ mệnh.',
-    cultural_significance: 'Bạc là linh hồn trừ tà khí, của hồi môn thiêng liêng thể hiện vị thế và lòng hiếu thảo giữa các thế hệ người Mông.',
-    source_verification: 'Nghề Chế tác Bạc truyền thống người H\'Mông (Hà Giang)',
-    image_url: 'https://images.unsplash.com/photo-1611591475870-652309f8ce34?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'H\'Mông',
-    gender_affinity: 'all'
-  },
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+    <defs>
+      <linearGradient id="bgParchment" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FAF8F5"/>
+        <stop offset="100%" stop-color="#ECE6D9"/>
+      </linearGradient>
+      <linearGradient id="borderGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#D8B454" stop-opacity="0.8"/>
+        <stop offset="100%" stop-color="#A03F30" stop-opacity="0.8"/>
+      </linearGradient>
+    </defs>
+    <rect width="400" height="400" fill="url(#bgParchment)"/>
+    <rect x="14" y="14" width="372" height="372" rx="18" fill="none" stroke="url(#borderGradient)" stroke-width="1.5" stroke-dasharray="5 3"/>
+    <rect x="22" y="22" width="356" height="356" rx="12" fill="none" stroke="#2D533F" stroke-width="0.8" stroke-opacity="0.3"/>
+    
+    <g transform="translate(200, 140)" opacity="0.85">
+      <circle r="46" fill="#2D533F" fill-opacity="0.07"/>
+      <circle r="38" fill="none" stroke="#2D533F" stroke-width="1.2" stroke-opacity="0.35"/>
+      <circle r="30" fill="none" stroke="#D8B454" stroke-width="0.8" stroke-opacity="0.6"/>
+      <path d="M 0 -26 C 14 -13 20 7 0 26 C -20 7 -14 -13 0 -26 Z" fill="#2D533F" fill-opacity="0.22"/>
+      <path d="M -26 0 C -13 14 7 20 26 0 C 7 -20 -13 -14 -26 0 Z" fill="#2D533F" fill-opacity="0.22"/>
+      <circle r="5" fill="#D8B454"/>
+    </g>
 
-  // --- TRANG PHỤC DÂN TỘC CHĂM (DUYÊN HẢI NAM TRUNG BỘ) ---
-  {
-    id: 'cham-top-01',
-    name: 'Áo Dài Nữ Chăm Truyền Thống (Aw Cam)',
-    slot: 'top',
-    category: 'Áo',
-    ethnic_group: 'Chăm',
-    period_or_region: 'Nam Trung Bộ (Ninh Thuận, Bình Thuận)',
-    ritual_level: 'festive',
-    cross_cultural_flag: false,
-    color_hex: '#FFFFFF',
-    material: 'Vải lụa cát trắng tinh khôi dệt hoa mờ',
-    pattern_description: 'Áo chui đầu thân may liền kín đáo, không xẻ tà bên hông, tay áo may chẽn tôn vóc dáng thanh mảnh duyên dáng.',
-    cultural_significance: 'Trang phục nữ Chăm trong lễ hội Katê dâng lễ Mẹ xứ sở Po Ino Nagar, tượng trưng cho nét đẹp thuần khiết.',
-    source_verification: 'Nghiên cứu Văn hóa Dân tộc Chăm (Trung tâm Nghiên cứu Văn hóa Chăm Ninh Thuận)',
-    image_url: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'Chăm Balamon',
-    gender_affinity: 'nu'
-  },
-  {
-    id: 'cham-head-01',
-    name: 'Khăn Khun Trùm Đầu Viền Đỏ (Khan Khun)',
-    slot: 'head',
-    category: 'Khăn',
-    ethnic_group: 'Chăm',
-    period_or_region: 'Nam Trung Bộ',
-    ritual_level: 'festive',
-    cross_cultural_flag: false,
-    color_hex: '#F5F6FA',
-    material: 'Vải dệt trắng viền sợi tơ đỏ dệt hoa văn hình học cổ',
-    pattern_description: 'Khăn trùm nhẹ từ đỉnh đầu buông rủ qua hai vai, viền tua đỏ mềm mại phất phơ theo nhịp múa quạt.',
-    cultural_significance: 'Khăn trùm đầu là nét văn hóa đặc thù biểu đạt sự khiêm nhường, thành kính trước các vị thần linh trên tháp cổ Po Klong Garai.',
-    source_verification: 'Nghệ thuật Múa và Trang phục Chăm (NXB Sân Khấu)',
-    image_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'Chăm Balamon',
-    gender_affinity: 'nu'
-  },
-  {
-    id: 'cham-bottom-01',
-    name: 'Váy Khép Quấn Chân Chăm (Khan Ni)',
-    slot: 'bottom',
-    category: 'Váy',
-    ethnic_group: 'Chăm',
-    period_or_region: 'Nam Trung Bộ',
-    ritual_level: 'festive',
-    cross_cultural_flag: false,
-    color_hex: '#2F3542',
-    material: 'Vải dệt thổ cẩm sợi bông nhuộm đen than củi và chỉ vàng',
-    pattern_description: 'Váy dạng tấm vải quấn quanh eo (sarong), chân váy có dải hoa văn búp hoa bèo và răng cưa cổ xưa.',
-    cultural_significance: 'Gắn liền với phong tục mẫu hệ của người Chăm, bước đi uyển chuyển khoan thai.',
-    source_verification: 'Làng Dệt Thổ Cẩm Mỹ Nghiệp (Ninh Thuận)',
-    image_url: 'https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'Chăm Balamon',
-    gender_affinity: 'nu'
-  },
-  {
-    id: 'cham-acc-01',
-    name: 'Dây Thắt Lưng Thổ Cẩm Vàng Đỏ (Khaban)',
-    slot: 'accessories',
-    category: 'Phụ kiện',
-    ethnic_group: 'Chăm',
-    period_or_region: 'Nam Trung Bộ',
-    ritual_level: 'festive',
-    cross_cultural_flag: false,
-    color_hex: '#FFA502',
-    material: 'Sợi tơ vàng và chỉ đỏ dệt nổi kỹ thuật dệt hoa văn cài sợi phức tạp',
-    pattern_description: 'Dải thắt lưng dài quấn ngang ngực chéo qua vai rồi rủ dài trước bụng, hoa văn móc câu và quả trám thần thoại.',
-    cultural_significance: 'Dây thắt lưng Khaban là điểm nhấn rực rỡ nhất trên nền áo trắng trong các điệu múa thiêng Apsara.',
-    source_verification: 'Bảo tàng Điêu khắc Chăm Đà Nẵng',
-    image_url: 'https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'Chăm Balamon',
-    gender_affinity: 'all'
-  },
-  {
-    id: 'cham-foot-01',
-    name: 'Guốc Gỗ Khảm Xà Cừ Dáng Thuyền',
-    slot: 'footwear',
-    category: 'Giày',
-    ethnic_group: 'Chăm',
-    period_or_region: 'Nam Trung Bộ',
-    ritual_level: 'festive',
-    cross_cultural_flag: true,
-    color_hex: '#747D8C',
-    material: 'Gỗ gõ đỏ khắc chìm hoa văn rãnh hoa sen',
-    pattern_description: 'Guốc nhẹ dáng thuyền, mũi hơi vát, quai da mềm.',
-    cultural_significance: 'Khi bước lên tháp gạch tế thần, người Chăm thường để guốc ngoài chân tháp để đôi chân trần chạm vào đất mẹ thiêng liêng.',
-    source_verification: 'Phong tục Tập quán Người Chăm (Sở VHTT Ninh Thuận)',
-    image_url: 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'Chăm Balamon',
-    gender_affinity: 'all'
-  },
+    <text x="200" y="225" text-anchor="middle" font-family="serif" font-size="11" font-weight="700" fill="#A03F30" letter-spacing="2">
+      ${safeGroup.toUpperCase()}
+    </text>
+    <text x="200" y="244" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="600" fill="#717971" letter-spacing="1.2">
+      PHÂN LOẠI: ${safeCat.toUpperCase()}
+    </text>
 
-  // --- DÂN TỘC DAO ĐỎ (HÀ GIANG / LÀO CAI) ---
-  {
-    id: 'dao-top-01',
-    name: 'Áo Dài Chàm Đính Hàng Bông Đỏ Dao Đỏ',
-    slot: 'top',
-    category: 'Áo',
-    ethnic_group: 'Dao',
-    period_or_region: 'Tây Bắc (Lào Cai, Yên Bái)',
-    ritual_level: 'festive',
-    cross_cultural_flag: false,
-    color_hex: '#2F3542',
-    material: 'Vải lanh nhuộm chàm thẫm đính chùm bông len đỏ tươi',
-    pattern_description: 'Ngực áo kết 7-9 quả bông đỏ rực, lưng áo thêu tấm họa tiết dấu ấn vuông "chữ Vạn" và chân vạc.',
-    cultural_significance: 'Sắc đỏ rực rỡ xua tan cái lạnh vùng cao mây mù, tượng trưng cho hạnh phúc, sự sinh sôi và may mắn bất tận.',
-    source_verification: 'Nghệ thuật Thêu thổ cẩm Người Dao Đỏ (NXB Văn hóa Dân tộc)',
-    image_url: 'https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'Dao Đỏ',
-    gender_affinity: 'nu'
-  },
-  {
-    id: 'dao-head-01',
-    name: 'Khăn Đỏ Xếp Tầng Khảm Bạc Quả Chuông',
-    slot: 'head',
-    category: 'Khăn',
-    ethnic_group: 'Dao',
-    period_or_region: 'Tây Bắc',
-    ritual_level: 'festive',
-    cross_cultural_flag: false,
-    color_hex: '#FF4757',
-    material: 'Nhiều lớp vải đỏ gấp nếp vuông vức, viền chuỗi hạt cườm và lục lạc bạc',
-    pattern_description: 'Khăn dựng phom khối vuông cao nổi bật, chuỗi hạt buông rủ quanh trán tạo tiếng leng keng vui tươi khi di chuyển.',
-    cultural_significance: 'Điểm nhận diện đặc trưng nhất của phụ nữ Dao Đỏ, thể hiện phẩm giá gia đình và vẻ đẹp kiêu hãnh giữa non ngàn.',
-    source_verification: 'Bảo tàng Dân tộc học Việt Nam',
-    image_url: 'https://images.unsplash.com/photo-1588515724527-074a7a56616c?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'Dao Đỏ',
-    gender_affinity: 'nu'
-  },
-  {
-    id: 'dao-bottom-01',
-    name: 'Quần Chàm Thêu Kỷ Hà Chân Vạc Dao Đỏ',
-    slot: 'bottom',
-    category: 'Quần',
-    ethnic_group: 'Dao',
-    period_or_region: 'Tây Bắc',
-    ritual_level: 'festive',
-    cross_cultural_flag: false,
-    color_hex: '#1E272C',
-    material: 'Vải nhuộm chàm thêu chỉ ngũ sắc ở hai ống gấu quần',
-    pattern_description: 'Họa tiết cây thông, con rùa, hình người dắt tay nhau và móc ngoặc nhấp nhô dọc ống chân.',
-    cultural_significance: 'Khắc họa lại hành trình vượt biển, băng rừng của tổ tiên 12 họ người Dao về vùng đất mới.',
-    source_verification: 'Sử thi Bàn Vương và Di sản Trang phục Người Dao',
-    image_url: 'https://images.unsplash.com/photo-1551803091-e20673f15770?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'Dao Đỏ',
-    gender_affinity: 'all'
-  },
+    <text x="200" y="278" text-anchor="middle" font-family="serif" font-size="16" font-weight="bold" fill="#1A1C1A">
+      ${safeName}
+    </text>
 
-  // --- ITEM SACRED RITUAL (DÙNG ĐỂ KIỂM CHỨNG HARD CONSTRAINT) ---
-  {
-    id: 'ritual-top-01',
-    name: 'Khăn Chầu Áo Ngự Tam Phủ Thêu Rồng Vàng (Đồ Tế Tự Nghi Lễ)',
-    slot: 'top',
-    category: 'Áo',
-    ethnic_group: 'Kinh',
-    period_or_region: 'Đồng bằng Bắc Bộ',
-    ritual_level: 'sacred_ritual', // SACRED RITUAL -> CẤM DÙNG CHO DẠO PHỐ/THƯỜNG PHỤC!
-    cross_cultural_flag: false,
-    color_hex: '#E1B12C',
-    material: 'Lụa the bóng thêu rồng cuộn mây thiêng, viền chuỗi hạt ngọc',
-    pattern_description: 'Hình rồng năm móng giáng trần, sóng nước thủy ba ngũ sắc mang ý nghĩa giáng đồng tế tự thiêng liêng.',
-    cultural_significance: 'Y phục tín ngưỡng Hầu Đồng / Thực hành Tín ngưỡng Thờ Mẫu Tam Phủ của người Việt (Di sản UNESCO). Nghiêm cấm mặc dạo phố hay phối đồ thế tục.',
-    source_verification: 'Hồ sơ Di sản Thực hành Tín ngưỡng Thờ Mẫu Tam Phủ (Bộ VHTT&DL)',
-    image_url: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'Tín ngưỡng Dân gian',
-    gender_affinity: 'all'
-  },
+    <rect x="110" y="316" width="180" height="26" rx="13" fill="#2D533F" fill-opacity="0.08"/>
+    <text x="200" y="333" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="600" fill="#2D533F" letter-spacing="0.8">
+      BẢN GHI TƯ LIỆU · CHỜ NẠP ẢNH
+    </text>
+  </svg>`;
 
-  // --- PHỤ KIỆN GIAO THOA HIỆN ĐẠI (CROSS CULTURAL) ---
-  {
-    id: 'modern-acc-01',
-    name: 'Túi Gấm Đương Đại Quai Trúc Thủ Công',
-    slot: 'accessories',
-    category: 'Phụ kiện',
-    ethnic_group: 'Kinh',
-    period_or_region: 'Giao thoa Đương đại',
-    ritual_level: 'daily',
-    cross_cultural_flag: true,
-    color_hex: '#2C3E50',
-    material: 'Gấm tơ tằm dệt họa tiết vân mây kết hợp quai tre trúc tự nhiên',
-    pattern_description: 'Vân mây kỷ hà thời Lê - Nguyễn trên dáng túi phom đứng hiện đại.',
-    cultural_significance: 'Sự tiếp biến giữa hoa văn cổ phong và nhịp sống trẻ trung, dễ dàng đồng hành cùng trang phục dạo phố hay sự kiện đương đại.',
-    source_verification: 'Nghiên cứu Ứng dụng Họa tiết Cổ truyền trong Thiết kế Sáng tạo 2026',
-    image_url: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=600&q=80',
-    subgroup: 'Thời trang sáng tạo',
-    gender_affinity: 'all'
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
+/**
+ * Phân định slot trong bộ phối dựa trên category chuẩn hóa
+ */
+export function categoryToSlot(category: string): CostumeSlot {
+  const cat = (category || '').toLowerCase();
+  if (cat.includes('áo')) return 'ao';
+  if (cat.includes('quần')) return 'quan';
+  if (cat.includes('váy')) return 'vay';
+  if (cat.includes('khăn')) return 'khan';
+  if (cat.includes('mũ')) return 'mu';
+  if (cat.includes('giày')) return 'giay';
+  if (cat.includes('trang sức')) return 'trang_suc';
+  if (cat.includes('thân dưới') || cat.includes('khố')) return 'quan';
+  return 'phu_kien';
+}
+
+/**
+ * Trích xuất màu hex đại diện mang sắc thái văn hóa
+ */
+function deriveColorHex(category: string, group: string): string {
+  const g = (group || '').toLowerCase();
+  if (g.includes('huế') || g.includes('triều nguyễn')) return '#A03F30';
+  if (g.includes('thái')) return '#2D533F';
+  if (g.includes('dao')) return '#C0392B';
+  if (g.includes('mường')) return '#8E44AD';
+  if (g.includes('chăm')) return '#D35400';
+  if (g.includes('khmer')) return '#D4AC0D';
+  if (g.includes('pà thẻn')) return '#E74C3C';
+  if (g.includes('tày')) return '#2980B9';
+  if (category.includes('Áo')) return '#2D533F';
+  if (category.includes('Khăn') || category.includes('Mũ')) return '#D8B454';
+  return '#4A5568';
+}
+
+/**
+ * 77 BẢN GHI ITEMS CHUẨN HÓA V2
+ */
+export const NORMALIZED_ITEMS: CostumeItem[] = (NORMALIZED_CATALOG.items || []).map((item) => {
+  const slot = categoryToSlot(item.category);
+  const colorHex = deriveColorHex(item.category, item.cultural_group);
+  const placeholderImg = createNeutralPlaceholder(
+    item.name,
+    item.category,
+    item.cultural_group,
+    item.subgroup
+  );
+
+  return {
+    id: item.id,
+    name: item.name,
+    category: item.category as GarmentCategory,
+    slot,
+    ethnic_group: item.cultural_group || 'Việt phục',
+    culturalGroup: item.cultural_group,
+    cultural_group: item.cultural_group,
+    subgroup: item.subgroup || '',
+    period_or_region: item.cultural_information_note || item.usage || 'Việt Nam',
+    material: item.materials || 'Chất liệu theo tư liệu lịch sử',
+    materials: item.materials,
+    pattern_description: item.visual_features || 'Đặc điểm thị giác ghi nhận trong nguồn tư liệu.',
+    patternDescription: item.visual_features,
+    visual_features: item.visual_features,
+    usage: item.usage,
+    cultural_significance: item.description || '',
+    culturalContext: item.description,
+    source_verification:
+      item.source_titles && item.source_titles.length > 0
+        ? item.source_titles.join('; ')
+        : item.verification_status || 'Chưa có thông tin xác minh độc lập',
+    verification_status: item.verification_status,
+    verificationStatus: item.verification_status,
+    source_ids: item.source_ids || [],
+    source_urls: item.source_urls || [],
+    source_titles: item.source_titles || [],
+    cultural_information_note: item.cultural_information_note,
+    notes: item.notes || '',
+    image_url: placeholderImg,
+    imageUrl: placeholderImg,
+    image_path: item.image_path || null,
+    imageReference: item.source_urls && item.source_urls.length > 0 ? item.source_urls[0] : null,
+    ritual_level:
+      item.usage && (item.usage.includes('nghi lễ') || item.usage.includes('cưới') || item.usage.includes('tế tự'))
+        ? 'festive'
+        : 'daily',
+    cross_cultural_flag: !(
+      item.compatibility_policy &&
+      item.compatibility_policy.includes('not automatically compatible')
+    ),
+    selectable_independently: item.selectable_independently ?? true,
+    is_structural_part: item.is_structural_part ?? false,
+    variant_group: item.variant_group || '',
+    outfit_memberships: item.outfit_memberships || [],
+    belongs_to_outfit_ids: item.belongs_to_outfit_ids || [],
+    tags: item.tags ? item.tags.map((t: any) => `${t.type}:${t.value}`) : [],
+    raw_tags: item.tags || [],
+    pairing: item.pairing,
+    compatibility_policy: item.compatibility_policy,
+    color_hex: colorHex,
+    is_personal: false
+  };
+});
+
+/**
+ * 21 BỘ THAM CHIẾU OUTFITS CHUẨN HÓA V2 -> TƯƠNG THÍCH MOCK_COLLECTIONS
+ */
+export const MOCK_COLLECTIONS: HeritageCollection[] = NORMALIZED_OUTFITS.map((o) => {
+  const sampleTop =
+    o.components.find((c) => c.slot.toLowerCase().includes('áo'))?.item_id ||
+    o.components[0]?.item_id ||
+    '';
+  const sampleBottom =
+    o.components.find(
+      (c) =>
+        c.slot.toLowerCase().includes('quần') ||
+        c.slot.toLowerCase().includes('váy') ||
+        c.slot.toLowerCase().includes('thân dưới')
+    )?.item_id || '';
+  const sampleHead =
+    o.components.find(
+      (c) => c.slot.toLowerCase().includes('khăn') || c.slot.toLowerCase().includes('mũ')
+    )?.item_id || '';
+  const sampleFoot =
+    o.components.find(
+      (c) => c.slot.toLowerCase().includes('giày') || c.slot.toLowerCase().includes('dép')
+    )?.item_id || '';
+  const sampleAccs = o.components
+    .filter(
+      (c) =>
+        c.item_id !== sampleTop &&
+        c.item_id !== sampleBottom &&
+        c.item_id !== sampleHead &&
+        c.item_id !== sampleFoot
+    )
+    .map((c) => c.item_id);
+
+  return {
+    id: o.outfit_id,
+    title: o.normalized_name,
+    subtitle: `${o.group}${o.subgroup ? ` · ${o.subgroup}` : ''}`,
+    period_or_ethnic: o.group,
+    description: o.history || o.usage,
+    accent_color: '#2D533F',
+    status: o.status,
+    cautions: o.cautions,
+    components_count: o.components.length,
+    sample_outfit: {
+      top_id: sampleTop,
+      bottom_id: sampleBottom,
+      head_id: sampleHead,
+      footwear_id: sampleFoot,
+      accessories_ids: sampleAccs
+    },
+    normalized_outfit: o
+  };
+});
+
+/**
+ * Xuất MOCK_HERITAGE_ITEMS tương thích tuyệt đối từ 77 items chuẩn hóa
+ */
+export const MOCK_HERITAGE_ITEMS: CostumeItem[] = NORMALIZED_ITEMS;
+
+/**
+ * Tra cứu quy tắc tương thích giữa 2 item cụ thể theo 168 compatibilityRules
+ */
+export function findCompatibilityRule(itemAId: string, itemBId: string): CompatibilityRule | null {
+  return (
+    NORMALIZED_COMPATIBILITY_RULES.find(
+      (r) =>
+        (r.item_a_id === itemAId && r.item_b_id === itemBId) ||
+        (r.item_a_id === itemBId && r.item_b_id === itemAId)
+    ) || null
+  );
+}
+
+/**
+ * Đánh giá tính chuẩn xác và tương thích của tổ hợp trang phục đang mặc
+ */
+export function evaluateEquippedOutfitCompatibility(equippedItems: CostumeItem[]): {
+  status: 'reference_match' | 'conditional_match' | 'alternative_conflict' | 'contemporary_remix';
+  badgeTitle: string;
+  badgeClass: string;
+  matchedOutfit: NormalizedOutfit | null;
+  ruleMessages: Array<{
+    type: 'conflict' | 'condition' | 'co_member' | 'review';
+    itemA: string;
+    itemB: string;
+    message: string;
+    ruleId?: string;
+  }>;
+  explanation: string;
+} {
+  const items = equippedItems.filter(Boolean);
+  if (items.length < 2) {
+    return {
+      status: 'contemporary_remix',
+      badgeTitle: 'Đang chọn món',
+      badgeClass: 'bg-stone-100 text-stone-700',
+      matchedOutfit: null,
+      ruleMessages: [],
+      explanation: 'Hãy chọn thêm món để hệ thống đánh giá tương thích văn hóa.'
+    };
   }
-];
 
-export const MOCK_COLLECTIONS: HeritageCollection[] = [
-  {
-    id: 'col-nguyen-dynasty',
-    title: 'Vang Bóng Triều Nguyễn',
-    subtitle: 'Nội Cung Cố Đô Huế · Thế Kỷ XIX',
-    period_or_ethnic: 'Kinh · Thời Nguyễn',
-    description: 'Tôn vinh vẻ đẹp tôn quý, mực thước của thường phục hoàng gia và lễ phục mệnh phụ với áo Nhật Bình ngũ sắc rực rỡ kết hợp khăn vành dây tơ tằm óng ả.',
-    accent_color: '#2d533f',
-    cover_image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=800&q=80',
-    sample_outfit: {
-      head_id: 'nb-head-01',
-      top_id: 'nb-top-01',
-      bottom_id: 'nb-bottom-01',
-      footwear_id: 'nb-foot-01',
-      accessories_ids: ['nb-acc-01']
-    }
-  },
-  {
-    id: 'col-thang-long',
-    title: 'Sắc Gấm Thăng Long',
-    subtitle: 'Phong Thái Nho Nhã Sĩ Phu Bắc Hà',
-    period_or_ethnic: 'Kinh · Bắc Bộ',
-    description: 'Tái hiện cốt cách tao nhã của trí thức và giai tầng quý tộc xưa với áo Tấc phẩm lam tay thụng buông dài, khăn đóng chỉnh tề cùng xà tích bạc ba tầng Kinh Bắc.',
-    accent_color: '#1E3799',
-    cover_image: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80',
-    sample_outfit: {
-      head_id: 'tac-head-01',
-      top_id: 'tac-top-01',
-      bottom_id: 'tac-bottom-01',
-      footwear_id: 'tac-foot-01',
-      accessories_ids: ['tac-acc-01']
-    }
-  },
-  {
-    id: 'col-tay-bac',
-    title: 'Hùng Thiêng Tây Bắc',
-    subtitle: 'Bản Hòa Ca Thổ Cẩm & Sáp Ong Đại Ngàn',
-    period_or_ethnic: 'H\'Mông & Thái',
-    description: 'Vũ khúc sắc màu giữa ngút ngàn non cao với kỹ thuật vẽ sáp ong bí truyền, váy dập ly trăm nếp xòe hoa và những hàng khuy bướm bạc óng ả.',
-    accent_color: '#0A3D62',
-    cover_image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80',
-    sample_outfit: {
-      head_id: 'hm-head-01',
-      top_id: 'hm-top-01',
-      bottom_id: 'hm-bottom-01',
-      footwear_id: 'hm-foot-01',
-      accessories_ids: ['hm-acc-01']
-    }
-  },
-  {
-    id: 'col-cham-pa',
-    title: 'Huyền Tích Chăm Pa',
-    subtitle: 'Lễ Hội Katê Dưới Chân Tháp Cổ Ninh Thuận',
-    period_or_ethnic: 'Chăm · Nam Trung Bộ',
-    description: 'Nét đẹp thoát tục thuần khiết của tà áo dài Aw Cam trắng muốt, dải thắt lưng dệt thổ cẩm Khaban rực lửa và nhịp múa uyển chuyển hướng về Mẹ Xứ Sở Po Ino Nagar.',
-    accent_color: '#FFA502',
-    cover_image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=800&q=80',
-    sample_outfit: {
-      head_id: 'cham-head-01',
-      top_id: 'cham-top-01',
-      bottom_id: 'cham-bottom-01',
-      footwear_id: 'cham-foot-01',
-      accessories_ids: ['cham-acc-01']
+  // Check pairwise rules
+  const ruleMessages: Array<{
+    type: 'conflict' | 'condition' | 'co_member' | 'review';
+    itemA: string;
+    itemB: string;
+    message: string;
+    ruleId?: string;
+  }> = [];
+
+  let hasAlternativeConflict = false;
+  let hasConditional = false;
+
+  for (let i = 0; i < items.length; i++) {
+    for (let j = i + 1; j < items.length; j++) {
+      const a = items[i];
+      const b = items[j];
+      const rule = findCompatibilityRule(a.id, b.id);
+
+      if (rule) {
+        if (rule.status === 'alternative_not_simultaneous') {
+          hasAlternativeConflict = true;
+          ruleMessages.push({
+            type: 'conflict',
+            itemA: a.name,
+            itemB: b.name,
+            message: `Xung đột: ${a.name} và ${b.name} là phương án thay thế trong cùng bộ, không nên mặc đồng thời.`,
+            ruleId: rule.relationship_id
+          });
+        } else if (rule.status === 'conditional_in_reference_context') {
+          hasConditional = true;
+          ruleMessages.push({
+            type: 'condition',
+            itemA: a.name,
+            itemB: b.name,
+            message: `Điều kiện kết hợp: ${rule.condition_a || rule.condition_b || rule.explanation}`,
+            ruleId: rule.relationship_id
+          });
+        } else if (rule.status === 'candidate_requires_confirmation') {
+          ruleMessages.push({
+            type: 'review',
+            itemA: a.name,
+            itemB: b.name,
+            message: `Cần xác nhận ảnh/mẫu: ${rule.explanation}`,
+            ruleId: rule.relationship_id
+          });
+        } else if (rule.status === 'co_listed_in_reference_outfit') {
+          ruleMessages.push({
+            type: 'co_member',
+            itemA: a.name,
+            itemB: b.name,
+            message: `Cùng thuộc bộ tham chiếu: ${rule.outfit_name}`,
+            ruleId: rule.relationship_id
+          });
+        }
+      }
     }
   }
-];
+
+  // Find if all items belong to a single reference outfit
+  const itemOutfitSets = items.map((it) => new Set(it.belongs_to_outfit_ids || []));
+  const commonOutfitIds = (items[0].belongs_to_outfit_ids || []).filter((oid) =>
+    itemOutfitSets.every((s) => s.has(oid))
+  );
+
+  const matchedOutfit = commonOutfitIds.length > 0
+    ? NORMALIZED_OUTFITS.find((o) => o.outfit_id === commonOutfitIds[0]) || null
+    : null;
+
+  if (hasAlternativeConflict) {
+    return {
+      status: 'alternative_conflict',
+      badgeTitle: '⚠️ Xung đột biến thể (Alternative Not Simultaneous)',
+      badgeClass: 'bg-red-100 text-red-800 border-red-300',
+      matchedOutfit,
+      ruleMessages,
+      explanation: 'Bộ đồ đang chứa 2 món là phương án thay thế cho nhau theo tư liệu nghiên cứu.'
+    };
+  }
+
+  if (matchedOutfit) {
+    if (hasConditional) {
+      return {
+        status: 'conditional_match',
+        badgeTitle: `Tương thích có điều kiện · ${matchedOutfit.normalized_name}`,
+        badgeClass: 'bg-amber-100 text-amber-900 border-amber-300',
+        matchedOutfit,
+        ruleMessages,
+        explanation: `Bộ trang phục khớp với tổ hợp tham chiếu ${matchedOutfit.normalized_name}. Cần lưu ý các điều kiện kết hợp chi tiết.`
+      };
+    }
+    return {
+      status: 'reference_match',
+      badgeTitle: `Chuẩn nguyên bản · ${matchedOutfit.normalized_name}`,
+      badgeClass: 'bg-emerald-100 text-emerald-900 border-emerald-300',
+      matchedOutfit,
+      ruleMessages,
+      explanation: `Tất cả các món đều thuộc tổ hợp tham chiếu lịch sử: ${matchedOutfit.normalized_name}.`
+    };
+  }
+
+  return {
+    status: 'contemporary_remix',
+    badgeTitle: 'Phối cách tân / Giao thoa văn hóa',
+    badgeClass: 'bg-stone-100 text-stone-800 border-stone-300',
+    matchedOutfit: null,
+    ruleMessages,
+    explanation: 'Chưa có quan hệ đối chiếu trong cùng một bộ tư liệu tham chiếu gốc (Chế độ Phối sáng tạo / Remix đương đại).'
+  };
+}
