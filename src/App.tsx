@@ -17,8 +17,8 @@ import { CulturalChatbot } from './components/chat/CulturalChatbot';
 import { AuthModal } from './components/auth/AuthModal';
 
 export default function App() {
-  const { activeTab } = useCostumeStore();
-  const { initAuth } = useAuthStore();
+  const { activeTab, initPersonalCloset } = useCostumeStore();
+  const { initAuth, user } = useAuthStore();
 
   useEffect(() => {
     const unsubscribe = initAuth();
@@ -26,6 +26,10 @@ export default function App() {
       if (unsubscribe) unsubscribe();
     };
   }, [initAuth]);
+
+  useEffect(() => {
+    initPersonalCloset(user?.uid);
+  }, [user?.uid, initPersonalCloset]);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#fbf9f4] text-[#1a1c1a] font-sans">

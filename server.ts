@@ -447,57 +447,90 @@ Trả về JSON đúng cấu trúc đã định nghĩa, đính kèm mảng recom
       if (!aiClient) {
         // Rule-based classification fallback
         const desc = (description || '').toLowerCase();
-        let slot = itemCategory || 'top';
-        if (desc.includes('khăn') || desc.includes('mũ') || desc.includes('nón')) slot = 'head';
-        else if (desc.includes('áo') || desc.includes('yếm')) slot = 'top';
-        else if (desc.includes('quần') || desc.includes('váy')) slot = 'bottom';
-        else if (desc.includes('hài') || desc.includes('giày') || desc.includes('guốc')) slot = 'footwear';
-        else if (desc.includes('kiềng') || desc.includes('vòng') || desc.includes('túi') || desc.includes('xà tích'))
-          slot = 'accessories';
+        let slot = 'top';
+        let category = 'Áo';
+        if (desc.includes('khăn')) { slot = 'head'; category = 'Khăn'; }
+        else if (desc.includes('mũ') || desc.includes('nón')) { slot = 'head'; category = 'Mũ'; }
+        else if (desc.includes('váy')) { slot = 'bottom'; category = 'Váy'; }
+        else if (desc.includes('quần')) { slot = 'bottom'; category = 'Quần'; }
+        else if (desc.includes('áo') || desc.includes('yếm')) { slot = 'top'; category = 'Áo'; }
+        else if (desc.includes('hài') || desc.includes('giày') || desc.includes('guốc')) { slot = 'footwear'; category = 'Giày'; }
+        else if (desc.includes('kiềng') || desc.includes('vòng') || desc.includes('chuỗi') || desc.includes('bạc')) { slot = 'accessories'; category = 'Trang sức'; }
+        else if (desc.includes('túi') || desc.includes('thắt lưng') || desc.includes('xà tích')) { slot = 'accessories'; category = 'Phụ kiện'; }
+        else if (itemCategory) {
+          category = itemCategory;
+          if (['Khăn', 'Mũ'].includes(itemCategory)) slot = 'head';
+          else if (itemCategory === 'Áo') slot = 'top';
+          else if (['Quần', 'Váy'].includes(itemCategory)) slot = 'bottom';
+          else if (itemCategory === 'Giày') slot = 'footwear';
+          else slot = 'accessories';
+        }
 
-        let ethnic = 'Kinh';
+        let ethnic = 'Chưa xác minh';
         if (desc.includes('mông') || desc.includes('lanh') || desc.includes('chàm')) ethnic = "H'Mông";
         else if (desc.includes('chăm') || desc.includes('aw cam') || desc.includes('khaban')) ethnic = 'Chăm';
         else if (desc.includes('dao') || desc.includes('quả bông')) ethnic = 'Dao';
+        else if (desc.includes('ngũ thân') || desc.includes('nhật bình') || desc.includes('áo tấc')) ethnic = 'Kinh';
 
         return res.json({
+          predicted_category: category,
           predicted_slot: slot,
           predicted_ethnic_group: ethnic,
-          silhouette: 'Phom suông truyền thống cách điệu',
-          material: 'Lụa hoặc sợi tự nhiên thủ công',
-          cultural_compatibility: `Phù hợp phối cùng trang phục dân tộc ${ethnic} hoặc phong cách giao thoa đương đại.`,
+          color_hex: '#456B56',
+          silhouette: 'Phom trang phục cổ phong cách điệu',
+          material: 'Vải dệt hoặc tơ tự nhiên',
+          cultural_compatibility: 'Món đồ có thể phối cùng các trang phục giao thoa hoặc dạo phố đương đại.',
           cross_cultural_recommended: true
         });
       }
 
       const promptText = `
-Bạn là Giám định viên Trang phục Việt Cổ Y Phong AI.
-Hãy phân tích món đồ thời trang cá nhân từ mô tả sau:
-"${description || 'Trang phục hoa văn truyền thống'}"
-(Thể loại người dùng chọn: ${itemCategory || 'chưa rõ'})
+Bạn là Chuyên gia Giám định Trang phục & Di sản Thời trang "VIỆT PHỤC REMIX".
+Hãy phân tích hình ảnh và thông tin của món đồ thời trang cá nhân người dùng tải lên:
+- Mô tả bổ sung từ người dùng: "${description || 'Món đồ trang phục cá nhân'}"
+- Phân loại sơ bộ từ người dùng: "${itemCategory || 'Chưa rõ'}"
 
-Hãy dự đoán:
-1. slot: 'head' | 'top' | 'bottom' | 'footwear' | 'accessories'
-2. ethnic_group: Dân tộc hoặc triều đại phù hợp nhất (Kinh, H'Mông, Chăm, Dao, Thái, Tây Nguyên...)
-3. silhouette: Phom dáng nhận diện
-4. material: Gợi ý chất liệu
-5. cultural_compatibility: Lời khuyên kết hợp và cảnh báo nếu có
-6. cross_cultural_recommended: boolean (cho phép phối giao thoa hay không)
+QUY TẮC CẢNH BÁO QUAN TRỌNG:
+1. KHÔNG tự ý gán nhãn trang phục cá nhân là đồ tế tự/tín ngưỡng (sacred_ritual) nếu không có bằng chứng rõ ràng.
+2. KHÔNG tự bịa điển tích lịch sử. Nếu chưa đủ tư liệu, ghi "Chưa có thông tin xác minh" cho trường văn hóa.
+3. Nhận diện hình dáng thực tế từ ảnh: Áo, Quần, Váy, Khăn, Mũ, Giày, Trang sức, hay Phụ kiện.
 
-Trả về JSON:
+Hãy phân tích và trả về đúng định dạng JSON sau:
 {
-  "predicted_slot": "top",
-  "predicted_ethnic_group": "Kinh",
-  "silhouette": "Áo ngũ thân tay chẽn",
-  "material": "Lụa gấm tơ tằm",
-  "cultural_compatibility": "Phù hợp phối cùng khăn đóng và quần bạch sa",
+  "predicted_category": "Áo" | "Quần" | "Váy" | "Khăn" | "Mũ" | "Giày" | "Trang sức" | "Phụ kiện",
+  "predicted_slot": "top" | "bottom" | "head" | "footwear" | "accessories",
+  "predicted_ethnic_group": "Tên dân tộc nếu nhận diện được (ví dụ: Kinh, H'Mông, Chăm...) hoặc 'Chưa xác minh'",
+  "color_hex": "#Mã màu chủ đạo của món đồ (ví dụ: #2D533F)",
+  "silhouette": "Mô tả ngắn phom dáng (dưới 15 từ)",
+  "material": "Gợi ý chất liệu phỏng đoán (dưới 15 từ)",
+  "cultural_compatibility": "Gợi ý cách phối kết hợp đương đại an toàn",
   "cross_cultural_recommended": true
 }
 `;
 
+      const contentParts: any[] = [];
+
+      // Extract Base64 Image if provided
+      if (base64Image && typeof base64Image === 'string') {
+        const commaIdx = base64Image.indexOf(',');
+        if (commaIdx !== -1) {
+          const mimeMatch = base64Image.substring(0, commaIdx).match(/data:([^;]+);/);
+          const mimeType = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+          const rawBase64 = base64Image.substring(commaIdx + 1);
+          contentParts.push({
+            inlineData: {
+              data: rawBase64,
+              mimeType: mimeType
+            }
+          });
+        }
+      }
+
+      contentParts.push({ text: promptText });
+
       const response = await aiClient.models.generateContent({
-        model: 'gemini-3.8-flash',
-        contents: promptText,
+        model: 'gemini-2.5-flash',
+        contents: contentParts,
         config: {
           responseMimeType: 'application/json',
           temperature: 0.2
@@ -509,11 +542,13 @@ Trả về JSON:
     } catch (err: any) {
       console.error('Error in classify-upload endpoint:', err);
       return res.json({
-        predicted_slot: req.body?.itemCategory || 'top',
-        predicted_ethnic_group: 'Kinh',
-        silhouette: 'Phom dáng truyền thống',
-        material: 'Vải dệt tự nhiên',
-        cultural_compatibility: 'Món đồ có tiềm năng kết hợp phong cách cổ phong giao thoa trẻ trung.',
+        predicted_category: req.body?.itemCategory || 'Áo',
+        predicted_slot: 'top',
+        predicted_ethnic_group: 'Chưa xác minh',
+        color_hex: '#456B56',
+        silhouette: 'Phom dáng đương đại',
+        material: 'Vải tự nhiên',
+        cultural_compatibility: 'Món đồ có tiềm năng phối giao thoa phong cách trẻ trung.',
         cross_cultural_recommended: true
       });
     }
@@ -528,7 +563,7 @@ Trả về JSON:
         // Fallback response if API key is not yet set
         const lastMsg = messages[messages.length - 1]?.content || '';
         return res.json({
-          reply: `Chào bạn! Tôi là Cố vấn Việt Cổ Y Phong AI. Về câu hỏi "${lastMsg}", trang phục truyền thống Việt Nam và 54 dân tộc luôn tuân theo các nguyên tắc hài hòa ngũ sắc, tôn trọng tín ngưỡng và nguồn gốc cội nguồn. Bạn có thể sử dụng tính năng "Phối theo ngữ cảnh" hoặc chọn các món đồ trên ma-nơ-canh 3D để trải nghiệm trực quan nhé!`
+          reply: `Chào bạn! Tôi là Cố vấn Việt Cổ Y Phong AI. Về câu hỏi "${lastMsg}", trang phục truyền thống Việt Nam và 54 dân tộc luôn tuân theo các nguyên tắc hài hòa ngũ sắc, tôn trọng tín ngưỡng và nguồn gốc cội nguồn. Bạn có thể sử dụng tính năng "Phối theo ngữ cảnh" hoặc chọn các món đồ tại Studio phối đồ để trải nghiệm trực quan nhé!`
         });
       }
 

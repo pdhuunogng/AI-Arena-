@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useCostumeStore } from '../../store/useCostumeStore';
-import { MannequinViewer } from '../mannequin/MannequinViewer';
-import { CostumeSlot, CostumeItem } from '../../types/costume';
+import { CostumeItem, GarmentCategory } from '../../types/costume';
 import {
   Sparkles,
   Wand2,
@@ -14,23 +13,24 @@ import {
   Send,
   Bookmark,
   ShieldCheck,
-  Star,
   Check,
   Sliders,
   Layers,
-  Eye,
-  Box
+  X,
+  Plus,
+  Trash2,
+  Search,
+  Filter
 } from 'lucide-react';
 
 export const StylingStudio: React.FC = () => {
   const {
     outfit,
     setSlotItem,
+    removeSlotItem,
     toggleLockSlot,
     isSlotLocked,
     clearOutfit,
-    selectedSlotForWardrobe,
-    setSelectedSlotForWardrobe,
     setSelectedItemForDetail,
     heritageItems,
     customClosetItems,
@@ -46,40 +46,93 @@ export const StylingStudio: React.FC = () => {
   } = useCostumeStore();
 
   const [promptText, setPromptText] = useState('');
+  const [selectedOccasion, setSelectedOccasion] = useState('Dạo phố & gặp gỡ bạn bè');
   const [saveSuccessMsg, setSaveSuccessMsg] = useState(false);
-  const [activeSubTab, setActiveSubTab] = useState<'manual' | 'ai'>('ai');
-  const [viewMode, setViewMode] = useState<'flatlay' | '3d'>('flatlay');
+  const [activeSubTab, setActiveSubTab] = useState<'manual' | 'ai'>('manual');
+  const [activeDrawerSlot, setActiveDrawerSlot] = useState<GarmentCategory | null>('Áo');
+  const [drawerSearch, setDrawerSearch] = useState('');
+  const [drawerSourceFilter, setDrawerSourceFilter] = useState<'all' | 'heritage' | 'personal'>('all');
 
-  // All items in catalog
+  // Unified catalog
   const catalog = [...heritageItems, ...customClosetItems];
 
-  // Preset context prompt suggestions
+  // Presets
   const PRESET_PROMPTS = [
     {
       title: '🌾 Đám cưới mùa thu',
-      prompt: 'Phối cho tôi một bộ đi dự đám cưới bạn mùa thu, tông màu nhã nhặn, chất liệu lụa sa, chuẩn nghi lễ trang trọng'
+      prompt: 'Phối cho tôi một bộ đi dự đám cưới bạn mùa thu, tông màu nhã nhặn, chất liệu tơ sa, chuẩn mực trang trọng'
     },
     {
       title: '⛰️ Hội Gầu Tào Tây Bắc',
-      prompt: 'Trang phục thiếu nữ H\'Mông đi trẩy hội mùa xuân, váy lanh xòe vẽ sáp ong và kiềng bạc nguyên bản'
+      prompt: 'Set đồ thổ cẩm lanh H\'Mông đi hội xuân vùng cao Tây Bắc, họa tiết sáp ong và vòng bạc hộ thân'
     },
     {
       title: '☀️ Lễ hội Katê tháp Chăm',
-      prompt: 'Trang phục nữ Chăm tham dự lễ hội Katê nắng tháp, áo trắng Aw Cam kết hợp thắt lưng dệt thổ cẩm Khaban rực rỡ'
+      prompt: 'Trang phục nữ Chăm áo Aw Cam trắng kết hợp thắt lưng thổ cẩm Khaban rực rỡ dự lễ hội Katê'
     },
     {
       title: '🍃 Dạo phố giao thoa',
-      prompt: 'Phối đồ dạo phố cuối tuần mang hơi thở cổ phong thanh lịch, giao thoa đương đại nhẹ nhàng'
+      prompt: 'Phối áo ngũ thân cách tân đương đại để dạo phố cuối tuần, trẻ trung, phối hợp phụ kiện thoải mái'
+    },
+    {
+      title: '🔥 Streetwear Cổ Phong',
+      prompt: 'Phối áo truyền thống theo phong cách streetwear Gen Z cá tính, giữ nguyên hoa văn và phom dáng gốc'
     }
   ];
 
-  // Mechanism 1: Trigger AI outfit completion based on unlocked slots
-  const handleCompleteOutfit = async () => {
-    try {
-      setAiLoading(true);
-      setAiError(null);
+  // Filter items compatible with current active drawer slot
+  const drawerItems = catalog.filter((item) => {
+    if (activeDrawerSlot && item.category !== activeDrawerSlot) {
+      return false;
+    }
+    if (drawerSourceFilter === 'heritage' && item.is_personal) return false;
+    if (drawerSourceFilter === 'personal' && !item.is_personal) return false;
 
-      const response = await fetch('/api/advisor/complete-outfit', {
+    if (drawerSearch.trim()) {
+      const q = drawerSearch.toLowerCase();
+      const match =
+        item.name.toLowerCase().includes(q) ||
+        item.ethnic_group.toLowerCase().includes(q) ||
+        item.material.toLowerCase().includes(q) ||
+        item.pattern_description.toLowerCase().includes(q);
+      if (!match) return false;
+    }
+    return true;
+  });
+
+  // Check if item is currently in outfit
+  const isItemEquipped = (item: CostumeItem): boolean => {
+    const s = outfit.slots;
+    return (
+      s.ao?.id === item.id ||
+      s.quan?.id === item.id ||
+      s.vay?.id === item.id ||
+      s.khan?.id === item.id ||
+      s.mu?.id === item.id ||
+      s.giay?.id === item.id ||
+      s.trang_suc.some((a) => a.id === item.id) ||
+      s.phu_kien.some((a) => a.id === item.id)
+    );
+  };
+
+  // Handle selecting an item into the outfit
+  const handleSelectItem = (item: CostumeItem) => {
+    if (item.category === 'Áo') setSlotItem('ao', item);
+    else if (item.category === 'Quần') setSlotItem('quan', item);
+    else if (item.category === 'Váy') setSlotItem('vay', item);
+    else if (item.category === 'Khăn') setSlotItem('khan', item);
+    else if (item.category === 'Mũ') setSlotItem('mu', item);
+    else if (item.category === 'Giày') setSlotItem('giay', item);
+    else if (item.category === 'Trang sức') setSlotItem('trang_suc', item);
+    else if (item.category === 'Phụ kiện') setSlotItem('phu_kien', item);
+  };
+
+  // AI Advisor Call: Hoàn thiện từ slot đang chọn (Cơ chế 1)
+  const handleTriggerAiComplete = async () => {
+    setAiLoading(true);
+    setAiError(null);
+    try {
+      const res = await fetch('/api/advisor/complete-outfit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -87,661 +140,567 @@ export const StylingStudio: React.FC = () => {
           lockedSlots: outfit.locked_slots,
           catalogItems: catalog,
           userGender: outfit.gender,
-          occasionPrompt: promptText.trim() || 'Hoàn thiện trang phục hài hòa văn hóa'
+          occasionPrompt: `${selectedOccasion}: ${promptText}`
         })
       });
 
-      if (!response.ok) {
-        throw new Error('Không thể kết nối đến cố vấn AI');
-      }
-
-      const data = await response.json();
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const data = await res.json();
       setAiAdvisoryResult(data);
-      applyAiOutfit(data);
     } catch (err: any) {
-      console.error(err);
-      setAiError(err.message || 'Lỗi khi gọi AI cố vấn');
+      console.error('Failed to complete outfit:', err);
+      setAiError('Không thể kết nối đến Cố vấn AI. Đang sử dụng engine quy tắc di sản nội tại.');
     } finally {
       setAiLoading(false);
     }
   };
 
-  // Mechanism 2: Free context-based prompt styling
-  const handleFreePrompt = async (selectedPrompt?: string) => {
-    const textToSend = selectedPrompt || promptText;
-    if (!textToSend.trim()) return;
-
+  // AI Advisor Call: Phối tự do theo prompt (Cơ chế 2)
+  const handleTriggerAiFreePrompt = async () => {
+    if (!promptText.trim()) return;
+    setAiLoading(true);
+    setAiError(null);
     try {
-      setAiLoading(true);
-      setAiError(null);
-      if (selectedPrompt) setPromptText(selectedPrompt);
-
-      const response = await fetch('/api/advisor/free-prompt', {
+      const res = await fetch('/api/advisor/free-prompt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          prompt: textToSend,
+          prompt: `${selectedOccasion}: ${promptText}`,
           catalogItems: catalog,
           userGender: outfit.gender
         })
       });
 
-      if (!response.ok) {
-        throw new Error('Không thể phân tích ngữ cảnh phối đồ');
-      }
-
-      const data = await response.json();
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const data = await res.json();
       setAiAdvisoryResult(data);
-      applyAiOutfit(data);
     } catch (err: any) {
-      console.error(err);
-      setAiError(err.message || 'Lỗi khi gọi AI phân tích bối cảnh');
+      console.error('Failed to run prompt advisor:', err);
+      setAiError('Không thể kết nối đến Cố vấn AI. Vui lòng thử lại.');
     } finally {
       setAiLoading(false);
     }
   };
 
+  // Save to Lookbook
   const handleSaveLookbook = () => {
     saveCurrentToLookbook();
     setSaveSuccessMsg(true);
     setTimeout(() => setSaveSuccessMsg(false), 2500);
   };
 
-  const scoreNum = parseInt(aiAdvisoryResult?.cultural_accuracy_score?.replace('%', '') || '96', 10);
-
-  // Flat-lay items helper
-  const topItem = outfit.slots.top;
-  const bottomItem = outfit.slots.bottom;
-  const footwearItem = outfit.slots.footwear;
-  const headItem = outfit.slots.head || outfit.slots.accessories[0];
+  // Equipped items count
+  const equippedCount = [
+    outfit.slots.ao,
+    outfit.slots.quan,
+    outfit.slots.vay,
+    outfit.slots.khan,
+    outfit.slots.mu,
+    outfit.slots.giay,
+    ...outfit.slots.trang_suc,
+    ...outfit.slots.phu_kien
+  ].filter(Boolean).length;
 
   return (
-    <div className="relative min-h-screen bg-[#fbf9f4] text-[#1a1c1a] font-sans pb-16 selection:bg-[#CE6250]/15 selection:text-[#CE6250]">
-      {/* Subtle Vietnamese Heritage Geometric Watermark */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.035] overflow-hidden">
-        <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="stitch-heritage-grid" width="100" height="100" patternUnits="userSpaceOnUse">
-              <path d="M50 0 L100 50 L50 100 L0 50 Z" fill="none" stroke="#2d533f" strokeWidth="1" />
-              <circle cx="50" cy="50" r="16" fill="none" stroke="#caa749" strokeWidth="0.8" />
-              <path d="M0 0 L100 100 M100 0 L0 100" stroke="#2d533f" strokeWidth="0.5" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#stitch-heritage-grid)" />
-        </svg>
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+      {/* 1. Header Bar: Identity & Actions */}
+      <div className="relative rounded-3xl overflow-hidden bg-[#2D533F] text-[#FFFDF8] p-6 sm:p-8 shadow-xl border border-[#234131]">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-[#D8B454] font-mono">
+                VIỆT PHỤC REMIX · STYLING STUDIO
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-label-sm bg-black/30 text-[#FFFDF8] border border-white/20 font-semibold">
+                ✓ {equippedCount} món đang mặc · {aiAdvisoryResult?.cultural_accuracy_score || '96% Chuẩn Di Sản'}
+              </span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-serif font-bold text-white mt-1">
+              Phòng Phối Trang Phục & Phụ Kiện
+            </h1>
+            <p className="text-xs sm:text-sm text-stone-100 font-sans mt-0.5 max-w-xl">
+              Chọn từng món đồ truyền thống, hoàn thiện diện mạo theo phong cách Gen Z cùng sự bảo chứng của AI
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Gender Quick Preset */}
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-black/20 border border-white/20 text-xs font-label-md">
+              {(['nam', 'nu', 'nonbinary'] as const).map((g) => (
+                <button
+                  key={g}
+                  onClick={() => setGender(g)}
+                  className={`px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
+                    outfit.gender === g
+                      ? 'bg-[#D8B454] text-stone-900 font-bold shadow-xs'
+                      : 'text-stone-100 hover:text-white'
+                  }`}
+                >
+                  {g === 'nam' ? 'Nam' : g === 'nu' ? 'Nữ' : 'Nonbinary'}
+                </button>
+              ))}
+            </div>
+
+            {/* Clear outfit button */}
+            <button
+              onClick={clearOutfit}
+              className="px-3.5 py-2 text-xs font-label-md text-white bg-white/15 hover:bg-white/25 rounded-xl transition-colors cursor-pointer border border-white/25 font-semibold"
+            >
+              + Làm mới
+            </button>
+
+            {/* Save lookbook button */}
+            <button
+              onClick={handleSaveLookbook}
+              className="flex items-center gap-1.5 px-4 py-2 text-xs font-label-md font-bold text-stone-900 bg-[#D8B454] hover:bg-[#c9a33e] rounded-xl transition-all shadow-md cursor-pointer"
+            >
+              <Bookmark className="w-3.5 h-3.5" />
+              <span>{saveSuccessMsg ? 'Đã lưu vào Lookbook!' : 'Lưu Lookbook'}</span>
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+      {/* 2. Mode Switcher (Tự phối đồ vs AI hỗ trợ) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-3 rounded-2xl bg-white border border-[#e9e8e3] shadow-xs">
+        <div className="bg-[#efeee9] p-1 rounded-full flex max-w-sm border border-[#e9e8e3]">
+          <button
+            onClick={() => setActiveSubTab('manual')}
+            className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-full text-xs font-label-md transition-all cursor-pointer ${
+              activeSubTab === 'manual'
+                ? 'bg-white text-[#2d533f] font-bold shadow-xs'
+                : 'text-[#414942] hover:text-[#1a1c1a]'
+            }`}
+          >
+            <Sliders className="w-3.5 h-3.5 text-[#a03f30]" />
+            <span>Tự phối đồ (Thủ công)</span>
+          </button>
 
-        {/* 1. Header Banner - TAB 2: ĐỎ CHU SA DI SẢN (VERMILION / TERRACOTTA) */}
-        <div className="relative rounded-3xl overflow-hidden bg-[#CE6250] text-white p-6 sm:p-8 shadow-md border border-[#B84D3C]">
-          <div className="absolute inset-0 pointer-events-none opacity-20">
-            <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <pattern id="vent-brick-24" width="24" height="24" patternUnits="userSpaceOnUse">
-                  <path d="M12 0 L24 12 L12 24 L0 12 Z" fill="none" stroke="#FFFFFF" strokeOpacity="0.3" strokeWidth="0.8"></path>
-                  <circle cx="12" cy="12" fill="#FFFFFF" fillOpacity="0.3" r="1.5"></circle>
-                </pattern>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#vent-brick-24)"></rect>
-            </svg>
+          <button
+            onClick={() => setActiveSubTab('ai')}
+            className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-full text-xs font-label-md transition-all cursor-pointer ${
+              activeSubTab === 'ai'
+                ? 'bg-[#2d533f] text-white font-bold shadow-xs'
+                : 'text-[#414942] hover:text-[#2d533f]'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-[#D8B454]" />
+            <span>AI hỗ trợ ✨</span>
+          </button>
+        </div>
+
+        {/* Heritage Guard Status */}
+        <div className="flex items-center gap-2 text-xs text-[#414942] px-3.5 py-2 rounded-xl bg-[#f5f4ef] border border-[#e9e8e3]">
+          <ShieldCheck className="w-4 h-4 text-[#2d533f] shrink-0" />
+          <span className="font-label-md font-bold text-[#1a1c1a]">Ràng buộc văn hóa:</span>
+          <span className="text-[#2d533f] font-semibold">Đang bật (Chống lai tạp nghi lễ)</span>
+        </div>
+      </div>
+
+      {/* 3. Main Grid: Selected Items Area (Left 7 Cols) + Garment Selector / AI Console (Right 5 Cols) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* LEFT COLUMN: SELECTED ITEMS AREA (BẢNG PHỐI ĐỒ DẠNG THẺ THỰC TẾ) */}
+        <div className="lg:col-span-7 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Layers className="w-4 h-4 text-[#2d533f]" />
+              <h2 className="font-serif font-bold text-lg text-[#1a1c1a]">
+                Các Món Đã Chọn Vào Bộ Trang Phục
+              </h2>
+            </div>
+            <span className="text-[11px] font-label-sm text-[#755b00] bg-[#D8B454]/20 px-2.5 py-0.5 rounded-full border border-[#D8B454]/40 font-semibold">
+              {equippedCount}/8 vị trí trang phục
+            </span>
           </div>
 
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[11px] font-bold uppercase tracking-widest text-[#FFDAD4] font-mono">
-                  STYLING STUDIO · DI SẢN CỐ ĐÔ
-                </span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-label-sm bg-black/20 text-[#FFFDF8] border border-white/20 font-semibold">
-                  ✓ Chuẩn Mực Cố Đô · {scoreNum}% Chuẩn
-                </span>
+          {/* Slots Grid: 8 Modular Garment Slots */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Slot 1: ÁO */}
+            <GarmentSlotCard
+              title="Áo"
+              category="Áo"
+              slotKey="ao"
+              item={outfit.slots.ao}
+              isLocked={isSlotLocked('ao')}
+              onToggleLock={() => toggleLockSlot('ao')}
+              onOpenDrawer={() => setActiveDrawerSlot('Áo')}
+              onRemove={() => removeSlotItem('ao')}
+              onViewDetail={(item) => setSelectedItemForDetail(item)}
+            />
+
+            {/* Slot 2: QUẦN */}
+            <GarmentSlotCard
+              title="Quần"
+              category="Quần"
+              slotKey="quan"
+              item={outfit.slots.quan}
+              isLocked={isSlotLocked('quan')}
+              onToggleLock={() => toggleLockSlot('quan')}
+              onOpenDrawer={() => setActiveDrawerSlot('Quần')}
+              onRemove={() => removeSlotItem('quan')}
+              onViewDetail={(item) => setSelectedItemForDetail(item)}
+            />
+
+            {/* Slot 3: VÁY */}
+            <GarmentSlotCard
+              title="Váy"
+              category="Váy"
+              slotKey="vay"
+              item={outfit.slots.vay}
+              isLocked={isSlotLocked('vay')}
+              onToggleLock={() => toggleLockSlot('vay')}
+              onOpenDrawer={() => setActiveDrawerSlot('Váy')}
+              onRemove={() => removeSlotItem('vay')}
+              onViewDetail={(item) => setSelectedItemForDetail(item)}
+            />
+
+            {/* Slot 4: KHĂN */}
+            <GarmentSlotCard
+              title="Khăn"
+              category="Khăn"
+              slotKey="khan"
+              item={outfit.slots.khan}
+              isLocked={isSlotLocked('khan')}
+              onToggleLock={() => toggleLockSlot('khan')}
+              onOpenDrawer={() => setActiveDrawerSlot('Khăn')}
+              onRemove={() => removeSlotItem('khan')}
+              onViewDetail={(item) => setSelectedItemForDetail(item)}
+            />
+
+            {/* Slot 5: MŨ */}
+            <GarmentSlotCard
+              title="Mũ"
+              category="Mũ"
+              slotKey="mu"
+              item={outfit.slots.mu}
+              isLocked={isSlotLocked('mu')}
+              onToggleLock={() => toggleLockSlot('mu')}
+              onOpenDrawer={() => setActiveDrawerSlot('Mũ')}
+              onRemove={() => removeSlotItem('mu')}
+              onViewDetail={(item) => setSelectedItemForDetail(item)}
+            />
+
+            {/* Slot 6: GIÀY */}
+            <GarmentSlotCard
+              title="Giày / Hài"
+              category="Giày"
+              slotKey="giay"
+              item={outfit.slots.giay}
+              isLocked={isSlotLocked('giay')}
+              onToggleLock={() => toggleLockSlot('giay')}
+              onOpenDrawer={() => setActiveDrawerSlot('Giày')}
+              onRemove={() => removeSlotItem('giay')}
+              onViewDetail={(item) => setSelectedItemForDetail(item)}
+            />
+          </div>
+
+          {/* Multi-item slots: TRANG SỨC & PHỤ KIỆN */}
+          <div className="space-y-4 pt-2">
+            {/* Slot 7: TRANG SỨC */}
+            <div className="bg-white rounded-2xl border border-[#e9e8e3] p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-[#caa749]/20 text-[#755b00] flex items-center justify-center text-[10px] font-bold">
+                    7
+                  </span>
+                  <span className="text-xs font-label-md font-bold uppercase tracking-wider text-[#1a1c1a]">
+                    Trang Sức (Kiềng, Xà tích, Vòng)
+                  </span>
+                </div>
+                <button
+                  onClick={() => setActiveDrawerSlot('Trang sức')}
+                  className="px-2.5 py-1 text-xs font-label-md font-semibold text-[#2d533f] hover:bg-[#2d533f]/10 rounded-lg transition-colors cursor-pointer"
+                >
+                  + Thêm trang sức
+                </button>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-serif font-bold text-white mt-1">
-                Bảng Phối Đồ Cổ Phong
-              </h1>
-              <p className="text-xs sm:text-sm text-stone-100 font-sans mt-0.5 max-w-xl">
-                Phối kết ngũ thân, áo tấc cùng trang phục 54 dân tộc đương đại dưới sự trợ vấn của AI
-              </p>
+
+              {outfit.slots.trang_suc.length === 0 ? (
+                <div
+                  onClick={() => setActiveDrawerSlot('Trang sức')}
+                  className="p-4 rounded-xl border border-dashed border-[#c1c9bf] bg-[#fbf9f4] text-center text-xs text-[#717971] cursor-pointer hover:border-[#2d533f] transition-all"
+                >
+                  Chưa chọn món trang sức nào. Nhấn để khám phá kiềng bạc, xà tích...
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {outfit.slots.trang_suc.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center gap-3 p-2.5 rounded-xl bg-[#f5f4ef] border border-[#e9e8e3]"
+                    >
+                      <img
+                        src={item.image_url}
+                        alt={item.name}
+                        className="w-12 h-12 rounded-lg object-cover bg-white shrink-0 border border-[#e9e8e3]"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <h4 className="text-xs font-bold text-[#1a1c1a] truncate">{item.name}</h4>
+                        <span className="text-[10px] text-[#717971]">{item.ethnic_group}</span>
+                      </div>
+                      <button
+                        onClick={() => setSlotItem('trang_suc', item)}
+                        className="p-1 text-[#717971] hover:text-[#a03f30] transition-colors cursor-pointer"
+                        title="Gỡ bỏ món này"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
-            <div className="flex flex-wrap items-center gap-2.5">
-              {/* View Mode Toggle (Flat-lay vs 3D) */}
-              <div className="flex items-center gap-1 p-1 rounded-xl bg-black/20 border border-white/20 text-xs font-label-md">
+            {/* Slot 8: PHỤ KIỆN */}
+            <div className="bg-white rounded-2xl border border-[#e9e8e3] p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-[#caa749]/20 text-[#755b00] flex items-center justify-center text-[10px] font-bold">
+                    8
+                  </span>
+                  <span className="text-xs font-label-md font-bold uppercase tracking-wider text-[#1a1c1a]">
+                    Phụ Kiện (Thắt lưng, Túi gấm, Quạt)
+                  </span>
+                </div>
                 <button
-                  onClick={() => setViewMode('flatlay')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                    viewMode === 'flatlay'
-                      ? 'bg-white text-[#CE6250] font-bold shadow-xs'
-                      : 'text-stone-100 hover:text-white'
-                  }`}
+                  onClick={() => setActiveDrawerSlot('Phụ kiện')}
+                  className="px-2.5 py-1 text-xs font-label-md font-semibold text-[#2d533f] hover:bg-[#2d533f]/10 rounded-lg transition-colors cursor-pointer"
                 >
-                  <Layers className="w-3.5 h-3.5" />
-                  <span>Flat-lay 2x2</span>
-                </button>
-                <button
-                  onClick={() => setViewMode('3d')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                    viewMode === '3d'
-                      ? 'bg-white text-[#CE6250] font-bold shadow-xs'
-                      : 'text-stone-100 hover:text-white'
-                  }`}
-                >
-                  <Box className="w-3.5 h-3.5" />
-                  <span>Ma-nơ-canh 3D</span>
+                  + Thêm phụ kiện
                 </button>
               </div>
 
-              {/* Gender Quick Toggle */}
-              <div className="flex items-center gap-1 p-1 rounded-xl bg-black/20 border border-white/20 text-xs font-label-md">
-                {(['nam', 'nu', 'nonbinary'] as const).map((g) => (
-                  <button
-                    key={g}
-                    onClick={() => setGender(g)}
-                    className={`px-2.5 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
-                      outfit.gender === g
-                        ? 'bg-[#D8B454] text-stone-900 font-bold'
-                        : 'text-stone-100 hover:text-white'
-                    }`}
-                  >
-                    {g === 'nam' ? 'Nam' : g === 'nu' ? 'Nữ' : 'Nonbinary'}
-                  </button>
-                ))}
-              </div>
-
-              {/* Action buttons */}
-              <button
-                onClick={clearOutfit}
-                className="px-3.5 py-2 text-xs font-label-md text-white bg-white/15 hover:bg-white/25 rounded-xl transition-colors cursor-pointer border border-white/25 font-semibold"
-              >
-                + Làm mới
-              </button>
-              <button
-                onClick={handleSaveLookbook}
-                className="flex items-center gap-1.5 px-4 py-2 text-xs font-label-md font-bold text-stone-900 bg-[#D8B454] hover:bg-[#c9a33e] rounded-xl transition-all shadow-xs cursor-pointer"
-              >
-                <Bookmark className="w-3.5 h-3.5" />
-                <span>{saveSuccessMsg ? 'Đã lưu!' : 'Lưu Lookbook'}</span>
-              </button>
+              {outfit.slots.phu_kien.length === 0 ? (
+                <div
+                  onClick={() => setActiveDrawerSlot('Phụ kiện')}
+                  className="p-4 rounded-xl border border-dashed border-[#c1c9bf] bg-[#fbf9f4] text-center text-xs text-[#717971] cursor-pointer hover:border-[#2d533f] transition-all"
+                >
+                  Chưa chọn phụ kiện nào. Nhấn để thêm thắt lưng lụa, túi gấm...
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {outfit.slots.phu_kien.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center gap-3 p-2.5 rounded-xl bg-[#f5f4ef] border border-[#e9e8e3]"
+                    >
+                      <img
+                        src={item.image_url}
+                        alt={item.name}
+                        className="w-12 h-12 rounded-lg object-cover bg-white shrink-0 border border-[#e9e8e3]"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <h4 className="text-xs font-bold text-[#1a1c1a] truncate">{item.name}</h4>
+                        <span className="text-[10px] text-[#717971]">{item.ethnic_group}</span>
+                      </div>
+                      <button
+                        onClick={() => setSlotItem('phu_kien', item)}
+                        className="p-1 text-[#717971] hover:text-[#a03f30] transition-colors cursor-pointer"
+                        title="Gỡ bỏ món này"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
 
-        {/* 2. Pill Switcher Tabs & Heritage Constraint Badge */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-3 rounded-2xl bg-white border border-[#e9e8e3] shadow-xs">
-          {/* Segmented Pill Tabs */}
-          <div className="bg-[#efeee9] p-1 rounded-full flex max-w-sm border border-[#e9e8e3]">
-            <button
-              onClick={() => setActiveSubTab('manual')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-full text-xs font-label-md transition-all cursor-pointer ${
-                activeSubTab === 'manual'
-                  ? 'bg-white text-[#2d533f] font-bold shadow-xs'
-                  : 'text-[#414942] hover:text-[#1a1c1a]'
-              }`}
-            >
-              <Sliders className="w-3.5 h-3.5 text-[#a03f30]" />
-              <span>Tự phối đồ</span>
-            </button>
+        {/* RIGHT COLUMN: DRAWER SELECTOR (MANUAL) OR AI ASSISTANT CONSOLE (AI) */}
+        <div className="lg:col-span-5 space-y-4">
+          {activeSubTab === 'manual' ? (
+            /* VISUAL GARMENT SELECTOR PANEL */
+            <div className="bg-white rounded-3xl border border-[#e9e8e3] p-5 shadow-xs space-y-4">
+              <div className="flex items-center justify-between border-b border-[#efeee9] pb-3">
+                <div className="space-y-0.5">
+                  <div className="text-[10px] font-mono text-[#A03F30] uppercase font-bold tracking-wider">
+                    NGĂN KÉO CHỌN ĐỒ
+                  </div>
+                  <h3 className="text-base sm:text-lg font-serif font-bold text-[#1a1c1a]">
+                    Chọn: {activeDrawerSlot || 'Tất cả món'}
+                  </h3>
+                </div>
+                <span className="text-xs font-mono text-[#717971]">
+                  {drawerItems.length} món khả dụng
+                </span>
+              </div>
 
-            <button
-              onClick={() => setActiveSubTab('ai')}
-              className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-full text-xs font-label-md transition-all cursor-pointer ${
-                activeSubTab === 'ai'
-                  ? 'bg-[#2d533f] text-white font-bold shadow-xs'
-                  : 'text-[#414942] hover:text-[#2d533f]'
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5 text-[#caa749]" />
-              <span>AI hỗ trợ ✨</span>
-            </button>
-          </div>
+              {/* Category fast tabs */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
+                {(['Áo', 'Quần', 'Váy', 'Khăn', 'Mũ', 'Giày', 'Trang sức', 'Phụ kiện'] as GarmentCategory[]).map(
+                  (cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setActiveDrawerSlot(cat)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-label-md font-semibold shrink-0 cursor-pointer transition-all ${
+                        activeDrawerSlot === cat
+                          ? 'bg-[#2d533f] text-white shadow-xs'
+                          : 'bg-[#f5f4ef] text-[#414942] hover:bg-[#e9e8e3]'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  )
+                )}
+              </div>
 
-          {/* Heritage Constraint Status Strip */}
-          <div className="flex items-center gap-2.5 text-xs text-[#414942] px-3.5 py-2 rounded-xl bg-[#f5f4ef] border border-[#e9e8e3]">
-            <ShieldCheck className="w-4 h-4 text-[#2d533f] shrink-0" />
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-label-md font-bold text-[#1a1c1a] uppercase text-[11px]">
-                Chuẩn Mực Cố Đô:
-              </span>
-              <span className="text-[#2d533f] font-medium font-body-sm">
-                Ràng buộc văn hóa: <strong className="text-[#1a1c1a]">Đang bật</strong> ✦ {outfit.slots.top?.ethnic_group || 'Kinh (Thời Nguyễn)'}
-              </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-label-sm bg-[#2d533f] text-white font-bold">
-                {aiAdvisoryResult?.cultural_accuracy_score || '96% Chuẩn'}
-              </span>
-            </div>
-          </div>
-        </div>
+              {/* Source filter & Search bar */}
+              <div className="space-y-2">
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 absolute left-3 top-3 text-[#717971]" />
+                  <input
+                    type="text"
+                    value={drawerSearch}
+                    onChange={(e) => setDrawerSearch(e.target.value)}
+                    placeholder="Tìm theo tên, dân tộc, chất liệu..."
+                    className="w-full bg-[#fbf9f4] border border-[#e9e8e3] rounded-xl pl-9 pr-3 py-2 text-xs text-[#1a1c1a] focus:outline-none focus:border-[#2d533f]"
+                  />
+                </div>
 
-        {/* 3. Main Body Grid: Showcase on Left (5 cols), Console / AI Advisor on Right (7 cols) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          
-          {/* Left Column: Flat-lay 2x2 Grid OR 3D Mannequin */}
-          <div className="lg:col-span-5 space-y-4">
-            
-            {viewMode === '3d' ? (
-              /* 3D Mannequin Viewer */
-              <div className="space-y-3">
-                <MannequinViewer interactive={true} autoRotateDefault={false} />
-                <div className="p-3 bg-white rounded-2xl border border-[#e9e8e3] text-center text-xs font-label-sm text-[#414942]">
-                  Dáng ma-nơ-canh: <strong className="text-[#2d533f] capitalize">{outfit.gender}</strong> · Kéo chuột để xoay 360°
+                <div className="flex items-center gap-1.5 text-[11px]">
+                  <span className="text-[#717971]">Nguồn:</span>
+                  {(['all', 'heritage', 'personal'] as const).map((src) => (
+                    <button
+                      key={src}
+                      onClick={() => setDrawerSourceFilter(src)}
+                      className={`px-2.5 py-0.5 rounded-md transition-colors cursor-pointer ${
+                        drawerSourceFilter === src
+                          ? 'bg-[#caa749]/30 text-[#755b00] font-bold'
+                          : 'text-[#414942] hover:bg-[#f5f4ef]'
+                      }`}
+                    >
+                      {src === 'all' ? 'Tất cả' : src === 'heritage' ? 'Di sản mẫu' : 'Tủ đồ cá nhân'}
+                    </button>
+                  ))}
                 </div>
               </div>
-            ) : (
-              /* Flat-lay Outfit Grid ("Bảng Phối Đồ Flat-lay") */
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Layers className="w-4 h-4 text-[#2d533f]" />
-                    <h2 className="font-headline font-bold text-base sm:text-lg text-[#1a1c1a]">
-                      Bảng Phối Đồ Flat-lay
-                    </h2>
-                  </div>
-                  <span className="text-[11px] font-label-sm text-[#755b00] bg-[#caa749]/15 px-2.5 py-0.5 rounded-full border border-[#caa749]/30">
-                    4 vị trí trang phục
-                  </span>
-                </div>
 
-                {/* 2x2 Grid of modular outfit slots */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  
-                  {/* Slot 1 (Top / Áo) */}
-                  <div className="bg-white rounded-2xl border border-[#e9e8e3] p-3 hover:border-[#2d533f]/40 hover:shadow-xs transition-all flex flex-col justify-between group">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-5 h-5 rounded-full bg-[#2d533f]/15 text-[#2d533f] flex items-center justify-center text-[10px] font-bold">1</span>
-                        <span className="text-xs font-label-md font-bold uppercase tracking-wider text-[#2d533f]">Áo</span>
-                      </div>
-                      <button
-                        onClick={() => toggleLockSlot('top')}
-                        className={`p-1 rounded-md transition-colors ${isSlotLocked('top') ? 'text-[#2d533f] bg-[#2d533f]/10' : 'text-[#717971] hover:text-[#2d533f]'}`}
-                        title={isSlotLocked('top') ? 'Đang khóa slot này' : 'Khóa slot này'}
+              {/* Garment Cards List */}
+              <div className="space-y-3 max-h-[520px] overflow-y-auto pr-1">
+                {drawerItems.length === 0 ? (
+                  <div className="py-8 text-center text-xs text-[#717971]">
+                    Không tìm thấy món đồ phù hợp trong mục {activeDrawerSlot}.
+                  </div>
+                ) : (
+                  drawerItems.map((item) => {
+                    const equipped = isItemEquipped(item);
+                    return (
+                      <div
+                        key={item.id}
+                        className={`p-3 rounded-2xl border transition-all flex items-center gap-3.5 ${
+                          equipped
+                            ? 'bg-[#2d533f]/10 border-[#2d533f]'
+                            : 'bg-[#fbf9f4] border-[#e9e8e3] hover:border-[#2d533f]/50'
+                        }`}
                       >
-                        {isSlotLocked('top') ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
-
-                    <div className="relative w-full h-36 bg-[#f5f4ef] rounded-xl overflow-hidden mb-2.5 border border-[#e9e8e3]/80 flex items-center justify-center">
-                      {topItem && topItem.image_url && topItem.image_url.trim() !== '' ? (
                         <img
-                          src={topItem.image_url}
-                          alt={topItem.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          src={item.image_url}
+                          alt={item.name}
+                          className="w-16 h-16 rounded-xl object-cover bg-white border border-[#e9e8e3] shrink-0"
                         />
-                      ) : topItem ? (
-                        <div className="flex flex-col items-center justify-center p-3 text-center">
-                          <span
-                            className="w-8 h-8 rounded-full mb-1.5 border border-black/15 shadow-2xs block"
-                            style={{ backgroundColor: topItem.color_hex || '#2d533f' }}
-                          />
-                          <span className="text-[11px] font-semibold text-[#1a1c1a] truncate max-w-[120px]">
-                            {topItem.name}
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="text-xs text-[#717971] italic font-body-sm">Chưa có áo</div>
-                      )}
-                      {topItem && (
-                        <span className="absolute bottom-1.5 left-1.5 px-2 py-0.5 bg-black/60 backdrop-blur-xs text-white text-[10px] font-label-sm rounded-md">
-                          {topItem.ethnic_group}
-                        </span>
-                      )}
-                    </div>
 
-                    <div>
-                      <h3 className="font-headline font-bold text-xs text-[#1a1c1a] truncate">
-                        {topItem ? topItem.name : 'Áo Giao Lĩnh'}
-                      </h3>
-                      <p className="text-[11px] text-[#414942] font-body-sm mb-2.5 truncate">
-                        {topItem ? topItem.material : 'Lụa tơ tằm dệt thủ công'}
-                      </p>
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          onClick={() => {
-                            setActiveSubTab('manual');
-                            setSelectedSlotForWardrobe(selectedSlotForWardrobe === 'top' ? null : 'top');
-                          }}
-                          className="flex-1 py-1.5 text-xs font-label-md font-semibold text-white bg-[#2d533f] hover:bg-[#456b56] rounded-xl transition-colors text-center shadow-2xs"
-                        >
-                          [Đổi món]
-                        </button>
-                        {topItem && (
-                          <button
-                            onClick={() => setSelectedItemForDetail(topItem)}
-                            className="p-1.5 text-[#2d533f] bg-[#f5f4ef] hover:bg-[#efeee9] rounded-xl border border-[#e9e8e3] text-xs"
-                            title="Ý nghĩa"
-                          >
-                            <Info className="w-3.5 h-3.5" />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Slot 2 (Bottom / Quần - Váy) */}
-                  <div className="bg-white rounded-2xl border border-[#e9e8e3] p-3 hover:border-[#2d533f]/40 hover:shadow-xs transition-all flex flex-col justify-between group">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-5 h-5 rounded-full bg-[#2d533f]/15 text-[#2d533f] flex items-center justify-center text-[10px] font-bold">2</span>
-                        <span className="text-xs font-label-md font-bold uppercase tracking-wider text-[#2d533f]">Quần / Váy</span>
-                      </div>
-                      <button
-                        onClick={() => toggleLockSlot('bottom')}
-                        className={`p-1 rounded-md transition-colors ${isSlotLocked('bottom') ? 'text-[#2d533f] bg-[#2d533f]/10' : 'text-[#717971] hover:text-[#2d533f]'}`}
-                        title={isSlotLocked('bottom') ? 'Đang khóa slot này' : 'Khóa slot này'}
-                      >
-                        {isSlotLocked('bottom') ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
-
-                    <div className="relative w-full h-36 bg-[#f5f4ef] rounded-xl overflow-hidden mb-2.5 border border-[#e9e8e3]/80 flex items-center justify-center">
-                      {bottomItem && bottomItem.image_url && bottomItem.image_url.trim() !== '' ? (
-                        <img
-                          src={bottomItem.image_url}
-                          alt={bottomItem.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : bottomItem ? (
-                        <div className="flex flex-col items-center justify-center p-3 text-center">
-                          <span
-                            className="w-8 h-8 rounded-full mb-1.5 border border-black/15 shadow-2xs block"
-                            style={{ backgroundColor: bottomItem.color_hex || '#2d533f' }}
-                          />
-                          <span className="text-[11px] font-semibold text-[#1a1c1a] truncate max-w-[120px]">
-                            {bottomItem.name}
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="text-xs text-[#717971] italic font-body-sm">Chưa có quần/váy</div>
-                      )}
-                      {bottomItem && (
-                        <span className="absolute bottom-1.5 left-1.5 px-2 py-0.5 bg-black/60 backdrop-blur-xs text-white text-[10px] font-label-sm rounded-md">
-                          {bottomItem.ethnic_group}
-                        </span>
-                      )}
-                    </div>
-
-                    <div>
-                      <h3 className="font-headline font-bold text-xs text-[#1a1c1a] truncate">
-                        {bottomItem ? bottomItem.name : 'Quần Lụa Hà Đông'}
-                      </h3>
-                      <p className="text-[11px] text-[#414942] font-body-sm mb-2.5 truncate">
-                        {bottomItem ? bottomItem.material : 'Lụa trắng dệt trơn'}
-                      </p>
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          onClick={() => {
-                            setActiveSubTab('manual');
-                            setSelectedSlotForWardrobe(selectedSlotForWardrobe === 'bottom' ? null : 'bottom');
-                          }}
-                          className="flex-1 py-1.5 text-xs font-label-md font-semibold text-white bg-[#2d533f] hover:bg-[#456b56] rounded-xl transition-colors text-center shadow-2xs"
-                        >
-                          [Đổi món]
-                        </button>
-                        {bottomItem && (
-                          <button
-                            onClick={() => setSelectedItemForDetail(bottomItem)}
-                            className="p-1.5 text-[#2d533f] bg-[#f5f4ef] hover:bg-[#efeee9] rounded-xl border border-[#e9e8e3] text-xs"
-                            title="Ý nghĩa"
-                          >
-                            <Info className="w-3.5 h-3.5" />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Slot 3 (Footwear / Hài - Giày) */}
-                  <div className="bg-white rounded-2xl border border-[#e9e8e3] p-3 hover:border-[#2d533f]/40 hover:shadow-xs transition-all flex flex-col justify-between group">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-5 h-5 rounded-full bg-[#2d533f]/15 text-[#2d533f] flex items-center justify-center text-[10px] font-bold">3</span>
-                        <span className="text-xs font-label-md font-bold uppercase tracking-wider text-[#2d533f]">Giày / Hài</span>
-                      </div>
-                      <button
-                        onClick={() => toggleLockSlot('footwear')}
-                        className={`p-1 rounded-md transition-colors ${isSlotLocked('footwear') ? 'text-[#2d533f] bg-[#2d533f]/10' : 'text-[#717971] hover:text-[#2d533f]'}`}
-                        title={isSlotLocked('footwear') ? 'Đang khóa slot này' : 'Khóa slot này'}
-                      >
-                        {isSlotLocked('footwear') ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
-
-                    <div className="relative w-full h-36 bg-[#f5f4ef] rounded-xl overflow-hidden mb-2.5 border border-[#e9e8e3]/80 flex items-center justify-center">
-                      {footwearItem && footwearItem.image_url && footwearItem.image_url.trim() !== '' ? (
-                        <img
-                          src={footwearItem.image_url}
-                          alt={footwearItem.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : footwearItem ? (
-                        <div className="flex flex-col items-center justify-center p-3 text-center">
-                          <span
-                            className="w-8 h-8 rounded-full mb-1.5 border border-black/15 shadow-2xs block"
-                            style={{ backgroundColor: footwearItem.color_hex || '#2d533f' }}
-                          />
-                          <span className="text-[11px] font-semibold text-[#1a1c1a] truncate max-w-[120px]">
-                            {footwearItem.name}
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="text-xs text-[#717971] italic font-body-sm">Chưa có hài</div>
-                      )}
-                      {footwearItem && (
-                        <span className="absolute bottom-1.5 left-1.5 px-2 py-0.5 bg-black/60 backdrop-blur-xs text-white text-[10px] font-label-sm rounded-md">
-                          {footwearItem.ethnic_group}
-                        </span>
-                      )}
-                    </div>
-
-                    <div>
-                      <h3 className="font-headline font-bold text-xs text-[#1a1c1a] truncate">
-                        {footwearItem ? footwearItem.name : 'Hài Cong Thêu Vân Mây'}
-                      </h3>
-                      <p className="text-[11px] text-[#414942] font-body-sm mb-2.5 truncate">
-                        {footwearItem ? footwearItem.material : 'Nhung đen · Chỉ kim tuyến'}
-                      </p>
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          onClick={() => {
-                            setActiveSubTab('manual');
-                            setSelectedSlotForWardrobe(selectedSlotForWardrobe === 'footwear' ? null : 'footwear');
-                          }}
-                          className="flex-1 py-1.5 text-xs font-label-md font-semibold text-white bg-[#2d533f] hover:bg-[#456b56] rounded-xl transition-colors text-center shadow-2xs"
-                        >
-                          [Đổi món]
-                        </button>
-                        {footwearItem && (
-                          <button
-                            onClick={() => setSelectedItemForDetail(footwearItem)}
-                            className="p-1.5 text-[#2d533f] bg-[#f5f4ef] hover:bg-[#efeee9] rounded-xl border border-[#e9e8e3] text-xs"
-                            title="Ý nghĩa"
-                          >
-                            <Info className="w-3.5 h-3.5" />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Slot 4 (Head/Accessory / Khăn - Mũ / Phụ Kiện) */}
-                  <div className="bg-white rounded-2xl border border-[#e9e8e3] p-3 hover:border-[#2d533f]/40 hover:shadow-xs transition-all flex flex-col justify-between group">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-5 h-5 rounded-full bg-[#2d533f]/15 text-[#2d533f] flex items-center justify-center text-[10px] font-bold">4</span>
-                        <span className="text-xs font-label-md font-bold uppercase tracking-wider text-[#2d533f]">Khăn & Phụ Kiện</span>
-                      </div>
-                      <button
-                        onClick={() => toggleLockSlot('head')}
-                        className={`p-1 rounded-md transition-colors ${isSlotLocked('head') ? 'text-[#2d533f] bg-[#2d533f]/10' : 'text-[#717971] hover:text-[#2d533f]'}`}
-                        title={isSlotLocked('head') ? 'Đang khóa slot này' : 'Khóa slot này'}
-                      >
-                        {isSlotLocked('head') ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
-                      </button>
-                    </div>
-
-                    <div className="relative w-full h-36 bg-[#f5f4ef] rounded-xl overflow-hidden mb-2.5 border border-[#e9e8e3]/80 flex items-center justify-center">
-                      {headItem && headItem.image_url && headItem.image_url.trim() !== '' ? (
-                        <img
-                          src={headItem.image_url}
-                          alt={headItem.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : headItem ? (
-                        <div className="flex flex-col items-center justify-center p-3 text-center">
-                          <span
-                            className="w-8 h-8 rounded-full mb-1.5 border border-black/15 shadow-2xs block"
-                            style={{ backgroundColor: headItem.color_hex || '#2d533f' }}
-                          />
-                          <span className="text-[11px] font-semibold text-[#1a1c1a] truncate max-w-[120px]">
-                            {headItem.name}
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="text-xs text-[#717971] italic font-body-sm">Chưa có khăn/phụ kiện</div>
-                      )}
-                      {headItem && (
-                        <span className="absolute bottom-1.5 left-1.5 px-2 py-0.5 bg-black/60 backdrop-blur-xs text-white text-[10px] font-label-sm rounded-md">
-                          {headItem.ethnic_group}
-                        </span>
-                      )}
-                    </div>
-
-                    <div>
-                      <h3 className="font-headline font-bold text-xs text-[#1a1c1a] truncate">
-                        {headItem ? headItem.name : 'Khăn Vấn & Kiềng Bạc'}
-                      </h3>
-                      <p className="text-[11px] text-[#414942] font-body-sm mb-2.5 truncate">
-                        {headItem ? headItem.material : 'Bạc chạm lộng & Lụa sa'}
-                      </p>
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          onClick={() => {
-                            setActiveSubTab('manual');
-                            setSelectedSlotForWardrobe(selectedSlotForWardrobe === 'head' ? null : 'head');
-                          }}
-                          className="flex-1 py-1.5 text-xs font-label-md font-semibold text-white bg-[#2d533f] hover:bg-[#456b56] rounded-xl transition-colors text-center shadow-2xs"
-                        >
-                          [Đổi món]
-                        </button>
-                        {headItem && (
-                          <button
-                            onClick={() => setSelectedItemForDetail(headItem)}
-                            className="p-1.5 text-[#2d533f] bg-[#f5f4ef] hover:bg-[#efeee9] rounded-xl border border-[#e9e8e3] text-xs"
-                            title="Ý nghĩa"
-                          >
-                            <Info className="w-3.5 h-3.5" />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-            )}
-
-            {/* Quick Item Selection Drawer when [Đổi món] is clicked */}
-            {selectedSlotForWardrobe && (
-              <div className="p-4 rounded-2xl bg-white border border-[#e9e8e3] shadow-xs space-y-3 animate-in fade-in duration-200">
-                <div className="flex items-center justify-between text-xs pb-2 border-b border-[#efeee9]">
-                  <span className="font-headline font-bold text-[#2d533f] text-sm">
-                    Kho Di Sản: Chọn món thay thế cho vị trí [{selectedSlotForWardrobe.toUpperCase()}]
-                  </span>
-                  <button
-                    onClick={() => setSelectedSlotForWardrobe(null)}
-                    className="text-[#717971] hover:text-[#1a1c1a] text-xs font-label-md cursor-pointer"
-                  >
-                    Đóng [✕]
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 gap-2 max-h-60 overflow-y-auto pr-1">
-                  {catalog
-                    .filter((i) => i.slot === selectedSlotForWardrobe || (selectedSlotForWardrobe === 'head' && i.slot === 'accessories'))
-                    .map((catItem) => {
-                      const isEquipped =
-                        selectedSlotForWardrobe === 'accessories'
-                          ? outfit.slots.accessories.some((a) => a.id === catItem.id)
-                          : outfit.slots[selectedSlotForWardrobe]?.id === catItem.id;
-
-                      return (
-                        <div
-                          key={catItem.id}
-                          onClick={() => {
-                            setSlotItem(catItem.slot, catItem);
-                            setSelectedSlotForWardrobe(null);
-                          }}
-                          className={`p-2.5 rounded-xl border text-xs cursor-pointer flex items-center justify-between transition-all ${
-                            isEquipped
-                              ? 'bg-[#2d533f]/10 border-[#2d533f] text-[#2d533f] font-semibold'
-                              : 'bg-[#f5f4ef] border-[#e9e8e3] hover:bg-[#efeee9] text-[#1a1c1a]'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2.5 truncate">
-                            <span
-                              className="w-3 h-3 rounded-full shrink-0 border border-black/10 shadow-2xs"
-                              style={{ backgroundColor: catItem.color_hex }}
-                            />
-                            <div className="truncate">
-                              <span className="font-bold block truncate">{catItem.name}</span>
-                              <span className="text-[10px] text-[#717971] font-body-sm">{catItem.material}</span>
-                            </div>
+                        <div className="min-w-0 flex-1 space-y-1">
+                          <div className="flex items-center gap-1.5">
+                            <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-[#2d533f] text-white">
+                              {item.category}
+                            </span>
+                            <span className="text-[10px] text-[#717971] font-medium">
+                              {item.ethnic_group}
+                            </span>
                           </div>
-                          <span className="text-[10px] text-[#755b00] shrink-0 font-label-sm font-semibold ml-2">
-                            {catItem.ethnic_group}
-                          </span>
+                          <h4 className="text-xs font-serif font-bold text-[#1a1c1a] truncate">
+                            {item.name}
+                          </h4>
+                          <p className="text-[11px] text-[#414942] line-clamp-1">
+                            {item.material}
+                          </p>
                         </div>
-                      );
-                    })}
-                </div>
+
+                        <div className="flex flex-col gap-1 shrink-0">
+                          <button
+                            onClick={() => handleSelectItem(item)}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-label-md font-bold transition-all cursor-pointer ${
+                              equipped
+                                ? 'bg-white text-[#2d533f] border border-[#2d533f]'
+                                : 'bg-[#2d533f] hover:bg-[#456b56] text-white shadow-xs'
+                            }`}
+                          >
+                            {equipped ? 'Đang mặc' : '+ Chọn'}
+                          </button>
+                          <button
+                            onClick={() => setSelectedItemForDetail(item)}
+                            className="p-1 text-center text-[10px] text-[#717971] hover:text-[#1a1c1a]"
+                            title="Xem chi tiết"
+                          >
+                            Chi tiết
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
               </div>
-            )}
-
-          </div>
-
-          {/* Right Column: AI Cultural Advisor Console (7 Cols) */}
-          <div className="lg:col-span-7 space-y-6">
-            
-            {/* AI Advisor Card */}
-            <div className="p-5 sm:p-6 rounded-3xl bg-white border border-[#e9e8e3] shadow-xs space-y-5">
-              
-              <div className="flex items-center justify-between pb-3 border-b border-[#efeee9]">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-[#caa749]/20 text-[#755b00] flex items-center justify-center">
-                    <Sparkles className="w-5 h-5 text-[#755b00]" />
+            </div>
+          ) : (
+            /* AI ASSISTANT CONSOLE */
+            <div className="bg-white rounded-3xl border border-[#e9e8e3] p-5 shadow-xs space-y-4">
+              <div className="flex items-center justify-between border-b border-[#efeee9] pb-3">
+                <div className="space-y-0.5">
+                  <div className="text-[10px] font-mono text-[#D8B454] uppercase font-bold tracking-wider">
+                    AI CỐ VẤN VĂN HÓA
                   </div>
-                  <div>
-                    <h3 className="font-headline font-bold text-base sm:text-lg text-[#1a1c1a]">
-                      Ngữ Cảnh & Bản Sắc Phối Đồ
-                    </h3>
-                    <p className="text-xs text-[#414942] font-body-sm">
-                      Giám định di sản đa triều đại & 54 dân tộc Việt Nam
-                    </p>
-                  </div>
+                  <h3 className="text-base sm:text-lg font-serif font-bold text-[#1a1c1a]">
+                    Gợi Ý Phối Đồ Thông Minh
+                  </h3>
                 </div>
-
-                <button
-                  onClick={handleCompleteOutfit}
-                  disabled={isAiLoading}
-                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#2d533f] text-white text-xs font-label-md font-semibold hover:bg-[#456b56] transition-all shadow-xs disabled:opacity-50 cursor-pointer"
-                >
-                  <Wand2 className={`w-3.5 h-3.5 text-[#caa749] ${isAiLoading ? 'animate-spin' : ''}`} />
-                  <span>AI Hoàn Thiện Set</span>
-                </button>
-              </div>
-
-              {/* Preset Context Chips */}
-              <div className="space-y-1.5">
-                <span className="text-[11px] font-label-sm text-[#717971] uppercase tracking-wider block">
-                  Gợi ý bối cảnh thường nhật & lễ hội:
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-label-sm bg-[#caa749]/20 text-[#755b00] font-bold">
+                  Gemini AI 2026
                 </span>
-                <div className="flex flex-wrap gap-2">
+              </div>
+
+              {/* Occasion Selector */}
+              <div className="space-y-1">
+                <label className="text-xs font-label-md font-bold text-[#1a1c1a]">
+                  Bối cảnh / Sự kiện:
+                </label>
+                <select
+                  value={selectedOccasion}
+                  onChange={(e) => setSelectedOccasion(e.target.value)}
+                  className="w-full bg-[#fbf9f4] border border-[#e9e8e3] rounded-xl px-3 py-2 text-xs text-[#1a1c1a] focus:outline-none focus:border-[#2d533f]"
+                >
+                  <option value="Dạo phố & gặp gỡ bạn bè">Dạo phố & gặp gỡ bạn bè</option>
+                  <option value="Lễ cưới truyền thống">Lễ cưới truyền thống</option>
+                  <option value="Điểm hội văn hóa & Lễ hội">Điểm hội văn hóa & Lễ hội</option>
+                  <option value="Chụp ảnh nghệ thuật Cổ phong">Chụp ảnh nghệ thuật Cổ phong</option>
+                  <option value="Sự kiện giao lưu trang trọng">Sự kiện giao lưu trang trọng</option>
+                </select>
+              </div>
+
+              {/* Natural Language Prompt Input */}
+              <div className="space-y-1">
+                <label className="text-xs font-label-md font-bold text-[#1a1c1a]">
+                  Yêu cầu phối riêng của bạn:
+                </label>
+                <textarea
+                  rows={3}
+                  value={promptText}
+                  onChange={(e) => setPromptText(e.target.value)}
+                  placeholder="Ví dụ: Phối áo truyền thống theo phong cách streetwear, giữ nguyên hoa văn gốc..."
+                  className="w-full bg-[#fbf9f4] border border-[#e9e8e3] rounded-xl p-3 text-xs text-[#1a1c1a] focus:outline-none focus:border-[#2d533f]"
+                />
+              </div>
+
+              {/* Preset Chips */}
+              <div className="space-y-1.5">
+                <span className="text-[10px] font-label-sm text-[#717971] uppercase">Gợi ý nhanh:</span>
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
                   {PRESET_PROMPTS.map((p, idx) => (
                     <button
                       key={idx}
-                      onClick={() => handleFreePrompt(p.prompt)}
-                      className="px-3 py-1.5 rounded-xl text-xs font-label-sm bg-[#f5f4ef] hover:bg-[#e9e8e3] text-[#1a1c1a] border border-[#e9e8e3] transition-colors cursor-pointer text-left"
+                      onClick={() => setPromptText(p.prompt)}
+                      className="px-2.5 py-1 rounded-full bg-[#f5f4ef] hover:bg-[#e9e8e3] text-[11px] font-label-sm text-[#1a1c1a] shrink-0 transition-colors cursor-pointer border border-[#e9e8e3]"
                     >
                       {p.title}
                     </button>
@@ -749,194 +708,204 @@ export const StylingStudio: React.FC = () => {
                 </div>
               </div>
 
-              {/* Free Text Prompt Box */}
-              <div className="space-y-2">
-                <div className="relative">
-                  <textarea
-                    value={promptText}
-                    onChange={(e) => setPromptText(e.target.value)}
-                    placeholder="Nhập yêu cầu: sự kiện, thời tiết, triều đại, chất liệu mong muốn hoặc cảm hứng văn hóa..."
-                    rows={3}
-                    className="w-full p-3.5 pr-28 rounded-2xl bg-[#fbf9f4] border border-[#e9e8e3] text-sm text-[#1a1c1a] placeholder:text-[#717971] focus:outline-hidden focus:border-[#2d533f] focus:ring-1 focus:ring-[#2d533f] transition-all resize-none font-body-sm"
-                  />
-                  <button
-                    onClick={() => handleFreePrompt()}
-                    disabled={isAiLoading || !promptText.trim()}
-                    className="absolute bottom-3 right-3 flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#2d533f] text-white text-xs font-label-md font-semibold hover:bg-[#456b56] transition-all shadow-xs disabled:opacity-40 cursor-pointer"
-                  >
-                    <Send className="w-3.5 h-3.5" />
-                    <span>Cố Vấn AI ✨</span>
-                  </button>
-                </div>
-                
-                <div className="flex items-center justify-between text-[11px] text-[#717971] font-body-sm">
-                  <span className="flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#2d533f]" />
-                    Cam kết không phối chéo sắc tộc trái quy chuẩn
-                  </span>
-                  <span>Độ tin cậy: Tuyệt đối chống bịa đặt</span>
-                </div>
+              {/* Action Buttons: Hoàn thiện vs Phối mới */}
+              <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <button
+                  disabled={isAiLoading}
+                  onClick={handleTriggerAiComplete}
+                  className="py-2.5 px-3 bg-[#2d533f] hover:bg-[#456b56] disabled:opacity-50 text-white text-xs font-label-md font-bold rounded-xl transition-all shadow-sm cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <Wand2 className="w-3.5 h-3.5 text-[#D8B454]" />
+                  <span>{isAiLoading ? 'Đang phân tích...' : 'Hoàn thiện set này'}</span>
+                </button>
+
+                <button
+                  disabled={isAiLoading || !promptText.trim()}
+                  onClick={handleTriggerAiFreePrompt}
+                  className="py-2.5 px-3 bg-[#a03f30] hover:bg-[#863528] disabled:opacity-50 text-white text-xs font-label-md font-bold rounded-xl transition-all shadow-sm cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                  <span>{isAiLoading ? 'Đang suy nghĩ...' : 'Phối mới tự do'}</span>
+                </button>
               </div>
 
-              {/* AI Loading State */}
-              {isAiLoading && (
-                <div className="p-6 rounded-2xl bg-[#f5f4ef] border border-[#e9e8e3] text-center space-y-2.5">
-                  <RefreshCw className="w-6 h-6 animate-spin text-[#2d533f] mx-auto" />
-                  <p className="font-headline font-bold text-sm text-[#1a1c1a]">
-                    Đang tra cứu thư tịch & giám định tương thích văn hóa...
-                  </p>
-                  <p className="text-xs text-[#414942] font-body-sm">
-                    Kiểm tra Hard Constraints (chống phối chéo dân tộc, loại trừ đồ tế tự thế tục).
-                  </p>
-                </div>
-              )}
-
-              {/* AI Error Alert */}
               {aiError && (
-                <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-xs text-red-800 flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
+                <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 shrink-0" />
                   <span>{aiError}</span>
                 </div>
               )}
 
               {/* AI Advisory Result Card */}
-              {aiAdvisoryResult && !isAiLoading && (
-                <div className="pt-4 border-t border-[#efeee9] space-y-4 animate-in fade-in duration-200">
-                  {/* Outfit Title & Accuracy Badge */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-[#f5f4ef] border border-[#e9e8e3]">
-                    <div>
-                      <h4 className="font-headline font-bold text-lg text-[#1a1c1a]">
-                        {aiAdvisoryResult.outfit_name}
-                      </h4>
-                      <div className="flex items-center gap-2 text-xs text-[#414942] mt-0.5 font-body-sm">
-                        <span className="font-semibold text-[#1a1c1a]">{aiAdvisoryResult.ethnic_group}</span>
-                        <span>·</span>
-                        <span className="px-2 py-0.5 rounded-full bg-white text-[#755b00] border border-[#e9e8e3] font-label-sm font-semibold">
-                          {aiAdvisoryResult.style_type}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 self-start sm:self-auto bg-white px-3 py-1.5 rounded-xl border border-[#e9e8e3]">
-                      <div className="text-right">
-                        <span className="text-[10px] text-[#717971] uppercase tracking-wider block font-label-sm">
-                          Độ Chuẩn Xác
-                        </span>
-                        <span className="font-headline font-extrabold text-base text-[#2d533f]">
-                          {aiAdvisoryResult.cultural_accuracy_score}
-                        </span>
-                      </div>
-                      <div className="p-1.5 rounded-lg bg-[#2d533f]/15 text-[#2d533f]">
-                        <CheckCircle2 className="w-4 h-4" />
-                      </div>
-                    </div>
+              {aiAdvisoryResult && (
+                <div className="mt-4 p-4 rounded-2xl bg-[#fbf9f4] border border-[#caa749]/40 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-serif font-bold text-[#1a1c1a]">
+                      {aiAdvisoryResult.outfit_name}
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#2d533f] text-white">
+                      {aiAdvisoryResult.cultural_accuracy_score}
+                    </span>
                   </div>
+
+                  <p className="text-xs text-[#414942] italic leading-relaxed">
+                    "{aiAdvisoryResult.overall_comment}"
+                  </p>
 
                   {/* Warning Flags if any */}
                   {aiAdvisoryResult.warning_flags && aiAdvisoryResult.warning_flags.length > 0 && (
-                    <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 space-y-1 text-xs text-amber-900 font-body-sm">
-                      <div className="font-bold flex items-center gap-2 text-amber-800">
-                        <AlertTriangle className="w-4 h-4 text-amber-600" />
-                        <span>Lưu Ý Quy Cách Văn Hóa:</span>
-                      </div>
-                      {aiAdvisoryResult.warning_flags.map((warn, i) => (
-                        <p key={i} className="pl-6 text-amber-800">
-                          • {warn}
+                    <div className="p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-800 text-[11px] space-y-1">
+                      {aiAdvisoryResult.warning_flags.map((w, idx) => (
+                        <p key={idx} className="flex items-center gap-1.5">
+                          <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                          <span>{w}</span>
                         </p>
                       ))}
                     </div>
                   )}
 
-                  {/* Overall Comment */}
-                  <div className="space-y-1.5">
-                    <span className="text-xs font-label-md font-bold uppercase tracking-wider text-[#2d533f] block">
-                      Nhận Xét Giám Định Tổng Thể:
-                    </span>
-                    <p className="text-xs sm:text-sm font-body-sm italic text-[#1a1c1a] leading-relaxed bg-[#fbf9f4] p-3.5 rounded-xl border border-[#e9e8e3]">
-                      "{aiAdvisoryResult.overall_comment}"
-                    </p>
-                  </div>
-
-                  {/* Cultural Notes Breakdown */}
-                  <div className="space-y-2">
-                    <span className="text-xs font-label-md font-bold uppercase tracking-wider text-[#2d533f] block">
-                      Giám Định Hoa Văn & Tri Thức Chi Tiết:
-                    </span>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs font-body-sm">
-                      {aiAdvisoryResult.slots.head && (
-                        <div className="p-3 rounded-xl bg-[#f5f4ef] border border-[#e9e8e3] space-y-0.5">
-                          <span className="font-bold text-[#1a1c1a] block">
-                            Khăn/Mũ: {aiAdvisoryResult.slots.head.item_name}
-                          </span>
-                          <p className="text-[#414942] leading-relaxed line-clamp-3">
-                            {aiAdvisoryResult.slots.head.cultural_notes}
-                          </p>
-                        </div>
-                      )}
-
-                      {aiAdvisoryResult.slots.top && (
-                        <div className="p-3 rounded-xl bg-[#f5f4ef] border border-[#e9e8e3] space-y-0.5">
-                          <span className="font-bold text-[#1a1c1a] block">
-                            Áo: {aiAdvisoryResult.slots.top.item_name}
-                          </span>
-                          <p className="text-[#414942] leading-relaxed line-clamp-3">
-                            {aiAdvisoryResult.slots.top.cultural_notes}
-                          </p>
-                        </div>
-                      )}
-
-                      {aiAdvisoryResult.slots.bottom && (
-                        <div className="p-3 rounded-xl bg-[#f5f4ef] border border-[#e9e8e3] space-y-0.5">
-                          <span className="font-bold text-[#1a1c1a] block">
-                            Quần/Váy: {aiAdvisoryResult.slots.bottom.item_name}
-                          </span>
-                          <p className="text-[#414942] leading-relaxed line-clamp-3">
-                            {aiAdvisoryResult.slots.bottom.cultural_notes}
-                          </p>
-                        </div>
-                      )}
-
-                      {aiAdvisoryResult.slots.footwear && (
-                        <div className="p-3 rounded-xl bg-[#f5f4ef] border border-[#e9e8e3] space-y-0.5">
-                          <span className="font-bold text-[#1a1c1a] block">
-                            Hài/Giày: {aiAdvisoryResult.slots.footwear.item_name}
-                          </span>
-                          <p className="text-[#414942] leading-relaxed line-clamp-3">
-                            {aiAdvisoryResult.slots.footwear.cultural_notes}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="pt-3 border-t border-[#efeee9] flex items-center justify-between gap-3">
-                    <button
-                      onClick={() => applyAiOutfit(aiAdvisoryResult)}
-                      className="px-4 py-2.5 rounded-xl bg-[#2d533f] text-white text-xs font-label-md font-semibold hover:bg-[#456b56] transition-colors shadow-xs cursor-pointer flex items-center gap-2"
-                    >
-                      <Check className="w-3.5 h-3.5 text-[#caa749]" />
-                      <span>Mặc set này lên ma-nơ-canh</span>
-                    </button>
-                    <button
-                      onClick={handleSaveLookbook}
-                      className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#a03f30] text-white text-xs font-label-md font-semibold hover:bg-[#863326] transition-colors shadow-xs cursor-pointer"
-                    >
-                      <Bookmark className="w-3.5 h-3.5" />
-                      <span>Lưu vào Lookbook</span>
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => applyAiOutfit(aiAdvisoryResult)}
+                    className="w-full py-2 bg-[#D8B454] hover:bg-[#c9a33e] text-stone-900 font-label-md font-bold text-xs rounded-xl transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                    <span>Áp dụng gợi ý vào bảng phối</span>
+                  </button>
                 </div>
               )}
-
             </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
+// Reusable Sub-component for individual Garment Slot Cards
+interface GarmentSlotCardProps {
+  title: string;
+  category: GarmentCategory;
+  slotKey: string;
+  item: CostumeItem | null;
+  isLocked: boolean;
+  onToggleLock: () => void;
+  onOpenDrawer: () => void;
+  onRemove: () => void;
+  onViewDetail: (item: CostumeItem) => void;
+}
+
+const GarmentSlotCard: React.FC<GarmentSlotCardProps> = ({
+  title,
+  category,
+  item,
+  isLocked,
+  onToggleLock,
+  onOpenDrawer,
+  onRemove,
+  onViewDetail
+}) => {
+  return (
+    <div
+      className={`bg-white rounded-2xl border p-3.5 transition-all flex flex-col justify-between group ${
+        item ? 'border-[#e9e8e3] hover:border-[#2d533f]/50' : 'border-dashed border-[#c1c9bf] bg-[#fbf9f4]'
+      }`}
+    >
+      <div>
+        {/* Header Strip: Slot title and Lock button */}
+        <div className="flex items-center justify-between mb-2.5">
+          <div className="flex items-center gap-1.5">
+            <span className="w-5 h-5 rounded-full bg-[#2d533f]/15 text-[#2d533f] flex items-center justify-center text-[10px] font-bold">
+              ✦
+            </span>
+            <span className="text-xs font-label-md font-bold uppercase tracking-wider text-[#2d533f]">
+              {title}
+            </span>
+            {item && (
+              <span className="text-[10px] text-[#717971] font-mono">({item.ethnic_group})</span>
+            )}
           </div>
 
+          {item && (
+            <button
+              onClick={onToggleLock}
+              className={`p-1 rounded-md transition-colors cursor-pointer ${
+                isLocked ? 'text-[#2d533f] bg-[#2d533f]/10' : 'text-[#717971] hover:text-[#2d533f]'
+              }`}
+              title={isLocked ? 'Đang khóa món này khi AI gợi ý' : 'Khóa món này'}
+            >
+              {isLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+            </button>
+          )}
         </div>
 
+        {/* Card Body Image & Info */}
+        {item ? (
+          <div className="space-y-2">
+            <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-[#f5f4ef] border border-[#e9e8e3]">
+              <img
+                src={item.image_url}
+                alt={item.name}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              {item.color_hex && (
+                <span
+                  className="absolute bottom-2 right-2 w-3.5 h-3.5 rounded-full border border-white shadow-xs"
+                  style={{ backgroundColor: item.color_hex }}
+                />
+              )}
+            </div>
+
+            <div>
+              <h3 className="font-serif font-bold text-sm text-[#1a1c1a] truncate">{item.name}</h3>
+              <p className="text-[11px] text-[#414942] truncate font-sans">
+                {item.material || item.pattern_description}
+              </p>
+            </div>
+          </div>
+        ) : (
+          /* Empty Slot Placeholder */
+          <div
+            onClick={onOpenDrawer}
+            className="w-full aspect-[4/3] rounded-xl border border-dashed border-[#c1c9bf] flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:border-[#2d533f] hover:bg-white transition-all space-y-1.5"
+          >
+            <div className="w-8 h-8 rounded-full bg-[#efeee9] flex items-center justify-center text-[#717971]">
+              <Plus className="w-4 h-4" />
+            </div>
+            <span className="text-xs font-label-md font-semibold text-[#414942]">
+              + Thêm {title}
+            </span>
+            <span className="text-[10px] text-[#717971]">Nhấn để duyệt danh mục</span>
+          </div>
+        )}
       </div>
+
+      {/* Card Footer Actions */}
+      {item && (
+        <div className="mt-3 pt-2 border-t border-[#efeee9] flex items-center gap-2">
+          <button
+            onClick={onOpenDrawer}
+            className="flex-1 py-1 px-2.5 bg-[#f5f4ef] hover:bg-[#e9e8e3] text-[#1a1c1a] text-xs font-label-md font-semibold rounded-lg transition-colors cursor-pointer text-center"
+          >
+            Đổi món
+          </button>
+
+          <button
+            onClick={() => onViewDetail(item)}
+            className="p-1 text-[#717971] hover:text-[#2d533f] transition-colors cursor-pointer"
+            title="Xem điển chế & nguồn gốc"
+          >
+            <Info className="w-3.5 h-3.5" />
+          </button>
+
+          <button
+            onClick={onRemove}
+            className="p-1 text-[#717971] hover:text-[#a03f30] transition-colors cursor-pointer"
+            title="Gỡ bỏ khỏi outfit"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
     </div>
   );
 };

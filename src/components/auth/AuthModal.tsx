@@ -244,9 +244,9 @@ export const AuthModal: React.FC = () => {
               <div className="w-12 h-12 rounded-2xl bg-[#2d533f]/10 text-[#2d533f] flex items-center justify-center mx-auto">
                 <User className="w-6 h-6" />
               </div>
-              <h3 className="text-2xl font-headline font-bold text-stone-900">Thiết Lập Hồ Sơ 3D</h3>
+              <h3 className="text-2xl font-headline font-bold text-stone-900">Thiết Lập Hồ Sơ Phối Đồ</h3>
               <p className="text-xs sm:text-sm text-stone-600">
-                Cá nhân hóa tên hiển thị và phom dáng ma-nơ-canh mặc định cho trải nghiệm phối đồ di sản.
+                Cá nhân hóa tên hiển thị và vóc dáng người mặc mặc định cho trải nghiệm phối đồ di sản.
               </p>
             </div>
 
@@ -264,7 +264,7 @@ export const AuthModal: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-stone-700 mb-2">Phom dáng ma-nơ-canh mặc định</label>
+                <label className="block text-xs font-semibold text-stone-700 mb-2">Vóc dáng người mặc mặc định</label>
                 <div className="grid grid-cols-3 gap-2">
                   {[
                     { id: 'nam', label: 'Nam', desc: 'Vóc dáng tuấn tú · Áo Tấc' },

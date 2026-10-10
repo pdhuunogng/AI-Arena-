@@ -121,49 +121,89 @@ export const AccountView: React.FC = () => {
       218
     );
 
-    // Plate Box
+    // Plate Box (Curated Flat-Lay Garment Deck)
     ctx.fillStyle = '#FFFFFF';
     ctx.strokeStyle = '#E2D9CB';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.roundRect(140, 250, 520, 520, 16);
+    ctx.roundRect(100, 245, 600, 535, 16);
     ctx.fill();
     ctx.stroke();
 
-    // Silhouette preview on canvas
-    const topItem = record.slots.top;
-    const bottomItem = record.slots.bottom;
-    const headItem = record.slots.head;
+    // Plate Title
+    ctx.fillStyle = '#8C7A68';
+    ctx.font = 'bold 12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('BẢNG PHỐI Y PHỤC DI SẢN (CURATED FLAT-LAY)', canvas.width / 2, 275);
 
-    ctx.fillStyle = headItem?.color_hex || '#F9CA24';
-    ctx.beginPath();
-    ctx.ellipse(canvas.width / 2, 330, 40, 36, 0, 0, Math.PI * 2);
-    ctx.fill();
+    // Curated flat-lay garment slots
+    const garments = [
+      { label: 'Y Phục Chính (Áo)', item: record.slots.top },
+      { label: 'Hạ Phục (Váy / Quần)', item: record.slots.bottom },
+      { label: 'Khăn / Mũ', item: record.slots.head },
+      { label: 'Hài / Giày / Phụ Kiện', item: record.slots.footwear || record.slots.accessories[0] }
+    ];
 
-    ctx.fillStyle = topItem?.color_hex || '#2d533f';
-    ctx.beginPath();
-    ctx.moveTo(canvas.width / 2 - 90, 380);
-    ctx.lineTo(canvas.width / 2 + 90, 380);
-    ctx.lineTo(canvas.width / 2 + 110, 550);
-    ctx.lineTo(canvas.width / 2 - 110, 550);
-    ctx.closePath();
-    ctx.fill();
+    const cardPositions = [
+      { x: 125, y: 295, w: 260, h: 220 },
+      { x: 415, y: 295, w: 260, h: 220 },
+      { x: 125, y: 535, w: 260, h: 220 },
+      { x: 415, y: 535, w: 260, h: 220 }
+    ];
 
-    ctx.strokeStyle = '#F9CA24';
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(canvas.width / 2, 380);
-    ctx.lineTo(canvas.width / 2, 550);
-    ctx.stroke();
+    garments.forEach((g, idx) => {
+      const pos = cardPositions[idx];
+      ctx.fillStyle = '#FAF8F4';
+      ctx.strokeStyle = '#E9E4DC';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(pos.x, pos.y, pos.w, pos.h, 12);
+      ctx.fill();
+      ctx.stroke();
 
-    ctx.fillStyle = bottomItem?.color_hex || '#FFFFFF';
-    ctx.beginPath();
-    ctx.moveTo(canvas.width / 2 - 80, 550);
-    ctx.lineTo(canvas.width / 2 + 80, 550);
-    ctx.lineTo(canvas.width / 2 + 105, 710);
-    ctx.lineTo(canvas.width / 2 - 105, 710);
-    ctx.closePath();
-    ctx.fill();
+      ctx.fillStyle = '#456B56';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(g.label, pos.x + 14, pos.y + 24);
+
+      if (g.item) {
+        ctx.fillStyle = g.item.color_hex || '#D8B454';
+        ctx.beginPath();
+        ctx.roundRect(pos.x + 14, pos.y + 36, 32, 14, 7);
+        ctx.fill();
+
+        ctx.fillStyle = '#1A1C1A';
+        ctx.font = 'bold 15px serif';
+        const itemName = g.item.name.length > 22 ? g.item.name.slice(0, 20) + '...' : g.item.name;
+        ctx.fillText(itemName, pos.x + 14, pos.y + 72);
+
+        ctx.fillStyle = '#736B5E';
+        ctx.font = '12px sans-serif';
+        ctx.fillText(`${g.item.ethnic_group} · ${g.item.period_or_region}`, pos.x + 14, pos.y + 96);
+
+        ctx.fillStyle = '#554C41';
+        ctx.font = '12px sans-serif';
+        const mat = `Chất liệu: ${g.item.material}`.slice(0, 26);
+        ctx.fillText(mat, pos.x + 14, pos.y + 120);
+
+        ctx.fillStyle = '#456B56';
+        ctx.font = 'italic 11px serif';
+        const sig = (g.item.pattern_description || g.item.cultural_significance).slice(0, 32) + '...';
+        ctx.fillText(sig, pos.x + 14, pos.y + 145);
+        if ((g.item.pattern_description || g.item.cultural_significance).length > 32) {
+          const sig2 = (g.item.pattern_description || g.item.cultural_significance).slice(32, 64) + '...';
+          ctx.fillText(sig2, pos.x + 14, pos.y + 165);
+        }
+
+        ctx.fillStyle = '#9E9282';
+        ctx.font = '10px sans-serif';
+        ctx.fillText(`Khảo cứu: ${g.item.source_verification || 'Chuẩn xác'}`, pos.x + 14, pos.y + 200);
+      } else {
+        ctx.fillStyle = '#A3998D';
+        ctx.font = 'italic 13px sans-serif';
+        ctx.fillText('Chưa chọn món', pos.x + 14, pos.y + 80);
+      }
+    });
 
     // Quote
     ctx.fillStyle = '#2A2420';
@@ -299,7 +339,7 @@ export const AccountView: React.FC = () => {
                       <span className="text-[#D8B454] font-medium">Đã liên kết tài khoản Firebase Auth</span>
                     </>
                   ) : (
-                    'Vui lòng đăng nhập để lưu trữ bộ sưu tập cá nhân và đồng bộ 3D.'
+                    'Vui lòng đăng nhập để lưu trữ bộ sưu tập cá nhân và đồng bộ đám mây.'
                   )}
                 </p>
               </div>
@@ -344,7 +384,7 @@ export const AccountView: React.FC = () => {
               <span>Bộ Sưu Tập Lookbook Đã Lưu ({savedLookbooks.length})</span>
             </h2>
             <p className="text-xs sm:text-sm text-stone-600 mt-0.5 font-body-sm">
-              Những set trang phục di sản bạn đã giám định và lưu lại từ phòng thiết kế 3D.
+              Những set trang phục di sản bạn đã phối và lưu lại từ phòng phối đồ.
             </p>
           </div>
 
@@ -403,29 +443,24 @@ export const AccountView: React.FC = () => {
                       {record.style_type}
                     </div>
 
-                    {/* Stylized Miniature Mannequin Graphic */}
-                    <div className="w-32 h-36 relative flex flex-col items-center justify-center py-2 group-hover:scale-105 transition-transform">
-                      {/* Head */}
-                      <div
-                        className="w-10 h-10 rounded-full shadow-inner border border-stone-300 mb-1"
-                        style={{ backgroundColor: headItem?.color_hex || '#caa749' }}
-                        title={headItem?.name || 'Mũ/Khăn'}
-                      />
-                      {/* Top */}
-                      <div
-                        className="w-24 h-16 rounded-t-xl shadow-md border-x border-stone-300"
-                        style={{ backgroundColor: topItem?.color_hex || '#2d533f' }}
-                        title={topItem?.name || 'Y phục'}
-                      />
-                      {/* Bottom */}
-                      <div
-                        className="w-20 h-14 rounded-b-xl shadow-md border border-stone-300"
-                        style={{ backgroundColor: bottomItem?.color_hex || '#FFFFFF' }}
-                        title={bottomItem?.name || 'Hạ phục'}
-                      />
+                    {/* Clean Composition of Real Garment Image Thumbnails */}
+                    <div className="w-full grid grid-cols-3 gap-2 py-3 px-2">
+                      {[headItem, topItem, bottomItem].filter(Boolean).map((item) => (
+                        <div
+                          key={item!.id}
+                          className="aspect-square rounded-xl overflow-hidden bg-white border border-[#e9e8e3] shadow-xs group-hover:scale-105 transition-transform"
+                          title={item!.name}
+                        >
+                          <img
+                            src={item!.image_url}
+                            alt={item!.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ))}
                     </div>
 
-                    <div className="text-center mt-2">
+                    <div className="text-center mt-1">
                       <span className="text-xs font-headline font-bold text-stone-800 line-clamp-1">
                         {record.outfit_name}
                       </span>
@@ -451,10 +486,10 @@ export const AccountView: React.FC = () => {
                       <button
                         onClick={() => handleApplySavedOutfit(record)}
                         className="px-3 py-2 bg-[#2d533f] hover:bg-[#456b56] text-white text-xs font-semibold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
-                        title="Mặc bộ này lên mô hình 3D"
+                        title="Nạp bộ này vào Studio để phối tiếp"
                       >
                         <Sparkles className="w-3.5 h-3.5 text-[#caa749]" />
-                        <span>Mặc bộ này</span>
+                        <span>Phối tiếp bộ này</span>
                       </button>
 
                       <button

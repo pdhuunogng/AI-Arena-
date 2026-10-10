@@ -1,0 +1,75 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "phoneNumber": { "type": "string" },
+        "gender": { "type": "string", "enum": ["nam", "nu", "nonbinary"] },
+        "isNewUser": { "type": "boolean" },
+        "avatarUrl": { "type": "string" }
+      },
+      "required": ["uid"]
+    },
+    "PersonalGarment": {
+      "title": "PersonalGarment",
+      "description": "User uploaded garment in personal closet",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 200 },
+        "image_url": { "type": "string", "maxLength": 1000 },
+        "category": { "type": "string", "enum": ["Áo", "Quần", "Váy", "Khăn", "Mũ", "Giày", "Trang sức", "Phụ kiện"] },
+        "slot": { "type": "string" },
+        "ethnic_group": { "type": "string", "maxLength": 100 },
+        "subgroup": { "type": "string", "maxLength": 100 },
+        "period_or_region": { "type": "string", "maxLength": 100 },
+        "color_hex": { "type": "string", "maxLength": 20 },
+        "material": { "type": "string", "maxLength": 200 },
+        "pattern_description": { "type": "string", "maxLength": 1000 },
+        "cultural_significance": { "type": "string", "maxLength": 1000 },
+        "source_verification": { "type": "string", "maxLength": 200 },
+        "ritual_level": { "type": "string", "enum": ["daily", "festive", "sacred_ritual"] },
+        "cross_cultural_flag": { "type": "boolean" },
+        "storage_path": { "type": "string", "maxLength": 500 },
+        "owner_uid": { "type": "string" },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["name", "image_url", "category", "owner_uid"]
+    },
+    "LookbookItem": {
+      "title": "LookbookItem",
+      "description": "Saved user lookbook record",
+      "type": "object",
+      "properties": {
+        "outfit_name": { "type": "string", "maxLength": 200 },
+        "gender": { "type": "string" },
+        "ethnic_group": { "type": "string" },
+        "accuracy_score": { "type": "string" },
+        "style_type": { "type": "string" },
+        "cultural_quote": { "type": "string", "maxLength": 1000 },
+        "curator_notes": { "type": "string", "maxLength": 1000 },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["outfit_name"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile document"
+    },
+    "/users/{userId}/closet/{itemId}": {
+      "schema": "PersonalGarment",
+      "description": "User's personal closet garment items"
+    },
+    "/users/{userId}/lookbooks/{lookbookId}": {
+      "schema": "LookbookItem",
+      "description": "User's saved lookbook outfit records"
+    }
+  }
+}

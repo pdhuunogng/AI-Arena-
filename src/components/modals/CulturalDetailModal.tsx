@@ -30,7 +30,7 @@ export const CulturalDetailModal: React.FC = () => {
   const isEquipped =
     item.slot === 'accessories'
       ? outfit.slots.accessories.some((a) => a.id === item.id)
-      : outfit.slots[item.slot]?.id === item.id;
+      : (outfit.slots[item.slot] as CostumeItem | null | undefined)?.id === item.id;
   const isLocked = isSlotLocked(item.slot);
 
   const handleEquipToggle = () => {
@@ -190,7 +190,7 @@ export const CulturalDetailModal: React.FC = () => {
                 }`}
               >
                 {isLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
-                <span>{isLocked ? 'Đang khóa trên ma-nơ-canh' : 'Khóa món này khi AI phối'}</span>
+                <span>{isLocked ? 'Đang khóa trong Studio' : 'Khóa món này khi AI phối'}</span>
               </button>
             )}
           </div>
@@ -210,7 +210,7 @@ export const CulturalDetailModal: React.FC = () => {
                   : 'bg-[#2d533f] text-white hover:bg-[#456b56]'
               }`}
             >
-              {isEquipped ? 'Tháo khỏi ma-nơ-canh' : 'Mặc lên ma-nơ-canh'}
+              {isEquipped ? 'Bỏ khỏi bảng phối' : 'Thêm vào bảng phối'}
             </button>
           </div>
         </div>

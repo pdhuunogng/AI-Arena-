@@ -119,53 +119,97 @@ export const LookbookExport: React.FC = () => {
       218
     );
 
-    // 4. Center Mannequin Visual Plate
+    // 4. Center Curated Garments Flat-Lay Visual Plate
     ctx.fillStyle = '#FFFFFF';
     ctx.strokeStyle = '#E2D9CB';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.roundRect(140, 250, 520, 520, 16);
+    ctx.roundRect(100, 245, 600, 535, 16);
     ctx.fill();
     ctx.stroke();
 
-    // Draw stylized mannequin silhouette on canvas plate
-    const topItem = selectedRecord.slots.top;
-    const bottomItem = selectedRecord.slots.bottom;
-    const headItem = selectedRecord.slots.head;
+    // Plate Title
+    ctx.fillStyle = '#8C7A68';
+    ctx.font = 'bold 12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('BẢNG PHỐI Y PHỤC DI SẢN (CURATED FLAT-LAY)', canvas.width / 2, 275);
 
-    // Head
-    ctx.fillStyle = headItem?.color_hex || '#F9CA24';
-    ctx.beginPath();
-    ctx.ellipse(canvas.width / 2, 330, 40, 36, 0, 0, Math.PI * 2);
-    ctx.fill();
+    // Render garment cards on the canvas plate
+    const garments = [
+      { label: 'Y Phục Chính (Áo)', item: selectedRecord.slots.top },
+      { label: 'Hạ Phục (Váy / Quần)', item: selectedRecord.slots.bottom },
+      { label: 'Khăn / Mũ', item: selectedRecord.slots.head },
+      { label: 'Hài / Giày / Phụ Kiện', item: selectedRecord.slots.footwear || selectedRecord.slots.accessories[0] }
+    ];
 
-    // Top
-    ctx.fillStyle = topItem?.color_hex || '#2d533f';
-    ctx.beginPath();
-    ctx.moveTo(canvas.width / 2 - 90, 380);
-    ctx.lineTo(canvas.width / 2 + 90, 380);
-    ctx.lineTo(canvas.width / 2 + 110, 550);
-    ctx.lineTo(canvas.width / 2 - 110, 550);
-    ctx.closePath();
-    ctx.fill();
+    const cardPositions = [
+      { x: 125, y: 295, w: 260, h: 220 },
+      { x: 415, y: 295, w: 260, h: 220 },
+      { x: 125, y: 535, w: 260, h: 220 },
+      { x: 415, y: 535, w: 260, h: 220 }
+    ];
 
-    // Top decorative collar
-    ctx.strokeStyle = '#F9CA24';
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(canvas.width / 2, 380);
-    ctx.lineTo(canvas.width / 2, 550);
-    ctx.stroke();
+    garments.forEach((g, idx) => {
+      const pos = cardPositions[idx];
+      // Card background
+      ctx.fillStyle = '#FAF8F4';
+      ctx.strokeStyle = '#E9E4DC';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.roundRect(pos.x, pos.y, pos.w, pos.h, 12);
+      ctx.fill();
+      ctx.stroke();
 
-    // Bottom
-    ctx.fillStyle = bottomItem?.color_hex || '#FFFFFF';
-    ctx.beginPath();
-    ctx.moveTo(canvas.width / 2 - 80, 550);
-    ctx.lineTo(canvas.width / 2 + 80, 550);
-    ctx.lineTo(canvas.width / 2 + 105, 710);
-    ctx.lineTo(canvas.width / 2 - 105, 710);
-    ctx.closePath();
-    ctx.fill();
+      // Category badge
+      ctx.fillStyle = '#456B56';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(g.label, pos.x + 14, pos.y + 24);
+
+      if (g.item) {
+        // Color accent pill
+        ctx.fillStyle = g.item.color_hex || '#D8B454';
+        ctx.beginPath();
+        ctx.roundRect(pos.x + 14, pos.y + 36, 32, 14, 7);
+        ctx.fill();
+
+        // Item name
+        ctx.fillStyle = '#1A1C1A';
+        ctx.font = 'bold 15px serif';
+        const itemName = g.item.name.length > 22 ? g.item.name.slice(0, 20) + '...' : g.item.name;
+        ctx.fillText(itemName, pos.x + 14, pos.y + 72);
+
+        // Ethnic group & Region
+        ctx.fillStyle = '#736B5E';
+        ctx.font = '12px sans-serif';
+        ctx.fillText(`${g.item.ethnic_group} · ${g.item.period_or_region}`, pos.x + 14, pos.y + 96);
+
+        // Material
+        ctx.fillStyle = '#554C41';
+        ctx.font = '12px sans-serif';
+        const mat = `Chất liệu: ${g.item.material}`.slice(0, 26);
+        ctx.fillText(mat, pos.x + 14, pos.y + 120);
+
+        // Ritual level or cultural badge
+        ctx.fillStyle = '#456B56';
+        ctx.font = 'italic 11px serif';
+        const sig = (g.item.pattern_description || g.item.cultural_significance).slice(0, 32) + '...';
+        ctx.fillText(sig, pos.x + 14, pos.y + 145);
+        if ((g.item.pattern_description || g.item.cultural_significance).length > 32) {
+          const sig2 = (g.item.pattern_description || g.item.cultural_significance).slice(32, 64) + '...';
+          ctx.fillText(sig2, pos.x + 14, pos.y + 165);
+        }
+
+        // Verified source note
+        ctx.fillStyle = '#9E9282';
+        ctx.font = '10px sans-serif';
+        ctx.fillText(`Khảo cứu: ${g.item.source_verification || 'Chuẩn xác'}`, pos.x + 14, pos.y + 200);
+      } else {
+        ctx.fillStyle = '#A3998D';
+        ctx.font = 'italic 13px sans-serif';
+        ctx.fillText('Chưa chọn món', pos.x + 14, pos.y + 80);
+      }
+    });
 
     // 5. Cultural Essay / Quote Block
     ctx.fillStyle = '#2A2420';
@@ -334,7 +378,7 @@ export const LookbookExport: React.FC = () => {
                         }}
                         className="text-[#2d533f] hover:underline font-semibold cursor-pointer"
                       >
-                        Nạp lên ma-nơ-canh & Phối tiếp →
+                        Nạp vào Studio & Phối tiếp →
                       </button>
 
                       {savedLookbooks.length > 1 && (
@@ -367,7 +411,7 @@ export const LookbookExport: React.FC = () => {
                   Mục 3: Tính Năng Lookbook Export
                 </span>
                 <span className="text-[11px] uppercase tracking-widest text-stone-500 font-label-sm block">
-                  AI ARENA 2026 · THẺ DI SẢN MỸ THUẬT
+                  VIỆT PHỤC REMIX · THẺ DI SẢN MỸ THUẬT
                 </span>
                 <h2 className="text-2xl font-headline font-bold text-stone-900">
                   {selectedRecord.outfit_name}
@@ -380,6 +424,29 @@ export const LookbookExport: React.FC = () => {
                   <span className="font-semibold text-[#2d533f]">
                     Chuẩn xác: {selectedRecord.accuracy_score}
                   </span>
+                </div>
+              </div>
+
+              {/* Real Garments Thumbnails Composition */}
+              <div className="p-4 rounded-2xl bg-white border border-[#e9e8e3] space-y-3">
+                <span className="text-[11px] font-label-md font-bold text-stone-500 uppercase block">
+                  Hình ảnh các món trong bộ phối:
+                </span>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {[
+                    selectedRecord.slots.top,
+                    selectedRecord.slots.bottom,
+                    selectedRecord.slots.head,
+                    selectedRecord.slots.footwear
+                  ].filter(Boolean).map((item) => (
+                    <div key={item!.id} className="space-y-1 text-center">
+                      <div className="aspect-square rounded-xl overflow-hidden bg-[#f5f4ef] border border-[#e9e8e3]">
+                        <img src={item!.image_url} alt={item!.name} className="w-full h-full object-cover" />
+                      </div>
+                      <p className="text-[11px] font-bold text-stone-900 truncate">{item!.name}</p>
+                      <span className="text-[10px] text-stone-500 font-medium">{item!.category || item!.slot}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 

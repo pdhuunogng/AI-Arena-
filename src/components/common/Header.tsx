@@ -13,9 +13,9 @@ export const Header: React.FC = () => {
     bgPill: string;
     icon: React.ComponentType<{ className?: string }>;
   }[] = [
-    { id: 'showcase', label: 'Trang chủ', fullTitle: 'Trang chủ (Virtual Runway Showcase)', color: '#456B56', bgPill: 'bg-[#456B56]/10 text-[#456B56]', icon: Home },
+    { id: 'showcase', label: 'Trang chủ', fullTitle: 'Trang chủ (Khám Phá Di Sản)', color: '#456B56', bgPill: 'bg-[#456B56]/10 text-[#456B56]', icon: Home },
     { id: 'studio', label: 'Phối đồ – Studio', fullTitle: 'Phối đồ – Styling Studio (Lõi Tương Tác & AI)', color: '#CE6250', bgPill: 'bg-[#CE6250]/10 text-[#CE6250]', icon: Wand2 },
-    { id: 'archive', label: 'Tủ đồ & Kho Di sản', fullTitle: 'Tủ đồ & Kho Di sản (Heritage Archive)', color: '#1E3B5C', bgPill: 'bg-[#1E3B5C]/10 text-[#1E3B5C]', icon: Layers },
+    { id: 'archive', label: 'Tủ đồ & Thư viện', fullTitle: 'Tủ đồ & Thư viện Di sản', color: '#1E3B5C', bgPill: 'bg-[#1E3B5C]/10 text-[#1E3B5C]', icon: Layers },
     { id: 'lookbook', label: 'Tài khoản & Lookbook', fullTitle: 'Tài khoản & Xuất Thẻ Lookbook', color: '#5C2B4E', bgPill: 'bg-[#5C2B4E]/10 text-[#5C2B4E]', icon: BookmarkCheck }
   ];
 
@@ -31,8 +31,8 @@ export const Header: React.FC = () => {
             <Sparkles className="w-4 h-4 text-[#D8B454]" />
           </div>
           <div>
-            <span className="block text-[10px] font-label-md tracking-widest text-[#755b00] uppercase font-semibold leading-none">AI STUDIO · DI SẢN</span>
-            <span className="font-headline font-bold text-base sm:text-lg text-[#1a1c1a] leading-tight">Việt Cổ Y Phong</span>
+            <span className="block text-[10px] font-label-md tracking-widest text-[#755b00] uppercase font-semibold leading-none">AI STYLING · GEN Z</span>
+            <span className="font-headline font-bold text-base sm:text-lg text-[#1a1c1a] leading-tight">VIỆT PHỤC REMIX</span>
           </div>
         </button>
 
