@@ -165,8 +165,14 @@ export const NORMALIZED_ITEMS: CostumeItem[] = (NORMALIZED_CATALOG.items || []).
     source_titles: item.source_titles || [],
     cultural_information_note: item.cultural_information_note,
     notes: item.notes || '',
-    image_url: placeholderImg,
-    imageUrl: placeholderImg,
+    image_url:
+      typeof item.image_path === 'string' && item.image_path.trim() !== ''
+        ? item.image_path
+        : placeholderImg,
+    imageUrl:
+      typeof item.image_path === 'string' && item.image_path.trim() !== ''
+        ? item.image_path
+        : placeholderImg,
     image_path: item.image_path || null,
     imageReference: item.source_urls && item.source_urls.length > 0 ? item.source_urls[0] : null,
     ritual_level:

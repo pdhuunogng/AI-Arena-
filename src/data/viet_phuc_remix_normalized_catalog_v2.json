@@ -8,7 +8,7 @@
     "outfitRecordsIncludingResearchExtension": 21,
     "items": 77,
     "outfitItemLinks": 83,
-    "imagePolicy": "Tất cả image_path/imageUrl để null cho đến khi người dùng import ảnh thật.",
+    "imagePolicy": "image_path để null cho đến khi chạy sync-images",
     "verificationPolicy": "Giữ rõ trạng thái cần xác minh; không tự suy ra item hoặc ý nghĩa văn hóa khi thiếu nguồn.",
     "componentPolicy": "Một item có thể được liên kết với nhiều bộ, nhưng mỗi liên kết có role/condition và trạng thái chứng cứ.",
     "compatibilityModel": "Quan hệ tương thích có phạm vi theo outfit tham chiếu; không suy ra tương thích toàn cục chỉ từ dân tộc, màu sắc hoặc category.",
@@ -2613,7 +2613,8 @@
           "rel-set-vietphuc-ngu-than-item-ao-ngu-than--item-khan-van-ngu-than"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-quan-dai-ngu-than",
@@ -2704,7 +2705,8 @@
           "rel-set-vietphuc-ngu-than-item-khan-van-ngu-than--item-quan-dai-ngu-than"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-khan-dong",
@@ -2795,7 +2797,8 @@
           "rel-set-vietphuc-ngu-than-item-khan-dong--item-khan-van-ngu-than"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-khan-van-ngu-than",
@@ -2882,7 +2885,8 @@
           "rel-set-vietphuc-ngu-than-item-khan-dong--item-khan-van-ngu-than"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-ao-tu-than",
@@ -2974,7 +2978,8 @@
           "rel-set-vietphuc-tu-than-item-ao-tu-than--item-khan-mo-qua"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-yem-bac-bo",
@@ -3066,7 +3071,8 @@
           "rel-set-vietphuc-tu-than-item-khan-mo-qua--item-yem-bac-bo"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-vay-bac-bo",
@@ -3158,7 +3164,8 @@
           "rel-set-vietphuc-tu-than-item-khan-mo-qua--item-vay-bac-bo"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-that-lung-tu-than",
@@ -3250,7 +3257,8 @@
           "rel-set-vietphuc-tu-than-item-khan-mo-qua--item-that-lung-tu-than"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-khan-mo-qua",
@@ -3339,7 +3347,8 @@
           "rel-set-vietphuc-tu-than-item-khan-mo-qua--item-that-lung-tu-than"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-ao-ba-ba",
@@ -3427,7 +3436,8 @@
           "rel-set-vietphuc-ba-ba-item-ao-ba-ba--item-khan-ran"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-quan-ba-ba",
@@ -3515,7 +3525,8 @@
           "rel-set-vietphuc-ba-ba-item-khan-ran--item-quan-ba-ba"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-khan-ran",
@@ -3603,7 +3614,8 @@
           "rel-set-vietphuc-ba-ba-item-khan-ran--item-quan-ba-ba"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-ao-giao-linh",
@@ -3726,7 +3738,8 @@
           "rel-set-vietphuc-doi-kham-item-ao-giao-linh--item-that-lung-doi-kham"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-yem-giao-linh",
@@ -3817,7 +3830,8 @@
           "rel-set-vietphuc-giao-linh-item-that-lung-giao-linh--item-yem-giao-linh"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-ao-lot-giao-linh",
@@ -3908,7 +3922,8 @@
           "rel-set-vietphuc-giao-linh-item-ao-lot-giao-linh--item-that-lung-giao-linh"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-vay-quay",
@@ -3999,7 +4014,8 @@
           "rel-set-vietphuc-giao-linh-item-that-lung-giao-linh--item-vay-quay"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-kho",
@@ -4090,7 +4106,8 @@
           "rel-set-vietphuc-giao-linh-item-kho--item-that-lung-giao-linh"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-that-lung-giao-linh",
@@ -4180,7 +4197,8 @@
           "rel-set-vietphuc-giao-linh-item-kho--item-that-lung-giao-linh"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-ao-dai-lemur",
@@ -4262,7 +4280,8 @@
           "rel-set-vietphuc-lemur-item-ao-dai-lemur--item-quan-loe-lemur"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-quan-loe-lemur",
@@ -4344,7 +4363,8 @@
           "rel-set-vietphuc-lemur-item-ao-dai-lemur--item-quan-loe-lemur"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-ao-vien-linh",
@@ -4456,7 +4476,8 @@
           "rel-set-vietphuc-doi-kham-item-ao-vien-linh--item-that-lung-doi-kham"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-ao-doi-kham",
@@ -4543,7 +4564,8 @@
           "rel-set-vietphuc-doi-kham-item-ao-doi-kham--item-that-lung-doi-kham"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-that-lung-doi-kham",
@@ -4630,7 +4652,8 @@
           "rel-set-vietphuc-doi-kham-item-ao-vien-linh--item-that-lung-doi-kham"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-ao-nhat-binh",
@@ -4722,7 +4745,8 @@
           "rel-set-vietphuc-nhat-binh-item-ao-nhat-binh--item-tram-hoa-nhat-binh"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-xiem-trang-nhat-binh",
@@ -4814,7 +4838,8 @@
           "rel-set-vietphuc-nhat-binh-item-tram-hoa-nhat-binh--item-xiem-trang-nhat-binh"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-quan-trang-nhat-binh",
@@ -4906,7 +4931,8 @@
           "rel-set-vietphuc-nhat-binh-item-quan-trang-nhat-binh--item-tram-hoa-nhat-binh"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-khan-vanh-nhat-binh",
@@ -4998,7 +5024,8 @@
           "rel-set-vietphuc-nhat-binh-item-khan-vanh-nhat-binh--item-tram-hoa-nhat-binh"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-mu-phuong-nhat-binh",
@@ -5090,7 +5117,8 @@
           "rel-set-vietphuc-nhat-binh-item-mu-phuong-nhat-binh--item-tram-hoa-nhat-binh"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-tram-hoa-nhat-binh",
@@ -5182,7 +5210,8 @@
           "rel-set-vietphuc-nhat-binh-item-khan-vanh-nhat-binh--item-tram-hoa-nhat-binh"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-ao-tu-dien",
@@ -5252,7 +5281,8 @@
         "needs_review_item_ids": [],
         "pairing_rule_ids": []
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-ao-dai-hien-dai",
@@ -5334,7 +5364,8 @@
           "rel-set-vietphuc-ao-dai-hien-dai-item-ao-dai-hien-dai--item-quan-ao-dai"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-quan-ao-dai",
@@ -5416,7 +5447,8 @@
           "rel-set-vietphuc-ao-dai-hien-dai-item-ao-dai-hien-dai--item-quan-ao-dai"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-ao-com-thai-trang",
@@ -5508,7 +5540,8 @@
           "rel-set-thai-trang-item-ao-com-thai-trang--item-khan-pieu-thai"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-vay-thai-den",
@@ -5636,7 +5669,8 @@
           "rel-set-thai-den-item-vay-thai-den--item-xa-tich-thai"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-that-lung-thai",
@@ -5754,7 +5788,8 @@
           "rel-set-thai-den-item-that-lung-thai--item-xa-tich-thai"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-khan-pieu-thai",
@@ -5876,7 +5911,8 @@
           "rel-set-thai-den-item-khan-pieu-thai--item-xa-tich-thai"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-ao-com-thai-den",
@@ -5970,7 +6006,8 @@
           "rel-set-thai-den-item-ao-com-thai-den--item-xa-tich-thai"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-xa-tich-thai",
@@ -6062,7 +6099,8 @@
           "rel-set-thai-den-item-that-lung-thai--item-xa-tich-thai"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-ao-dao-tien",
@@ -6158,7 +6196,8 @@
           "rel-set-dao-tien-item-ao-dao-tien--item-trang-suc-bac-dao"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-vay-sap-ong-dao-tien",
@@ -6254,7 +6293,8 @@
           "rel-set-dao-tien-item-trang-suc-bac-dao--item-vay-sap-ong-dao-tien"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-khan-trang-dao-tien",
@@ -6349,7 +6389,8 @@
           "rel-set-dao-tien-item-khan-trang-dao-tien--item-trang-suc-bac-dao"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-mu-do-dao-tien",
@@ -6444,7 +6485,8 @@
           "rel-set-dao-tien-item-mu-do-dao-tien--item-trang-suc-bac-dao"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-xa-cap-dao-tien",
@@ -6540,7 +6582,8 @@
           "rel-set-dao-tien-item-trang-suc-bac-dao--item-xa-cap-dao-tien"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-trang-suc-bac-dao",
@@ -6635,7 +6678,8 @@
           "rel-set-dao-tien-item-trang-suc-bac-dao--item-xa-cap-dao-tien"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-ao-dai-dao-do",
@@ -6740,7 +6784,8 @@
           "rel-set-dao-do-item-ao-dai-dao-do--item-bac-dao-do"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-quan-dao-do",
@@ -6842,7 +6887,8 @@
           "rel-set-dao-do-item-bac-dao-do--item-quan-dao-do"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-yem-dao-do",
@@ -6941,7 +6987,8 @@
           "rel-set-dao-do-item-bac-dao-do--item-yem-dao-do"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-that-lung-dao-do",
@@ -7043,7 +7090,8 @@
           "rel-set-dao-do-item-bac-dao-do--item-that-lung-dao-do"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-dai-hong-dao-do",
@@ -7144,7 +7192,8 @@
           "rel-set-dao-do-item-bac-dao-do--item-dai-hong-dao-do"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-khan-do-dao-do",
@@ -7246,7 +7295,8 @@
           "rel-set-dao-do-item-bac-dao-do--item-khan-do-dao-do"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-bac-dao-do",
@@ -7350,7 +7400,8 @@
           "rel-set-dao-do-item-bac-dao-do--item-khan-do-dao-do"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-ao-ngan-muong",
@@ -7439,7 +7490,8 @@
           "rel-set-muong-item-ao-ngan-muong--item-tenh-muong"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-than-vay-muong",
@@ -7528,7 +7580,8 @@
           "rel-set-muong-item-tenh-muong--item-than-vay-muong"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-cap-vay-muong",
@@ -7621,7 +7674,8 @@
         ],
         "structural_part_note": "Đây là bộ phận cấu trúc của một món trang phục, không phải item mặc độc lập; cần ghép với món mà nó cấu thành."
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-yem-pang-muong",
@@ -7710,7 +7764,8 @@
           "rel-set-muong-item-tenh-muong--item-yem-pang-muong"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-tenh-muong",
@@ -7799,7 +7854,8 @@
           "rel-set-muong-item-tenh-muong--item-yem-pang-muong"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-ao-ede",
@@ -7885,7 +7941,8 @@
           "rel-set-ede-item-ao-ede--item-vay-ede"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-vay-ede",
@@ -7971,7 +8028,8 @@
           "rel-set-ede-item-ao-ede--item-vay-ede"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-ao-nu-cham",
@@ -8071,7 +8129,8 @@
           "rel-set-cham-nu-item-ao-nu-cham--item-trang-suc-cham"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-vay-xarong-cham",
@@ -8171,7 +8230,8 @@
           "rel-set-cham-nu-item-trang-suc-cham--item-vay-xarong-cham"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-khan-dau-cham",
@@ -8268,7 +8328,8 @@
           "rel-set-cham-nu-item-khan-dau-cham--item-trang-suc-cham"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-day-that-lung-cham",
@@ -8362,7 +8423,8 @@
           "rel-set-cham-nu-item-day-that-lung-cham--item-trang-suc-cham"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-trang-suc-cham",
@@ -8459,7 +8521,8 @@
           "rel-set-cham-nu-item-day-that-lung-cham--item-trang-suc-cham"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-ao-dai-cham-tay",
@@ -8537,7 +8600,8 @@
         "needs_review_item_ids": [],
         "pairing_rule_ids": []
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-ao-dai-pa-then",
@@ -8637,7 +8701,8 @@
           "rel-set-pa-then-item-ao-dai-pa-then--item-trang-suc-pa-then"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-vay-pa-then",
@@ -8737,7 +8802,8 @@
           "rel-set-pa-then-item-trang-suc-pa-then--item-vay-pa-then"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-yem-pa-then",
@@ -8834,7 +8900,8 @@
           "rel-set-pa-then-item-trang-suc-pa-then--item-yem-pa-then"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-khan-do-pa-then",
@@ -8930,7 +8997,8 @@
           "rel-set-pa-then-item-khan-do-pa-then--item-trang-suc-pa-then"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-khan-den-pa-then",
@@ -9026,7 +9094,8 @@
           "rel-set-pa-then-item-khan-den-pa-then--item-trang-suc-pa-then"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-that-lung-trang-pa-then",
@@ -9122,7 +9191,8 @@
           "rel-set-pa-then-item-that-lung-trang-pa-then--item-trang-suc-pa-then"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-that-lung-den-pa-then",
@@ -9218,7 +9288,8 @@
           "rel-set-pa-then-item-that-lung-den-pa-then--item-trang-suc-pa-then"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-trang-suc-pa-then",
@@ -9314,7 +9385,8 @@
           "rel-set-pa-then-item-that-lung-den-pa-then--item-trang-suc-pa-then"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-xam-pot-khmer",
@@ -9436,7 +9508,8 @@
           "rel-set-khmer-wedding-example-item-mu-kpal-plop-khmer--item-xam-pot-khmer"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-ao-xa-bay-khmer",
@@ -9529,7 +9602,8 @@
           "rel-set-khmer-wedding-example-item-ao-xa-bay-khmer--item-mu-kpal-plop-khmer"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-that-lung-khmer",
@@ -9622,7 +9696,8 @@
           "rel-set-khmer-wedding-example-item-mu-kpal-plop-khmer--item-that-lung-khmer"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-sronko-khmer",
@@ -9715,7 +9790,8 @@
           "rel-set-khmer-wedding-example-item-mu-kpal-plop-khmer--item-sronko-khmer"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     },
     {
       "id": "item-mu-kpal-plop-khmer",
@@ -9808,7 +9884,8 @@
           "rel-set-khmer-wedding-example-item-mu-kpal-plop-khmer--item-sronko-khmer"
         ]
       },
-      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible."
+      "compatibility_policy": "Compatibility is scoped to specific reference outfit relationships; items without a supported relationship are not automatically compatible.",
+      "imageUrl": null
     }
   ],
   "outfitItemLinks": [
