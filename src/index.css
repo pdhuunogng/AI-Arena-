@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #2d533f;
+  --color-primary-container: #456b56;
+  --color-secondary: #a03f30;
+  --color-secondary-container: #ffdad4;
+  --color-tertiary: #755b00;
+  --color-tertiary-container: #caa749;
+  --color-background: #fbf9f4;
+  --color-surface: #fbf9f4;
+  --color-surface-container-low: #f5f4ef;
+  --color-surface-container: #efeee9;
+  --color-surface-container-high: #e9e8e3;
+  --color-surface-container-highest: #e3e2dc;
+  --color-surface-container-lowest: #ffffff;
+  --color-on-surface: #1a1c1a;
+  --color-on-surface-variant: #414942;
+  --color-outline: #717971;
+  --color-outline-variant: #c1c9bf;
+
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, Cambria, serif;
+  --font-label: 'Space Grotesk', system-ui, sans-serif;
+}
+
+@layer base {
+  html, body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: #fbf9f4;
+    color: #1a1c1a;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-serif, .font-headline {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+
+  .font-label-sm, .font-label-md, .font-label-lg {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    vertical-align: middle;
+  }
+}

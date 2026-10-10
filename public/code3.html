@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="shell-type" content="mobile_tab" />
+  <title>Việt Cổ Y Phong – Phối Đồ · Styling Studio</title>
+
+  <!-- Google Fonts: Playfair Display, Plus Jakarta Sans, Space Grotesk, Material Symbols Outlined -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#456B56",
+            "primary-container": "#2D533F",
+            "primary-fixed": "#C2ECD2",
+            "on-primary": "#FFFDF8",
+            "on-primary-fixed": "#002113",
+            "secondary": "#A03F30",
+            "secondary-container": "#CE6250",
+            "on-secondary": "#FFFDF8",
+            "tertiary": "#755B00",
+            "tertiary-container": "#D8B454",
+            "on-tertiary": "#FFFDF8",
+            "on-tertiary-container": "#241A00",
+            "background": "#F5F4EF",
+            "surface": "#FFFDF8",
+            "on-surface": "#1B1C19",
+            "on-surface-variant": "#414843",
+            "surface-container-lowest": "#FFFFFF",
+            "surface-container-low": "#F5F4EF",
+            "surface-container": "#EFEEE9",
+            "surface-container-high": "#E9E8E3",
+            "outline": "#717973",
+            "outline-variant": "#C1C8C1"
+          },
+          fontFamily: {
+            "headline-lg": ["Playfair Display", "serif"],
+            "headline-md": ["Playfair Display", "serif"],
+            "headline-sm": ["Playfair Display", "serif"],
+            "title-lg": ["Plus Jakarta Sans", "sans-serif"],
+            "title-md": ["Plus Jakarta Sans", "sans-serif"],
+            "body-lg": ["Plus Jakarta Sans", "sans-serif"],
+            "body-md": ["Plus Jakarta Sans", "sans-serif"],
+            "body-sm": ["Plus Jakarta Sans", "sans-serif"],
+            "label-lg": ["Space Grotesk", "sans-serif"],
+            "label-md": ["Space Grotesk", "sans-serif"],
+            "label-sm": ["Space Grotesk", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    @layer base {
+      html, body {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        background-color: #F5F4EF;
+        color: #1B1C19;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+      }
+      body {
+        overscroll-behavior: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .pb-safe {
+        padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
+      }
+      .pt-safe {
+        padding-top: env(safe-area-inset-top, 0px);
+      }
+    }
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      vertical-align: middle;
+    }
+    .material-symbols-outlined.fill {
+      font-variation-settings: 'FILL' 1;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface flex flex-col min-h-screen selection:bg-[#D8B454]/30 selection:text-[#456B56]">
+
+  <!-- Global SVG Pattern Definitions from code10.html & code8.html -->
+  <svg aria-hidden="true" class="inline-defs-container" style="position:absolute;width:0;height:0;overflow:hidden">
+    <defs>
+      <!-- 24px Gạch bông gió lattice pattern from code10.html -->
+      <pattern id="gach-bong-gio-24" patternUnits="userSpaceOnUse" width="24" height="24">
+        <rect fill="none" stroke="#FFFDF8" stroke-width="0.8" width="24" height="24"></rect>
+        <path d="M12,1.5 L22.5,12 L12,22.5 L1.5,12 Z" fill="none" stroke="#FFFDF8" stroke-width="0.8"></path>
+        <circle cx="12" cy="12" fill="none" r="4.2" stroke="#FFFDF8" stroke-width="0.8"></circle>
+        <circle cx="12" cy="12" fill="#FFFDF8" r="1.3"></circle>
+      </pattern>
+
+      <!-- 16px Crisp window-frame seam pattern from code10.html -->
+      <pattern id="khung-cua-so-seam-crisp" patternUnits="userSpaceOnUse" width="16" height="16">
+        <rect fill="#365544" width="16" height="16"></rect>
+        <rect fill="none" stroke="#FFFDF8" stroke-opacity="0.5" stroke-width="0.8" width="12" height="12" x="2" y="2"></rect>
+        <line stroke="#D8B454" stroke-opacity="0.8" stroke-width="0.8" x1="8" x2="8" y1="2" y2="14"></line>
+        <line stroke="#D8B454" stroke-opacity="0.8" stroke-width="0.8" x1="2" x2="14" y1="8" y2="8"></line>
+      </pattern>
+
+      <!-- 6px Button diamond strip from code10.html -->
+      <pattern id="btn-diamond-strip" patternUnits="userSpaceOnUse" width="8" height="6">
+        <polygon fill="#FFFDF8" points="4,0.5 7.5,3 4,5.5 0.5,3"></polygon>
+      </pattern>
+
+      <!-- 6px Navigation window lattice strip from code10.html / code8.html -->
+      <pattern id="nav-lattice-strip" patternUnits="userSpaceOnUse" width="12" height="6">
+        <rect fill="none" stroke="#456B56" stroke-opacity="0.45" stroke-width="0.8" width="10" height="4.5" x="1" y="0.8"></rect>
+        <line stroke="#456B56" stroke-opacity="0.45" stroke-width="0.8" x1="6" x2="6" y1="0.8" y2="5.3"></line>
+      </pattern>
+    </defs>
+  </svg>
+
+  <!-- MAIN SCROLLABLE APP CONTAINER (Responsive Mobile + Tablet) -->
+  <main class="flex-1 flex flex-col relative w-full pb-24">
+
+    <!-- 1. TOP BANNER STAGE: HERITAGE JADE GREEN (#456B56) WITH 24px GẠCH BÔNG GIÓ -->
+    <header class="relative w-full bg-[#456B56] text-[#FFFDF8] pt-safe px-4 sm:px-6 pt-4 pb-8 overflow-hidden shadow-md">
+      <!-- 24px Gạch bông gió lattice at 22% contrast -->
+      <div class="absolute inset-0 pointer-events-none opacity-20">
+        <svg class="w-full h-full" preserveAspectRatio="none" viewBox="0 0 384 480" xmlns="http://www.w3.org/2000/svg">
+          <rect fill="url(#gach-bong-gio-24)" width="100%" height="100%"></rect>
+        </svg>
+      </div>
+
+      <div class="max-w-4xl mx-auto relative z-10 space-y-3">
+        <!-- Top Row: Branding wordmark & User Profile icon badge -->
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <!-- 4-Petal tile-flower SVG motif from code10.html -->
+            <svg class="w-6 h-6 text-[#D8B454]" fill="currentColor" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="2.5"></circle>
+              <path d="M12 2C10.5 5 10.5 7 12 9C13.5 7 13.5 5 12 2ZM12 22C10.5 19 10.5 17 12 15C13.5 17 13.5 19 12 22ZM2 12C5 10.5 7 10.5 9 12C7 13.5 5 13.5 2 12ZM22 12C19 10.5 17 10.5 15 12C17 13.5 19 13.5 22 12Z"></path>
+              <rect fill="none" height="18" stroke="currentColor" stroke-width="1" width="18" x="3" y="3"></rect>
+            </svg>
+            <span class="text-[#FFFDF8] uppercase leading-none font-label-sm font-bold tracking-widest">
+              AI STUDIO · VIỆT PHỤC REMIX
+            </span>
+          </div>
+
+          <!-- Arch Badge User Silhouette from code10.html -->
+          <div class="flex items-center gap-2">
+            <button class="w-8 h-8 rounded-full bg-[#FFFDF8]/15 hover:bg-[#FFFDF8]/25 flex items-center justify-center text-[#FFFDF8] transition-colors" title="Thông báo di sản">
+              <span class="material-symbols-outlined text-[19px]">local_florist</span>
+            </button>
+            <div class="w-8 h-10 rounded-t-full rounded-b-xs bg-[#D8B454] flex items-center justify-center shadow-xs">
+              <div class="w-7 h-7 rounded-full bg-[#456B56] flex items-center justify-center">
+                <svg class="w-4 h-4 text-[#FFFDF8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                  <circle cx="12" cy="7.5" r="3.75"></circle>
+                  <path d="M5 20.5 C5 15.5 8 13.5 12 13.5 C16 13.5 19 15.5 19 20.5"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Headline & Tagline -->
+        <div class="pt-1">
+          <h1 class="text-2xl sm:text-3xl font-headline-lg font-bold text-[#FFFDF8] tracking-tight leading-snug">
+            Phối Đồ Cổ Phong
+          </h1>
+          <p class="text-xs sm:text-sm text-[#FFFDF8]/80 font-body-sm mt-0.5 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-[#D8B454] inline-block"></span>
+            Tôn vinh hoa văn 54 dân tộc & triều đại Việt Nam trên nền tảng AI giám định.
+          </p>
+        </div>
+
+        <!-- Slat Switcher Tabs from Prompt ("Tự phối đồ" & "AI hỗ trợ ✦") -->
+        <div class="pt-2">
+          <div class="bg-[#365544]/80 p-1 rounded-full flex max-w-sm border border-[#D8B454]/30 shadow-inner">
+            <button id="tab-manual" onclick="setMode('manual')" class="flex-1 py-1.5 sm:py-2 text-center text-xs font-label-md font-medium text-[#FFFDF8]/80 hover:text-[#FFFDF8] rounded-full transition-all">
+              Tự phối đồ
+            </button>
+            <button id="tab-ai" onclick="setMode('ai')" class="flex-1 py-1.5 sm:py-2 text-center text-xs font-label-md font-bold bg-[#D8B454] text-[#241A00] rounded-full shadow-sm transition-all flex items-center justify-center gap-1.5">
+              <span class="material-symbols-outlined text-[15px] fill">auto_awesome</span>
+              <span>AI hỗ trợ ✦</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 16px CRISP WINDOW-FRAME PATTERN SEAM (from code10.html) -->
+    <div class="w-full h-4 bg-[#365544] relative overflow-hidden z-15">
+      <svg class="w-full h-full" preserveAspectRatio="none" viewBox="0 0 384 16" xmlns="http://www.w3.org/2000/svg">
+        <rect fill="url(#khung-cua-so-seam-crisp)" height="100%" width="100%"></rect>
+      </svg>
+    </div>
+
+    <!-- 2. LOWER WARM IVORY/STONE CANVAS (#FFFDF8 / #F5F4EF) -->
+    <div class="relative z-20 -mt-2 bg-[#FFFDF8] rounded-t-[28px] px-4 sm:px-6 pt-5 pb-8 flex flex-col gap-6 max-w-4xl mx-auto w-full">
+
+      <!-- Cultural Guard Banner: "CHUẨN MỰC CỐ ĐÔ - 96% Chuẩn" -->
+      <section class="w-full">
+        <div class="bg-[#F5F4EF] border border-[#C1C8C1]/70 p-3.5 rounded-2xl shadow-xs flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-2xl bg-[#456B56] text-[#FFFDF8] flex items-center justify-center shrink-0 shadow-xs">
+              <span class="material-symbols-outlined text-[20px] fill">verified_user</span>
+            </div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="font-label-sm text-label-sm text-[#456B56] font-bold tracking-wide uppercase">CULTURAL GUARD</span>
+                <span class="font-label-sm text-label-sm text-[#755B00]">◆ CHUẨN MỰC CỐ ĐÔ</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-label-sm font-bold bg-[#A03F30] text-white">96% Chuẩn</span>
+              </div>
+              <p class="font-title-md text-xs sm:text-sm text-[#1B1C19] truncate font-semibold mt-0.5">
+                Ràng buộc văn hóa: <strong class="text-[#456B56]">Đang bật</strong> ✦ Kinh (Thời Nguyễn)
+              </p>
+              <p class="font-body-sm text-[11px] text-[#414843] truncate">
+                Giao thoa ngũ thân chẽn hợp lệ, cấm lai tạp trang phục tế tự thế tục.
+              </p>
+            </div>
+          </div>
+
+          <div class="shrink-0 hidden sm:flex flex-col items-end">
+            <span class="w-12 h-1.5 bg-[#C1C8C1] rounded-full overflow-hidden">
+              <span class="block h-full bg-[#456B56] w-[96%] rounded-full"></span>
+            </span>
+            <span class="font-label-sm text-[11px] text-[#456B56] font-bold mt-1">96/100</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Prompt Bar with AI Gợi Ý Button & Quick Context Chips -->
+      <section class="bg-[#F5F4EF] border border-[#C1C8C1]/80 rounded-2xl p-4 shadow-xs space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-[#D8B454]">✦</span>
+            <span class="font-label-sm text-xs font-bold uppercase tracking-wider text-[#456B56]">
+              Nhập Ngữ Cảnh & Yêu Cầu Cố Vấn
+            </span>
+          </div>
+          <span class="text-[10px] font-label-sm text-[#755B00] bg-[#D8B454]/20 px-2 py-0.5 rounded-md font-semibold">
+            Gemini 2026 Engine
+          </span>
+        </div>
+
+        <!-- Prompt input and CTA button -->
+        <div class="flex flex-col sm:flex-row gap-2">
+          <div class="relative flex-1">
+            <input 
+              id="prompt-input"
+              type="text" 
+              value="Phối ngũ thân chẽn phong cách tân thời" 
+              placeholder="Nhập bối cảnh: sự kiện, lễ cưới, dạo phố, triều đại..." 
+              class="w-full bg-[#FFFDF8] border border-[#C1C8C1] rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-[#1B1C19] focus:outline-none focus:border-[#456B56] focus:ring-1 focus:ring-[#456B56] font-body-sm"
+            />
+          </div>
+          <!-- Button "AI gợi ý ✦" with 6px diamond strip from code10.html -->
+          <button 
+            onclick="triggerAiSuggestion()"
+            class="relative overflow-hidden h-[42px] px-5 bg-[#456B56] hover:bg-[#365544] text-[#FFFDF8] rounded-xl font-label-md font-semibold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all cursor-pointer"
+          >
+            <span class="relative z-10 flex items-center gap-1.5">
+              <span>AI gợi ý</span>
+              <span class="text-[#D8B454]">✦</span>
+            </span>
+            <!-- 6px tiny diamonds strip along button bottom edge -->
+            <div class="absolute bottom-0 inset-x-0 h-[6px] pointer-events-none opacity-40">
+              <svg class="w-full h-[6px]" preserveAspectRatio="none" viewBox="0 0 360 6">
+                <rect fill="url(#btn-diamond-strip)" height="100%" width="100%"></rect>
+              </svg>
+            </div>
+          </button>
+        </div>
+
+        <!-- Quick contextual suggestion chips -->
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-1">
+          <span class="text-[10px] font-label-sm text-[#717973] uppercase shrink-0">Gợi ý nhanh:</span>
+          <button onclick="fillPrompt('Phối ngũ thân chẽn đi dự đám cưới mùa thu nhã nhặn')" class="shrink-0 px-2.5 py-1 rounded-full bg-[#FFFDF8] hover:bg-[#E9E8E3] border border-[#C1C8C1] text-[11px] font-label-sm text-[#1B1C19] transition-colors">
+            🌾 Đám cưới mùa thu
+          </button>
+          <button onclick="fillPrompt('Trang phục thiếu nữ H\'Mông đi hội Gầu Tào Tây Bắc váy lanh vẽ sáp ong')" class="shrink-0 px-2.5 py-1 rounded-full bg-[#FFFDF8] hover:bg-[#E9E8E3] border border-[#C1C8C1] text-[11px] font-label-sm text-[#1B1C19] transition-colors">
+            ⛰️ Hội Gầu Tào
+          </button>
+          <button onclick="fillPrompt('Lễ hội Katê tháp Chăm áo Aw Cam trắng thắt lưng thổ cẩm')" class="shrink-0 px-2.5 py-1 rounded-full bg-[#FFFDF8] hover:bg-[#E9E8E3] border border-[#C1C8C1] text-[11px] font-label-sm text-[#1B1C19] transition-colors">
+            ☀️ Hội Katê Chăm
+          </button>
+          <button onclick="fillPrompt('Dạo phố giao thoa đương đại thanh lịch')" class="shrink-0 px-2.5 py-1 rounded-full bg-[#FFFDF8] hover:bg-[#E9E8E3] border border-[#C1C8C1] text-[11px] font-label-sm text-[#1B1C19] transition-colors">
+            🍃 Dạo phố giao thoa
+          </button>
+        </div>
+      </section>
+
+      <!-- "VỊ TRÍ PHỤC DỰNG" ARCH-STYLE COMPONENT SELECTOR PILLS -->
+      <section class="space-y-2">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-label-md font-bold uppercase tracking-wider text-[#1B1C19]">
+              Vị trí phục dựng
+            </span>
+            <!-- 3 Diamonds divider ornament from code10.html -->
+            <span class="inline-flex items-center gap-1 text-[#D8B454] select-none">
+              <span class="text-[8px] leading-none">◆</span>
+              <span class="text-[10px] leading-none">◆</span>
+              <span class="text-[8px] leading-none">◆</span>
+            </span>
+          </div>
+          <span class="text-[11px] font-label-sm text-[#717973]">Chọn lớp y phục</span>
+        </div>
+
+        <!-- Arch-style component pills -->
+        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+          <!-- Áo (Active jade pill) -->
+          <button class="shrink-0 px-3.5 py-1.5 rounded-t-full rounded-b-lg bg-[#456B56] text-[#FFFDF8] shadow-sm flex items-center gap-1.5 font-label-md text-xs font-bold border border-[#456B56]">
+            <span class="material-symbols-outlined text-[15px] fill">styler</span>
+            <span>Áo (01)</span>
+          </button>
+
+          <!-- Quần -->
+          <button class="shrink-0 px-3.5 py-1.5 rounded-t-full rounded-b-lg bg-[#F5F4EF] hover:bg-[#E9E8E3] text-[#414843] flex items-center gap-1.5 font-label-md text-xs border border-[#C1C8C1]/60 transition-colors">
+            <span class="material-symbols-outlined text-[15px]">dry_cleaning</span>
+            <span>Quần (02)</span>
+          </button>
+
+          <!-- Khăn & Vấn -->
+          <button class="shrink-0 px-3.5 py-1.5 rounded-t-full rounded-b-lg bg-[#F5F4EF] hover:bg-[#E9E8E3] text-[#414843] flex items-center gap-1.5 font-label-md text-xs border border-[#C1C8C1]/60 transition-colors">
+            <span class="material-symbols-outlined text-[15px]">face_retouching_natural</span>
+            <span>Khăn & Vấn (03)</span>
+          </button>
+
+          <!-- Hài -->
+          <button class="shrink-0 px-3.5 py-1.5 rounded-t-full rounded-b-lg bg-[#F5F4EF] hover:bg-[#E9E8E3] text-[#414843] flex items-center gap-1.5 font-label-md text-xs border border-[#C1C8C1]/60 transition-colors">
+            <span class="material-symbols-outlined text-[15px]">footprint</span>
+            <span>Hài (04)</span>
+          </button>
+
+          <!-- Phụ kiện -->
+          <button class="shrink-0 px-3.5 py-1.5 rounded-t-full rounded-b-lg bg-[#F5F4EF] hover:bg-[#E9E8E3] text-[#414843] flex items-center gap-1.5 font-label-md text-xs border border-[#C1C8C1]/60 transition-colors">
+            <span class="material-symbols-outlined text-[15px]">diamond</span>
+            <span>Phụ kiện</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- 3. BẢNG PHỐI ĐỒ FLAT-LAY (2x2 GRID WITH DASHED BORDERS) -->
+      <section class="space-y-3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <h2 class="font-headline-md text-lg sm:text-xl font-bold text-[#1B1C19]">
+              Bảng Phối Đồ Flat-lay
+            </h2>
+            <span class="text-[#D8B454] font-label-sm text-xs font-semibold">◆ 4 MÓN CHÍNH</span>
+          </div>
+
+          <button onclick="refreshOutfitGrid()" class="text-xs font-label-md font-semibold text-[#456B56] hover:text-[#2D533F] bg-[#F5F4EF] hover:bg-[#E9E8E3] px-3 py-1.5 rounded-xl border border-[#C1C8C1] transition-colors flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">restart_alt</span>
+            <span>+ Làm mới</span>
+          </button>
+        </div>
+
+        <!-- 2x2 Modular Grid (Responsive: 1-col on tiny mobile, 2-col on mobile/tablet) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+
+          <!-- SLOT 1: ÁO (TOP) -->
+          <article class="bg-[#FFFDF8] border-2 border-dashed border-[#456B56]/50 rounded-2xl p-3.5 shadow-xs hover:border-[#456B56] transition-all flex flex-col justify-between group relative">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-5 h-5 rounded-full bg-[#456B56] text-[#FFFDF8] flex items-center justify-center text-[10px] font-bold">1</span>
+                  <span class="text-xs font-label-md font-bold uppercase tracking-wider text-[#456B56]">Áo Cổ Phong</span>
+                  <span class="material-symbols-outlined text-[#456B56] text-[16px] fill">check_circle</span>
+                </div>
+                <button onclick="toggleSlotLock(this)" class="p-1 text-[#717973] hover:text-[#456B56] transition-colors" title="Khóa/Mở khóa món này">
+                  <span class="material-symbols-outlined text-[18px]">lock_open</span>
+                </button>
+              </div>
+
+              <!-- Arch image plate from code10.html -->
+              <div class="relative w-full aspect-[4/3] bg-[#F5F4EF] rounded-t-full rounded-b-xl overflow-hidden mb-2.5 border border-[#C1C8C1]/60 flex items-center justify-center p-2">
+                <span class="absolute top-2 left-2 z-10 bg-[#D8B454] text-[#241A00] font-label-sm text-[10px] px-1.5 py-0.5 rounded-full font-bold shadow-xs">
+                  98% Chuẩn
+                </span>
+                <span class="absolute top-2 right-2 z-10 bg-[#456B56] text-white font-label-sm text-[10px] px-1.5 py-0.5 rounded-md">
+                  Kinh · Triều Nguyễn
+                </span>
+                <img 
+                  src="https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=600&auto=format&fit=crop&q=80" 
+                  alt="Áo Ngũ Thân Chẽn Lục Bảo" 
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-full"
+                />
+              </div>
+
+              <div>
+                <h3 class="font-headline-sm font-bold text-sm text-[#1B1C19]">Áo Ngũ Thân Chẽn Lục Bảo</h3>
+                <p class="text-xs text-[#414843] font-body-sm mt-0.5">Lụa tơ tằm dệt trơn · Khuy cài đồng đúc</p>
+              </div>
+            </div>
+
+            <div class="mt-3 pt-2.5 border-t border-[#E9E8E3] flex items-center gap-2">
+              <button onclick="openSwapModal('ao')" class="flex-1 py-1.5 text-xs font-label-md font-semibold text-[#FFFDF8] bg-[#456B56] hover:bg-[#365544] rounded-xl transition-colors text-center shadow-xs">
+                [Đổi món]
+              </button>
+              <button onclick="showDetailModal('Áo Ngũ Thân Chẽn', 'Phom dáng ngũ thân 5 tà biểu trưng tứ thân phụ mẫu và bản thân. Thắt chẽn tôn vinh sự thanh nhã, giữ nếp phong lưu thế kỷ XIX.')" class="px-2.5 py-1.5 text-[#456B56] bg-[#F5F4EF] hover:bg-[#E9E8E3] rounded-xl border border-[#C1C8C1] text-xs font-label-md">
+                Ý nghĩa
+              </button>
+            </div>
+          </article>
+
+          <!-- SLOT 2: QUẦN / VÁY (BOTTOM) -->
+          <article class="bg-[#FFFDF8] border-2 border-dashed border-[#C1C8C1] rounded-2xl p-3.5 shadow-xs hover:border-[#456B56] transition-all flex flex-col justify-between group relative">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-5 h-5 rounded-full bg-[#456B56] text-[#FFFDF8] flex items-center justify-center text-[10px] font-bold">2</span>
+                  <span class="text-xs font-label-md font-bold uppercase tracking-wider text-[#456B56]">Quần / Váy</span>
+                  <span class="material-symbols-outlined text-[#456B56] text-[16px] fill">check_circle</span>
+                </div>
+                <button onclick="toggleSlotLock(this)" class="p-1 text-[#717973] hover:text-[#456B56] transition-colors" title="Khóa/Mở khóa món này">
+                  <span class="material-symbols-outlined text-[18px]">lock_open</span>
+                </button>
+              </div>
+
+              <div class="relative w-full aspect-[4/3] bg-[#F5F4EF] rounded-t-full rounded-b-xl overflow-hidden mb-2.5 border border-[#C1C8C1]/60 flex items-center justify-center p-2">
+                <span class="absolute top-2 left-2 z-10 bg-[#D8B454] text-[#241A00] font-label-sm text-[10px] px-1.5 py-0.5 rounded-full font-bold shadow-xs">
+                  96% Chuẩn
+                </span>
+                <span class="absolute top-2 right-2 z-10 bg-[#456B56] text-white font-label-sm text-[10px] px-1.5 py-0.5 rounded-md">
+                  Sa Hà Đông
+                </span>
+                <img 
+                  src="https://images.unsplash.com/photo-1582533561751-ef6f6ab93a2e?w=600&auto=format&fit=crop&q=80" 
+                  alt="Quần Bạch Sa Tơ Tằm" 
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-full"
+                />
+              </div>
+
+              <div>
+                <h3 class="font-headline-sm font-bold text-sm text-[#1B1C19]">Quần Bạch Sa Tơ Tằm</h3>
+                <p class="text-xs text-[#414843] font-body-sm mt-0.5">Lụa tơ dệt trắng ngà · Ống rộng bay bổng</p>
+              </div>
+            </div>
+
+            <div class="mt-3 pt-2.5 border-t border-[#E9E8E3] flex items-center gap-2">
+              <button onclick="openSwapModal('quan')" class="flex-1 py-1.5 text-xs font-label-md font-semibold text-[#FFFDF8] bg-[#456B56] hover:bg-[#365544] rounded-xl transition-colors text-center shadow-xs">
+                [Đổi món]
+              </button>
+              <button onclick="showDetailModal('Quần Bạch Sa', 'Lụa trắng Hà Đông mềm mại, tạo thế cân bằng âm dương với áo màu lục bảo, bước đi trang nhã mực thước.')" class="px-2.5 py-1.5 text-[#456B56] bg-[#F5F4EF] hover:bg-[#E9E8E3] rounded-xl border border-[#C1C8C1] text-xs font-label-md">
+                Ý nghĩa
+              </button>
+            </div>
+          </article>
+
+          <!-- SLOT 3: KHĂN & VẤN (HEAD) -->
+          <article class="bg-[#FFFDF8] border-2 border-dashed border-[#C1C8C1] rounded-2xl p-3.5 shadow-xs hover:border-[#456B56] transition-all flex flex-col justify-between group relative">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-5 h-5 rounded-full bg-[#456B56] text-[#FFFDF8] flex items-center justify-center text-[10px] font-bold">3</span>
+                  <span class="text-xs font-label-md font-bold uppercase tracking-wider text-[#456B56]">Khăn & Vấn</span>
+                  <span class="material-symbols-outlined text-[#456B56] text-[16px] fill">check_circle</span>
+                </div>
+                <button onclick="toggleSlotLock(this)" class="p-1 text-[#717973] hover:text-[#456B56] transition-colors" title="Khóa/Mở khóa món này">
+                  <span class="material-symbols-outlined text-[18px]">lock_open</span>
+                </button>
+              </div>
+
+              <div class="relative w-full aspect-[4/3] bg-[#F5F4EF] rounded-t-full rounded-b-xl overflow-hidden mb-2.5 border border-[#C1C8C1]/60 flex items-center justify-center p-2">
+                <span class="absolute top-2 left-2 z-10 bg-[#D8B454] text-[#241A00] font-label-sm text-[10px] px-1.5 py-0.5 rounded-full font-bold shadow-xs">
+                  97% Chuẩn
+                </span>
+                <span class="absolute top-2 right-2 z-10 bg-[#456B56] text-white font-label-sm text-[10px] px-1.5 py-0.5 rounded-md">
+                  Chữ Nhất · Sa đen
+                </span>
+                <img 
+                  src="https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=600&auto=format&fit=crop&q=80" 
+                  alt="Khăn Đóng Sa Đen & Kiềng" 
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-full"
+                />
+              </div>
+
+              <div>
+                <h3 class="font-headline-sm font-bold text-sm text-[#1B1C19]">Khăn Đóng Sa Đen & Kiềng Bạc</h3>
+                <p class="text-xs text-[#414843] font-body-sm mt-0.5">Khăn xếp chữ Nhất nếp gấp · Bạc ta chạm hoa</p>
+              </div>
+            </div>
+
+            <div class="mt-3 pt-2.5 border-t border-[#E9E8E3] flex items-center gap-2">
+              <button onclick="openSwapModal('khan')" class="flex-1 py-1.5 text-xs font-label-md font-semibold text-[#FFFDF8] bg-[#456B56] hover:bg-[#365544] rounded-xl transition-colors text-center shadow-xs">
+                [Đổi món]
+              </button>
+              <button onclick="showDetailModal('Khăn Đóng Chữ Nhất', 'Nếp gấp tạo hình chữ Nhất ngang trán biểu thị sự ngay thẳng, đoan chính của kẻ sĩ triều Nguyễn.')" class="px-2.5 py-1.5 text-[#456B56] bg-[#F5F4EF] hover:bg-[#E9E8E3] rounded-xl border border-[#C1C8C1] text-xs font-label-md">
+                Ý nghĩa
+              </button>
+            </div>
+          </article>
+
+          <!-- SLOT 4: HÀI / GUỐC (FOOTWEAR) -->
+          <article class="bg-[#FFFDF8] border-2 border-dashed border-[#C1C8C1] rounded-2xl p-3.5 shadow-xs hover:border-[#456B56] transition-all flex flex-col justify-between group relative">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-5 h-5 rounded-full bg-[#456B56] text-[#FFFDF8] flex items-center justify-center text-[10px] font-bold">4</span>
+                  <span class="text-xs font-label-md font-bold uppercase tracking-wider text-[#456B56]">Giày & Hài</span>
+                  <span class="material-symbols-outlined text-[#456B56] text-[16px] fill">check_circle</span>
+                </div>
+                <button onclick="toggleSlotLock(this)" class="p-1 text-[#717973] hover:text-[#456B56] transition-colors" title="Khóa/Mở khóa món này">
+                  <span class="material-symbols-outlined text-[18px]">lock_open</span>
+                </button>
+              </div>
+
+              <div class="relative w-full aspect-[4/3] bg-[#F5F4EF] rounded-t-full rounded-b-xl overflow-hidden mb-2.5 border border-[#C1C8C1]/60 flex items-center justify-center p-2">
+                <span class="absolute top-2 left-2 z-10 bg-[#D8B454] text-[#241A00] font-label-sm text-[10px] px-1.5 py-0.5 rounded-full font-bold shadow-xs">
+                  95% Chuẩn
+                </span>
+                <span class="absolute top-2 right-2 z-10 bg-[#456B56] text-white font-label-sm text-[10px] px-1.5 py-0.5 rounded-md">
+                  Cung đình Huế
+                </span>
+                <img 
+                  src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=600&auto=format&fit=crop&q=80" 
+                  alt="Hài Cong Thêu Vân Mây" 
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 rounded-t-full"
+                />
+              </div>
+
+              <div>
+                <h3 class="font-headline-sm font-bold text-sm text-[#1B1C19]">Hài Cong Thêu Vân Mây</h3>
+                <p class="text-xs text-[#414843] font-body-sm mt-0.5">Nhung then thêu chỉ kim tuyến · Mũi cong thanh thoát</p>
+              </div>
+            </div>
+
+            <div class="mt-3 pt-2.5 border-t border-[#E9E8E3] flex items-center gap-2">
+              <button onclick="openSwapModal('hai')" class="flex-1 py-1.5 text-xs font-label-md font-semibold text-[#FFFDF8] bg-[#456B56] hover:bg-[#365544] rounded-xl transition-colors text-center shadow-xs">
+                [Đổi món]
+              </button>
+              <button onclick="showDetailModal('Hài Cong Vân Mây', 'Mũi hài uốn cong giúp tà áo dài không bị vướng khi sải bước, thêu hoa văn mây tản phong lưu.')" class="px-2.5 py-1.5 text-[#456B56] bg-[#F5F4EF] hover:bg-[#E9E8E3] rounded-xl border border-[#C1C8C1] text-xs font-label-md">
+                Ý nghĩa
+              </button>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- CẨM NANG PHỐI NGŨ HÀNH & GIÁM ĐỊNH DI SẢN (ACCORDION CARD) -->
+      <section class="bg-[#F5F4EF] border border-[#C1C8C1]/80 rounded-2xl p-4 flex items-center justify-between gap-3 shadow-xs cursor-pointer hover:bg-[#E9E8E3] transition-colors" onclick="toggleHandbook()">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-[#D8B454]/30 flex items-center justify-center text-[#755B00]">
+            <span class="material-symbols-outlined text-[19px]">menu_book</span>
+          </div>
+          <div>
+            <p class="font-headline-sm text-sm font-bold text-[#1B1C19]">Cẩm nang phối ngũ hành & hoa văn</p>
+            <p class="font-body-sm text-xs text-[#414843]">Lục Bảo (Mộc) tương sinh với Bạch Sa (Thủy) · Chuẩn thức điển lệ</p>
+          </div>
+        </div>
+        <span id="handbook-chevron" class="material-symbols-outlined text-[#456B56] text-[20px] transition-transform">expand_more</span>
+      </section>
+
+      <div id="handbook-content" class="hidden -mt-3 p-4 bg-[#FFFDF8] border border-[#C1C8C1]/70 rounded-2xl text-xs text-[#414843] space-y-2 font-body-sm">
+        <p><strong>✦ Thư tịch đối chiếu:</strong> <em>Khâm Định Đại Nam Hội Điển Sự Lệ</em> quy định thể thức áo ngũ thân chẽn cho sĩ phu và quan lại thường triều.</p>
+        <p><strong>✦ Tương sinh ngũ sắc:</strong> Sắc xanh ngọc bích (Mộc) kết hợp trắng ngà (Thủy) đại diện cho sự thanh cao, an hòa và tri thức.</p>
+        <p><strong>✦ Chống ảo giác văn hóa:</strong> Trang phục không tự ý đính kết kim sa hiện đại, giữ nguyên cúc cài đồng và đường ráp nách chuẩn cổ truyền.</p>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- 4. BOTTOM NAVIGATION BAR (FIXED BOTTOM WITH 6px LATTICE STRIP & ARCH BADGE) -->
+  <nav class="fixed bottom-0 w-full z-50 pb-safe bg-[#FFFDF8] border-t border-[#1B1C19]/10 shadow-[0_-2px_12px_rgba(0,0,0,0.04)]">
+    <!-- 6px window lattice strip along top edge from code10.html / code8.html -->
+    <div class="w-full h-[6px] bg-[#456B56]/15 relative overflow-hidden">
+      <svg class="w-full h-full" preserveAspectRatio="none" viewBox="0 0 384 6">
+        <rect fill="url(#nav-lattice-strip)" height="100%" width="100%"></rect>
+      </svg>
+    </div>
+
+    <div class="max-w-md mx-auto flex justify-around items-center h-16 px-4">
+      <!-- Trang chủ -->
+      <a href="#" class="flex-1 flex flex-col items-center justify-center text-[#717973] hover:text-[#1B1C19] transition-colors">
+        <div class="w-8 h-8 flex items-center justify-center -mb-0.5">
+          <span class="material-symbols-outlined text-[20px]">cottage</span>
+        </div>
+        <span class="text-[11px] font-body-sm mt-0.5">Trang chủ</span>
+        <span class="h-[6px] mt-0.5"></span>
+      </a>
+
+      <!-- Phối đồ (Active: sits in arch badge with diamond ◆ marker from code10.html & code8.html) -->
+      <a href="#" class="flex-1 flex flex-col items-center justify-center text-[#456B56]">
+        <div class="w-10 h-8 rounded-t-full rounded-b-xs bg-[#456B56] flex items-center justify-center -mb-0.5 shadow-xs">
+          <span class="material-symbols-outlined text-[19px] text-[#FFFDF8]">styler</span>
+        </div>
+        <span class="text-[11px] font-bold mt-1 text-[#456B56] flex items-center gap-0.5">
+          <span>Phối đồ</span>
+          <span class="text-[7px] leading-none text-[#D8B454]">◆</span>
+        </span>
+      </a>
+
+      <!-- Tủ đồ -->
+      <a href="#" class="flex-1 flex flex-col items-center justify-center text-[#717973] hover:text-[#1B1C19] transition-colors">
+        <div class="w-8 h-8 flex items-center justify-center -mb-0.5">
+          <span class="material-symbols-outlined text-[20px]">checkroom</span>
+        </div>
+        <span class="text-[11px] font-body-sm mt-0.5">Tủ đồ</span>
+        <span class="h-[6px] mt-0.5"></span>
+      </a>
+
+      <!-- Tài khoản -->
+      <a href="#" class="flex-1 flex flex-col items-center justify-center text-[#717973] hover:text-[#1B1C19] transition-colors">
+        <div class="w-8 h-8 flex items-center justify-center -mb-0.5">
+          <span class="material-symbols-outlined text-[20px]">account_circle</span>
+        </div>
+        <span class="text-[11px] font-body-sm mt-0.5">Tài khoản</span>
+        <span class="h-[6px] mt-0.5"></span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- MODAL: CULTURAL DETAIL POPUP -->
+  <div id="detail-modal" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-[#FFFDF8] border border-[#C1C8C1] rounded-3xl max-w-sm w-full p-6 space-y-4 shadow-xl text-center">
+      <div class="w-12 h-12 rounded-2xl bg-[#456B56]/15 text-[#456B56] flex items-center justify-center mx-auto">
+        <span class="material-symbols-outlined text-2xl fill">verified</span>
+      </div>
+      <div>
+        <h4 id="modal-title" class="font-headline-sm font-bold text-lg text-[#1B1C19]">Ý Nghĩa Hoa Văn</h4>
+        <p id="modal-desc" class="text-xs text-[#414843] font-body-sm mt-2 leading-relaxed">
+          Thông tin chi tiết về hiện vật di sản.
+        </p>
+      </div>
+      <button onclick="closeDetailModal()" class="w-full py-2.5 bg-[#456B56] hover:bg-[#365544] text-[#FFFDF8] font-label-md text-xs font-semibold rounded-xl transition-colors cursor-pointer">
+        Đã hiểu
+      </button>
+    </div>
+  </div>
+
+  <!-- INTERACTION SCRIPT -->
+  <script>
+    function setMode(mode) {
+      const tabManual = document.getElementById('tab-manual');
+      const tabAi = document.getElementById('tab-ai');
+      if (mode === 'ai') {
+        tabAi.className = 'flex-1 py-1.5 sm:py-2 text-center text-xs font-label-md font-bold bg-[#D8B454] text-[#241A00] rounded-full shadow-sm transition-all flex items-center justify-center gap-1.5';
+        tabManual.className = 'flex-1 py-1.5 sm:py-2 text-center text-xs font-label-md font-medium text-[#FFFDF8]/80 hover:text-[#FFFDF8] rounded-full transition-all';
+      } else {
+        tabManual.className = 'flex-1 py-1.5 sm:py-2 text-center text-xs font-label-md font-bold bg-[#D8B454] text-[#241A00] rounded-full shadow-sm transition-all flex items-center justify-center gap-1.5';
+        tabAi.className = 'flex-1 py-1.5 sm:py-2 text-center text-xs font-label-md font-medium text-[#FFFDF8]/80 hover:text-[#FFFDF8] rounded-full transition-all';
+      }
+    }
+
+    function fillPrompt(text) {
+      document.getElementById('prompt-input').value = text;
+    }
+
+    function triggerAiSuggestion() {
+      const input = document.getElementById('prompt-input').value;
+      showDetailModal('AI Gợi Ý Phối Đồ', 'Đã phân tích bối cảnh: "' + input + '". Đề xuất hoàn thiện set ngũ thân chẽn ngọc bích với độ tương thích văn hóa 96%!');
+    }
+
+    function toggleSlotLock(btn) {
+      const icon = btn.querySelector('.material-symbols-outlined');
+      if (icon.textContent === 'lock_open') {
+        icon.textContent = 'lock';
+        btn.classList.add('text-[#456B56]');
+        btn.classList.remove('text-[#717973]');
+      } else {
+        icon.textContent = 'lock_open';
+        btn.classList.remove('text-[#456B56]');
+        btn.classList.add('text-[#717973]');
+      }
+    }
+
+    function refreshOutfitGrid() {
+      showDetailModal('Bảng Phối Đồ Flat-lay', 'Đã làm mới các món phối: Áo Ngũ Thân Chẽn Lục Bảo, Quần Bạch Sa, Khăn Đóng Sa Đen & Hài Vân Mây!');
+    }
+
+    function openSwapModal(slot) {
+      showDetailModal('Đổi Món Trang Phục', 'Mở kho di sản chọn món thay thế cho vị trí: ' + slot.toUpperCase() + ' (được chọn lọc chuẩn mực theo dân tộc Kinh).');
+    }
+
+    function showDetailModal(title, desc) {
+      document.getElementById('modal-title').innerText = title;
+      document.getElementById('modal-desc').innerText = desc;
+      document.getElementById('detail-modal').classList.remove('hidden');
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detail-modal').classList.add('hidden');
+    }
+
+    function toggleHandbook() {
+      const content = document.getElementById('handbook-content');
+      const chevron = document.getElementById('handbook-chevron');
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        chevron.style.transform = 'rotate(180deg)';
+      } else {
+        content.classList.add('hidden');
+        chevron.style.transform = 'rotate(0deg)';
+      }
+    }
+  </script>
+</body>
+</html>
