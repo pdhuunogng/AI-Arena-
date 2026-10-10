@@ -31,8 +31,8 @@ export const Header: React.FC = () => {
             <Sparkles className="w-4 h-4 text-[#D8B454]" />
           </div>
           <div>
-            <span className="block text-[10px] font-label-md tracking-widest text-[#755b00] uppercase font-semibold leading-none">AI STYLING · GEN Z</span>
-            <span className="font-headline font-bold text-base sm:text-lg text-[#1a1c1a] leading-tight">VIỆT PHỤC REMIX</span>
+            <span className="block text-[10px] font-label-md tracking-wider text-[#755b00] uppercase font-semibold leading-none">MẶC CHẤT RIÊNG, GIỮ NÉT VIỆT</span>
+            <span className="font-headline font-bold text-base sm:text-lg text-[#1a1c1a] leading-tight">VIỆT PHỤC 5.0</span>
           </div>
         </button>
 

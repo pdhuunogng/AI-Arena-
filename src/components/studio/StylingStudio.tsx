@@ -247,17 +247,17 @@ export const StylingStudio: React.FC = () => {
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-[11px] font-bold uppercase tracking-widest text-[#D8B454] font-mono">
-                VIỆT CỔ Y PHONG AI · PHÒNG PHỐI ĐỒ
+                VIỆT PHỤC 5.0 · PHỐI ĐỒ
               </span>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-label-sm bg-black/30 text-[#FFFDF8] border border-white/20 font-semibold">
                 ✓ {equippedCount} món đang mặc · {aiAdvisoryResult?.cultural_accuracy_score || '96% tương thích'}
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-serif font-bold text-white mt-1">
-              Phòng Phối Trang Phục Di Sản
+            <h1 className="text-2xl sm:text-3xl font-headline-md font-bold text-white mt-1">
+              Phòng Phối Đồ
             </h1>
-            <p className="text-xs sm:text-sm text-stone-100 font-sans mt-0.5 max-w-xl">
-              Phối trang phục truyền thống và giám định chuẩn xác cùng AI.
+            <p className="text-xs sm:text-sm text-stone-100 font-body-sm mt-0.5 max-w-xl">
+              Chọn trang phục yêu thích hoặc để AI gợi ý set đồ chuẩn nét Việt.
             </p>
           </div>
 

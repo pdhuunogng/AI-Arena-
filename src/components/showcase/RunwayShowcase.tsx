@@ -91,14 +91,16 @@ export const RunwayShowcase: React.FC = () => {
             <div className="space-y-2">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/25 border border-white/20 text-[#D8B454] text-xs font-mono font-bold tracking-wider uppercase">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>VIỆT CỔ Y PHONG AI · AI ARENA 2026</span>
+                <span>VIỆT PHỤC 5.0</span>
               </div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-extrabold tracking-tight text-white leading-tight">
-                Tôn Vinh Di Sản, <br />
-                <span className="italic font-light text-[#D8B454]">Phối Sắc Đương Đại</span>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-headline-lg font-bold tracking-tight text-white leading-tight">
+                Việt Phục 5.0
               </h1>
-              <p className="text-sm sm:text-base font-serif italic text-stone-100/90 leading-relaxed max-w-xl">
-                Cố vấn phối trang phục 54 dân tộc và cổ phục Việt Nam cùng AI giám định tri thức văn hóa chuẩn xác.
+              <p className="text-lg sm:text-xl font-headline-md italic text-[#D8B454] font-medium">
+                Mặc chất riêng, giữ nét Việt.
+              </p>
+              <p className="text-xs sm:text-sm text-stone-100/90 leading-relaxed max-w-xl font-body-sm">
+                Khám phá và phối đồ truyền thống 54 dân tộc Việt Nam cùng trợ lý AI.
               </p>
             </div>
 
@@ -238,11 +240,11 @@ export const RunwayShowcase: React.FC = () => {
               <span>✦</span>
               <span>TIÊU BIỂU</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-white mt-1">
-              Y Phục Tiêu Biểu
+            <h2 className="text-2xl sm:text-3xl font-headline-md font-bold text-white mt-1">
+              Trang Phục Nổi Bật
             </h2>
-            <p className="text-xs sm:text-sm text-stone-200 font-sans mt-0.5">
-              Trang phục tuyển chọn theo khảo cứu lịch sử, sẵn sàng phối đồ.
+            <p className="text-xs sm:text-sm text-stone-200 font-body-sm mt-0.5">
+              Các mẫu áo váy truyền thống đặc sắc, bấm để thử phối ngay.
             </p>
           </div>
 
@@ -336,13 +338,13 @@ export const RunwayShowcase: React.FC = () => {
       <div className="rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl">
         <div className="space-y-1 max-w-2xl">
           <span className="text-[11px] font-mono uppercase tracking-wider text-[#D8B454] font-bold">
-            TRI THỨC & NGUỒN CỘI
+            BẢN SẮC & PHONG CÁCH
           </span>
-          <h3 className="text-lg sm:text-xl font-serif font-bold text-white">
-            Bảo tồn tri thức trang phục dân tộc
+          <h3 className="text-lg sm:text-xl font-headline-sm font-bold text-white">
+            Giữ nét đẹp cổ phong, tạo phong cách riêng
           </h3>
-          <p className="text-xs sm:text-sm text-stone-200 leading-relaxed">
-            Bảo lưu tính nguyên bản của nghi lễ truyền thống; phát triển phong cách đương đại tinh tế.
+          <p className="text-xs sm:text-sm text-stone-200 leading-relaxed font-body-sm">
+            Kết hợp hài hòa nét đẹp truyền thống và phong cách hiện đại tự tin.
           </p>
         </div>
       </div>

@@ -9,10 +9,10 @@ export const Footer: React.FC = () => {
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="space-y-1 text-center sm:text-left">
           <p className="font-headline font-bold text-white text-sm">
-            Việt Cổ Y Phong AI · AI ARENA 2026
+            Việt Phục 5.0
           </p>
           <p className="text-stone-300/80 font-body-sm">
-            Tôn vinh họa tiết, hoa văn truyền thống 54 dân tộc và các triều đại Việt Nam.
+            Mặc chất riêng, giữ nét Việt.
           </p>
         </div>
 

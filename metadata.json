@@ -1,6 +1,6 @@
 {
-  "name": "Việt Cổ Y Phong AI – Cố Vấn Thời Trang & Di Sản Việt Nam",
-  "description": "Nền tảng cố vấn phối đồ và giám định tri thức trang phục truyền thống 54 dân tộc và cổ phục Việt Nam cùng AI tại AI ARENA 2026.",
+  "name": "Việt Phục 5.0",
+  "description": "Mặc chất riêng, giữ nét Việt. Cố vấn phối đồ và khám phá trang phục truyền thống 54 dân tộc Việt Nam cùng AI.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

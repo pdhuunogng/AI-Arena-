@@ -34,12 +34,16 @@
     text-rendering: optimizeLegibility;
   }
 
-  h1, h2, h3, h4, h5, h6, .font-serif, .font-headline {
+  h1, h2, h3, h4, h5, h6, .font-serif, .font-headline, .font-headline-lg, .font-headline-md, .font-headline-sm {
     font-family: 'Playfair Display', Georgia, serif;
   }
 
-  .font-label-sm, .font-label-md, .font-label-lg {
-    font-family: 'Space Grotesk', sans-serif;
+  .font-title-lg, .font-title-md, .font-body-lg, .font-body-md, .font-body-sm {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  .font-label-sm, .font-label-md, .font-label-lg, .font-label {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
   }
 
   .material-symbols-outlined {

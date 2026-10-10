@@ -324,13 +324,13 @@ export const HeritageCatalog: React.FC = () => {
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-1">
             <span className="text-[11px] font-mono text-[#D8B454] uppercase font-bold tracking-widest">
-              VIỆT PHỤC REMIX · KHO TƯ LIỆU VĂN HÓA CHUẨN HÓA V2
+              VIỆT PHỤC 5.0 · TỦ ĐỒ DI SẢN
             </span>
-            <h1 className="text-2xl sm:text-3xl font-serif font-bold text-white">
-              Thư Viện Trang Phục & Tủ Đồ Di Sản
+            <h1 className="text-2xl sm:text-3xl font-headline-md font-bold text-white">
+              Tủ Đồ & Thư Viện Di Sản
             </h1>
-            <p className="text-xs sm:text-sm text-stone-100 max-w-2xl leading-relaxed">
-              Dữ liệu chuẩn hóa gồm 77 món trang phục độc lập, 21 tổ hợp tham khảo, 83 liên kết thành phần, 168 quy tắc tương thích có phạm vi và 14 cờ thẩm định chuyên khảo.
+            <p className="text-xs sm:text-sm text-stone-100 max-w-2xl leading-relaxed font-body-sm">
+              Kho trang phục truyền thống 54 dân tộc, tra cứu chi tiết và quản lý tủ đồ cá nhân.
             </p>
           </div>
 

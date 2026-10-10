@@ -261,7 +261,7 @@ export const AccountView: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F5F0] py-8 px-4 sm:px-6 lg:px-8">
+    <div className="w-full py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-8">
         
         {/* Hidden Canvas for High-Res PNG Generation */}
@@ -325,11 +325,11 @@ export const AccountView: React.FC = () => {
                   </h1>
                   <span className="px-3 py-0.5 bg-white/15 text-[#D8B454] text-xs font-label-md font-semibold rounded-full border border-white/20 flex items-center gap-1">
                     <ShieldCheck className="w-3.5 h-3.5" />
-                    <span>AI ARENA 2026 · Đã Giám Định</span>
+                    <span>Việt Phục 5.0</span>
                   </span>
                 </div>
                 <p className="text-xs sm:text-sm text-stone-200 mt-1 font-body-sm">
-                  Lưu trữ, quản lý và xuất thẻ các set trang phục truyền thống của bạn.
+                  Lưu trữ và xuất thẻ bộ sưu tập trang phục của bạn.
                 </p>
               </div>
             </div>

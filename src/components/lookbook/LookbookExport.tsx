@@ -92,11 +92,11 @@ export const LookbookExport: React.FC = () => {
     ctx.fillStyle = '#6E6152';
     ctx.font = '14px serif';
     ctx.textAlign = 'center';
-    ctx.fillText('AI ARENA 2026 · BỘ SƯU TẬP DI SẢN CÁ NHÂN', canvas.width / 2, 75);
+    ctx.fillText('MẶC CHẤT RIÊNG, GIỮ NÉT VIỆT', canvas.width / 2, 75);
 
     ctx.fillStyle = '#2d533f';
     ctx.font = 'bold 34px serif';
-    ctx.fillText('VIỆT CỔ Y PHONG', canvas.width / 2, 120);
+    ctx.fillText('VIỆT PHỤC 5.0', canvas.width / 2, 120);
 
     // Separator line
     ctx.strokeStyle = '#D1C7B7';
