@@ -12,6 +12,7 @@ import {
 } from '../types/costume';
 
 import rawCatalogJson from './viet_phuc_remix_normalized_catalog_v2.json';
+import garmentImages from 'virtual:garment-images';
 
 export const NORMALIZED_CATALOG = rawCatalogJson as unknown as NormalizedCatalog;
 
@@ -136,6 +137,13 @@ export const NORMALIZED_ITEMS: CostumeItem[] = (NORMALIZED_CATALOG.items || []).
     item.subgroup
   );
 
+  const resolvedImage =
+    garmentImages[item.id] ||
+    (typeof item.image_path === 'string' && item.image_path.trim() !== ''
+      ? item.image_path
+      : null);
+  const finalImageUrl = resolvedImage || placeholderImg;
+
   return {
     id: item.id,
     name: item.name,
@@ -165,15 +173,9 @@ export const NORMALIZED_ITEMS: CostumeItem[] = (NORMALIZED_CATALOG.items || []).
     source_titles: item.source_titles || [],
     cultural_information_note: item.cultural_information_note,
     notes: item.notes || '',
-    image_url:
-      typeof item.image_path === 'string' && item.image_path.trim() !== ''
-        ? item.image_path
-        : placeholderImg,
-    imageUrl:
-      typeof item.image_path === 'string' && item.image_path.trim() !== ''
-        ? item.image_path
-        : placeholderImg,
-    image_path: item.image_path || null,
+    image_url: finalImageUrl,
+    imageUrl: finalImageUrl,
+    image_path: resolvedImage || null,
     imageReference: item.source_urls && item.source_urls.length > 0 ? item.source_urls[0] : null,
     ritual_level:
       item.usage && (item.usage.includes('nghi lễ') || item.usage.includes('cưới') || item.usage.includes('tế tự'))

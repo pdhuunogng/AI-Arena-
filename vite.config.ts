@@ -4,12 +4,14 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { defineConfig } from 'vite';
 
+import { garmentImagesPlugin } from './vite-plugins/garmentImages.ts';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig(() => {
 
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [react(), tailwindcss(), garmentImagesPlugin()],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

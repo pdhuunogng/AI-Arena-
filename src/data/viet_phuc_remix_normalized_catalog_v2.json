@@ -8,7 +8,7 @@
     "outfitRecordsIncludingResearchExtension": 21,
     "items": 77,
     "outfitItemLinks": 83,
-    "imagePolicy": "image_path để null cho đến khi chạy sync-images",
+    "imagePolicy": "Ảnh được tự nhận diện theo tên file = item.id trong public/assets/garments/",
     "verificationPolicy": "Giữ rõ trạng thái cần xác minh; không tự suy ra item hoặc ý nghĩa văn hóa khi thiếu nguồn.",
     "componentPolicy": "Một item có thể được liên kết với nhiều bộ, nhưng mỗi liên kết có role/condition và trạng thái chứng cứ.",
     "compatibilityModel": "Quan hệ tương thích có phạm vi theo outfit tham chiếu; không suy ra tương thích toàn cục chỉ từ dân tộc, màu sắc hoặc category.",

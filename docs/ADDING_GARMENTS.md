@@ -1,13 +1,14 @@
-# Hướng Dẫn Thêm & Đồng Bộ Ảnh Trang Phục Vào VIỆT PHỤC REMIX
+# Hướng Dẫn Thêm Ảnh Trang Phục Vào VIỆT PHỤC REMIX
 *(Curated Garment Image Integration Guide)*
 
-Tài liệu này hướng dẫn cách bổ sung ảnh thật cho các trang phục và phụ kiện truyền thống trong Thư viện Di sản của ứng dụng **VIỆT PHỤC REMIX**.
+Tài liệu này hướng dẫn cách bổ sung ảnh thật cho các trang phục và phụ kiện truyền thống trong Thư viện Di sản của ứng dụng **VIỆT PHỤC REMIX** (Việt Phục 5.0).
+
+Hệ thống sử dụng cơ chế **tự động nhận diện ảnh (Auto-Detection Vite Plugin)**, người dùng chỉ cần bỏ ảnh vào đúng thư mục và đặt tên theo quy chuẩn là ảnh sẽ tự động hiển thị ngay trên ứng dụng mà **không cần chạy bất kỳ câu lệnh nào**.
 
 Dữ liệu di sản gồm 77 trang phục chuẩn hóa được lưu trữ tập trung tại:
 ```text
 src/data/viet_phuc_remix_normalized_catalog_v2.json
 ```
-Bạn **không cần** thêm thủ công đối tượng vào mã nguồn `mockHeritageData.ts`. Quy trình nạp ảnh diễn ra tự động thông qua script đồng bộ.
 
 ---
 
@@ -19,8 +20,8 @@ Bạn **không cần** thêm thủ công đối tượng vào mã nguồn `mockH
 public/assets/garments/
 ```
 
-- Định dạng hỗ trợ: `.png`, `.jpg`, `.jpeg`, `.webp`, `.svg`.
-- Ảnh trang phục nên có nền sáng ngà (`#FBF9F4` hoặc `#F5F4EF`) hoặc nền trong suốt (PNG/SVG/WEBP) với phom dáng chuẩn mực, tỉ lệ cân đối.
+- **Định dạng hỗ trợ:** `.png`, `.jpg`, `.jpeg`, `.webp`, `.svg`.
+- **Quy cách khuyến nghị:** Ảnh trang phục nên có nền sáng ngà (`#FBF9F4` hoặc `#F5F4EF`) hoặc nền trong suốt (PNG/WEBP/SVG) với phom dáng chuẩn mực, tỉ lệ cân đối, chi tiết hoa văn sắc nét.
 - URL phục vụ tương ứng trên trình duyệt: `/assets/garments/<tên-file>`.
 
 ---
@@ -35,42 +36,42 @@ Tên tệp hình ảnh (phần trước phần mở rộng) **bắt buộc phả
 
 ### Ví dụ minh họa:
 - `item-ao-ngu-than.png` (khớp với trang phục `item-ao-ngu-than`)
-- `item-quan-dai-ngu-than.jpg` (khớp với trang phục `item-quan-dai-ngu-than`)
-- `item-khan-dong.webp` (khớp với trang phục `item-khan-dong`)
+- `item-quan-dai-ngu-than.png` (khớp với trang phục `item-quan-dai-ngu-than`)
+- `item-khan-dong.png` (khớp với trang phục `item-khan-dong`)
+- `item-khan-van-ngu-than.png` (khớp với trang phục `item-khan-van-ngu-than`)
 - `item-ao-tu-than.png` (khớp với trang phục `item-ao-tu-than`)
-- `item-yem-bac-bo.svg` (khớp với trang phục `item-yem-bac-bo`)
+- `item-yem-bac-bo.webp` (khớp với trang phục `item-yem-bac-bo`)
 
-*Gợi ý:* Bạn có thể tham khảo danh sách tên tệp gợi ý trong mảng `imageImportTemplate` nằm ở cuối tệp `src/data/viet_phuc_remix_normalized_catalog_v2.json`.
-
----
-
-## 3. Quy Trình Đồng Bộ Ảnh (Sync Workflow)
-
-Sau khi đưa ảnh vào thư mục, thực hiện quy trình sau:
-
-1. **Bước 1 — Bỏ ảnh vào thư mục:**
-   Sao chép các file ảnh đã đặt tên đúng quy ước vào `public/assets/garments/`.
-
-2. **Bước 2 — Chạy lệnh đồng bộ:**
-   Chạy lệnh sau tại thư mục gốc dự án:
-   ```bash
-   npm run sync-images
-   ```
-
-3. **Bước 3 — Kiểm tra kết quả:**
-   Script `scripts/sync-garment-images.mjs` sẽ:
-   - Quét thư mục `public/assets/garments/`.
-   - Ghép tên file (bỏ đuôi) với `item.id` trong `src/data/viet_phuc_remix_normalized_catalog_v2.json`.
-   - Nếu khớp: cập nhật `image_path = imageUrl = "/assets/garments/<file>"` cho item và cập nhật `imageImportTemplate`.
-   - Nếu không có ảnh: đặt `image_path = null` (ứng dụng sẽ tự động hiển thị placeholder SVG nhã nhặn).
-   - In ra thông báo: `Gắn ảnh cho X/77 item` và liệt kê các tệp trong thư mục không khớp với bất kỳ `item.id` nào.
-
-4. **Bước 4 — Hiển thị trên ứng dụng:**
-   Trong `src/data/mockHeritageData.ts`, khi `item.image_path` là đường dẫn hợp lệ, hệ thống sẽ ưu tiên hiển thị ảnh thật của trang phục trên toàn bộ giao diện: Thư viện (Heritage Library), Phòng thử đồ (Styling Studio), Sàn diễn (Runway), và Chi tiết văn hóa.
+*Gợi ý:* Bạn có thể tra cứu nhanh danh sách `item.id` và tên file gợi ý trong mảng `imageImportTemplate` nằm ở cuối tệp `src/data/viet_phuc_remix_normalized_catalog_v2.json`.
 
 ---
 
-## 4. Quy Chuẩn Đạo Đức Văn Hóa & Kiểm Chứng (Cultural Confidence)
+## 3. Quy Trình Thêm Ảnh (Hoàn Toàn Tự Động)
+
+Quy trình nạp ảnh diễn ra tự động 100%:
+
+1. **Bước 1:** Chuẩn bị file ảnh trang phục hoặc hiện vật khảo cứu.
+2. **Bước 2:** Đổi tên file theo đúng `item.id` (ví dụ `item-ao-ngu-than.png`).
+3. **Bước 3:** Thả file ảnh vào thư mục `public/assets/garments/`.
+4. **Kết quả:**
+   - **Tự động nhận diện:** Vite plugin (`garmentImagesPlugin`) thông qua virtual module `virtual:garment-images` sẽ tự động quét thư mục và ánh xạ ảnh tới trang phục tương ứng.
+   - **Tự động cập nhật:** Ở chế độ dev, watcher theo dõi thư mục `public/assets/garments/` và tự động gửi tín hiệu full-reload cho trình duyệt ngay khi bạn thêm, xoá hoặc đổi tên file ảnh — không cần khởi động lại server.
+   - **Không cần chạy lệnh:** Không cần chạy `sync-images` hay bất kỳ lệnh nào.
+   - **Cảnh báo lỗi chính tả:** Nếu tên file ảnh không khớp với bất kỳ `item.id` nào trong catalog, console dev sẽ tự động in cảnh báo (warning) để bạn phát hiện kịp thời.
+
+---
+
+## 4. Thứ Tự Ưu Tiên Hiển Thị Ảnh (Image Fallback Strategy)
+
+Trong `src/data/mockHeritageData.ts`, hệ thống áp dụng thứ tự ưu tiên 3 cấp:
+
+1. **Ưu tiên 1:** Ảnh tìm thấy từ virtual module `virtual:garment-images` (khớp theo tên file trong `public/assets/garments/`).
+2. **Ưu tiên 2:** Đường dẫn `item.image_path` nếu có khai báo trong JSON.
+3. **Ưu tiên 3:** SVG Placeholder trung tính, mỹ thuật di sản Việt Nam (`createNeutralPlaceholder`) được tự động sinh dựa trên nhóm trang phục và hoa văn đặc trưng.
+
+---
+
+## 5. Quy Chuẩn Đạo Đức Văn Hóa & Kiểm Chứng (Cultural Confidence)
 
 - **Trường `source_verification`:** Mọi trang phục đều gắn liền với tư liệu lịch sử hoặc bảo tàng đã được khảo cứu.
 - **Khi chưa đủ nguồn kiểm chứng:** Giữ nguyên trạng thái `Chưa có thông tin xác minh`, không tự ý thêm các khẳng định văn hóa chưa được đối chiếu.
