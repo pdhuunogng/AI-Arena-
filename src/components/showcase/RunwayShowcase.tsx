@@ -91,14 +91,14 @@ export const RunwayShowcase: React.FC = () => {
             <div className="space-y-2">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-black/25 border border-white/20 text-[#D8B454] text-xs font-mono font-bold tracking-wider uppercase">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>VIỆT PHỤC REMIX · GEN Z HERITAGE</span>
+                <span>VIỆT CỔ Y PHONG AI · AI ARENA 2026</span>
               </div>
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-extrabold tracking-tight text-white leading-tight">
                 Tôn Vinh Di Sản, <br />
                 <span className="italic font-light text-[#D8B454]">Phối Sắc Đương Đại</span>
               </h1>
               <p className="text-sm sm:text-base font-serif italic text-stone-100/90 leading-relaxed max-w-xl">
-                Cố vấn phối trang phục truyền thống 54 dân tộc và cổ phục Việt Nam cùng công nghệ AI giám định tri thức văn hóa có trách nhiệm.
+                Cố vấn phối trang phục 54 dân tộc và cổ phục Việt Nam cùng AI giám định tri thức văn hóa chuẩn xác.
               </p>
             </div>
 
@@ -130,18 +130,18 @@ export const RunwayShowcase: React.FC = () => {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-1">
               <button
                 onClick={handleTryStylingNow}
-                className="flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-[#D8B454] hover:bg-[#c9a33e] text-stone-900 text-sm font-label-md font-bold transition-all shadow-lg hover:shadow-xl cursor-pointer"
+                className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#D8B454] hover:bg-[#c9a33e] text-stone-900 text-sm font-label-md font-bold transition-all shadow-lg hover:shadow-xl cursor-pointer"
               >
-                <span>Thử Phối Ngay Set Này</span>
+                <span>Thử phối ngay</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
               <button
                 onClick={() => setActiveTab('archive')}
-                className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-sm font-label-md font-semibold transition-colors border border-white/20 cursor-pointer"
+                className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/15 hover:bg-white/25 text-white text-sm font-label-md font-semibold transition-colors border border-white/20 cursor-pointer"
               >
                 <Layers className="w-4 h-4 text-[#D8B454]" />
-                <span>Khám Phá Tủ Đồ Di Sản</span>
+                <span>Khám phá tủ đồ</span>
               </button>
             </div>
 
@@ -221,7 +221,7 @@ export const RunwayShowcase: React.FC = () => {
                 onClick={handleTryStylingNow}
                 className="w-full py-2.5 text-center text-xs font-label-md font-bold text-stone-900 bg-[#D8B454] hover:bg-[#c9a33e] rounded-xl transition-all cursor-pointer shadow-md flex items-center justify-center gap-1.5"
               >
-                <span>Mở trong Studio Phối Đồ</span>
+                <span>Phối trong Studio</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -231,26 +231,26 @@ export const RunwayShowcase: React.FC = () => {
 
       {/* 2. VISUAL DISCOVERY — MÓN ĐỒ TIÊU BIỂU TUYỂN CHỌN */}
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-[#e9e8e3] pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-white/20 pb-4">
           <div>
-            <div className="flex items-center gap-2 text-xs font-mono uppercase text-[#A03F30] font-bold tracking-wider">
+            <div className="flex items-center gap-2 text-xs font-mono uppercase text-[#D8B454] font-bold tracking-wider">
               <span>TRANG PHỤC & PHỤ KIỆN</span>
               <span>✦</span>
-              <span>TUYỂN CHỌN ĐẶC SẮC</span>
+              <span>TIÊU BIỂU</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#1a1c1a] mt-1">
-              Khám Phá Chi Tiết Y Phục
+            <h2 className="text-2xl sm:text-3xl font-serif font-bold text-white mt-1">
+              Y Phục Tiêu Biểu
             </h2>
-            <p className="text-xs sm:text-sm text-[#414942] font-sans mt-0.5">
-              Từng món đồ được chuẩn hóa để bạn tự do thử nghiệm phối ghép theo phong cách cá nhân
+            <p className="text-xs sm:text-sm text-stone-200 font-sans mt-0.5">
+              Trang phục tuyển chọn theo khảo cứu lịch sử, sẵn sàng phối đồ.
             </p>
           </div>
 
           <button
             onClick={() => setActiveTab('archive')}
-            className="flex items-center gap-1.5 text-xs font-label-md font-bold text-[#2d533f] hover:text-[#456b56] cursor-pointer"
+            className="flex items-center gap-1.5 text-xs font-label-md font-bold text-[#D8B454] hover:text-white cursor-pointer px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 transition-all shadow-sm"
           >
-            <span>Xem toàn bộ 54 dân tộc & triều đại</span>
+            <span>Xem tất cả</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -315,7 +315,7 @@ export const RunwayShowcase: React.FC = () => {
                     className="flex-1 py-2 px-3 bg-[#2d533f] hover:bg-[#456b56] text-white text-xs font-label-md font-bold rounded-xl transition-all shadow-xs cursor-pointer flex items-center justify-center gap-1.5"
                   >
                     <Wand2 className="w-3.5 h-3.5 text-[#D8B454]" />
-                    <span>+ Phối vào Studio</span>
+                    <span>Thử phối</span>
                   </button>
 
                   <button
@@ -333,26 +333,18 @@ export const RunwayShowcase: React.FC = () => {
       </div>
 
       {/* 3. EDITORIAL MANIFESTO STRIP */}
-      <div className="rounded-3xl bg-[#efeee9] border border-[#e3e2dc] p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl">
         <div className="space-y-1 max-w-2xl">
-          <span className="text-[11px] font-mono uppercase tracking-wider text-[#A03F30] font-bold">
-            TRI THỨC & TÔN TRỌNG NGUỒN CỘI
+          <span className="text-[11px] font-mono uppercase tracking-wider text-[#D8B454] font-bold">
+            TRI THỨC & NGUỒN CỘI
           </span>
-          <h3 className="text-lg sm:text-xl font-serif font-bold text-[#1a1c1a]">
-            Trang phục không chỉ là xiêm áo, mà là ký ức sống của tổ tiên
+          <h3 className="text-lg sm:text-xl font-serif font-bold text-white">
+            Bảo tồn tri thức trang phục dân tộc
           </h3>
-          <p className="text-xs sm:text-sm text-[#414942] leading-relaxed">
-            VIỆT PHỤC REMIX cam kết bảo lưu tính nguyên bản của đồ tế tự thiêng liêng, đồng thời mở ra không gian phối ghép sáng tạo chuẩn mực cho thế hệ trẻ.
+          <p className="text-xs sm:text-sm text-stone-200 leading-relaxed">
+            Bảo lưu tính nguyên bản của nghi lễ truyền thống; phát triển phong cách đương đại tinh tế.
           </p>
         </div>
-
-        <button
-          onClick={() => setActiveTab('lookbook')}
-          className="shrink-0 px-5 py-3 rounded-xl bg-white hover:bg-stone-50 border border-[#c1c9bf] text-[#1a1c1a] text-xs font-label-md font-bold shadow-xs transition-colors cursor-pointer flex items-center gap-2"
-        >
-          <BookmarkCheck className="w-4 h-4 text-[#A03F30]" />
-          <span>Xem Lookbook & Thẻ Sưu Tập</span>
-        </button>
       </div>
     </div>
   );

@@ -281,7 +281,7 @@ export const AccountView: React.FC = () => {
           </div>
         )}
 
-        {/* SECTION 1: FIREBASE USER PROFILE & AUTHENTICATION HEADER - TAB 4: TÍM CUNG ĐÌNH HUẾ (ROYAL HUE PURPLE) */}
+        {/* SECTION 1: USER PROFILE & HERITAGE LOOKBOOK BANNER */}
         <div className="relative rounded-3xl overflow-hidden bg-[#5C2B4E] text-[#FFFDF8] p-6 sm:p-8 shadow-md border border-[#47203C]">
           <div className="absolute inset-0 pointer-events-none opacity-20">
             <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -298,80 +298,40 @@ export const AccountView: React.FC = () => {
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
             <div className="flex items-center gap-5">
               <div className="relative">
-                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-[#D8B454] to-[#caa749] p-1 shadow-md">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-[#D8B454] to-[#caa749] p-1 shadow-md">
                   <div className="w-full h-full rounded-full bg-[#fbf9f4] flex items-center justify-center overflow-hidden">
                     {user ? (
                       user.avatarUrl && user.avatarUrl.trim() !== '' ? (
                         <img src={user.avatarUrl} alt={user.displayName || 'Người dùng'} className="w-full h-full object-cover" />
                       ) : (
-                        <span className="text-2xl sm:text-3xl font-headline font-bold text-[#5C2B4E]">
+                        <span className="text-xl sm:text-2xl font-headline font-bold text-[#5C2B4E]">
                           {(user.displayName || 'U').charAt(0)}
                         </span>
                       )
                     ) : (
-                      <User className="w-10 h-10 text-stone-400" />
+                      <User className="w-8 h-8 text-stone-400" />
                     )}
                   </div>
                 </div>
                 {user && (
-                  <span className="absolute bottom-0 right-0 w-5 h-5 bg-[#D8B454] border-2 border-[#5C2B4E] rounded-full" title="Đã xác thực" />
+                  <span className="absolute bottom-0 right-0 w-4 h-4 bg-[#D8B454] border-2 border-[#5C2B4E] rounded-full" title="Đã xác thực" />
                 )}
               </div>
 
               <div>
                 <div className="flex items-center gap-3 flex-wrap">
-                  <h1 className="text-2xl sm:text-3xl font-headline font-bold text-white">
-                    {user ? user.displayName : 'Khách tham quan AI Arena'}
+                  <h1 className="text-xl sm:text-2xl font-headline font-bold text-white">
+                    {user?.displayName || 'Bộ Sưu Tập Của Bạn'}
                   </h1>
-                  {user && (
-                    <span className="px-3 py-1 bg-white/15 text-[#D8B454] text-xs font-label-md font-semibold rounded-full border border-white/20 flex items-center gap-1">
-                      <ShieldCheck className="w-3.5 h-3.5" />
-                      Hồ sơ: {user.gender === 'nam' ? 'Nam · Dáng vóc uy nghi' : user.gender === 'nu' ? 'Nữ · Dáng thanh tú' : 'Nonbinary · Phom dáng linh hoạt'}
-                    </span>
-                  )}
+                  <span className="px-3 py-0.5 bg-white/15 text-[#D8B454] text-xs font-label-md font-semibold rounded-full border border-white/20 flex items-center gap-1">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>AI ARENA 2026 · Đã Giám Định</span>
+                  </span>
                 </div>
-                <p className="text-sm text-stone-200 mt-1 flex items-center gap-2 font-body-sm">
-                  {user ? (
-                    <>
-                      <Mail className="w-3.5 h-3.5 text-[#D8B454]" />
-                      <span>{user.email || user.phoneNumber || 'Đã liên kết Firebase'}</span>
-                      <span className="text-white/40">•</span>
-                      <span className="text-[#D8B454] font-medium">Đã liên kết tài khoản Firebase Auth</span>
-                    </>
-                  ) : (
-                    'Vui lòng đăng nhập để lưu trữ bộ sưu tập cá nhân và đồng bộ đám mây.'
-                  )}
+                <p className="text-xs sm:text-sm text-stone-200 mt-1 font-body-sm">
+                  Lưu trữ, quản lý và xuất thẻ các set trang phục truyền thống của bạn.
                 </p>
               </div>
-            </div>
-
-            <div className="flex items-center gap-3 w-full md:w-auto justify-end font-label-md">
-              {user ? (
-                <>
-                  <button
-                    onClick={() => setAuthModalOpen(true, 'onboarding')}
-                    className="flex-1 md:flex-initial px-4 py-2.5 bg-white/15 hover:bg-white/25 text-white text-xs sm:text-sm font-semibold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 border border-white/20"
-                  >
-                    <Edit3 className="w-4 h-4 text-[#D8B454]" />
-                    <span>Chỉnh sửa hồ sơ</span>
-                  </button>
-                  <button
-                    onClick={logout}
-                    className="px-4 py-2.5 bg-black/25 hover:bg-black/35 text-stone-200 text-xs sm:text-sm font-semibold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 border border-white/15"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span>Đăng xuất</span>
-                  </button>
-                </>
-              ) : (
-                <button
-                  onClick={() => setAuthModalOpen(true, 'signin')}
-                  className="w-full md:w-auto px-6 py-3 bg-[#D8B454] hover:bg-[#c9a33e] text-stone-900 text-sm font-bold rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
-                >
-                  <Sparkles className="w-4 h-4 text-stone-900" />
-                  <span>Đăng nhập / Đăng ký</span>
-                </button>
-              )}
             </div>
           </div>
         </div>
@@ -379,40 +339,40 @@ export const AccountView: React.FC = () => {
         {/* SECTION 2: LOOKBOOK & SAVED OUTFITS HEADER */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl sm:text-2xl font-headline font-bold text-stone-900 flex items-center gap-2">
-              <Bookmark className="w-5 h-5 text-[#2d533f]" />
-              <span>Bộ Sưu Tập Lookbook Đã Lưu ({savedLookbooks.length})</span>
+            <h2 className="text-xl sm:text-2xl font-headline font-bold text-white flex items-center gap-2">
+              <Bookmark className="w-5 h-5 text-[#D8B454]" />
+              <span>Bộ Sưu Tập Đã Lưu ({savedLookbooks.length})</span>
             </h2>
-            <p className="text-xs sm:text-sm text-stone-600 mt-0.5 font-body-sm">
-              Những set trang phục di sản bạn đã phối và lưu lại từ phòng phối đồ.
+            <p className="text-xs sm:text-sm text-stone-200 mt-0.5 font-body-sm">
+              Trang phục đã lưu từ phòng phối đồ.
             </p>
           </div>
 
           <button
             onClick={() => setActiveTab('studio')}
-            className="self-start sm:self-auto px-4 py-2 bg-[#2d533f] hover:bg-[#456b56] text-white text-xs font-label-md font-semibold rounded-xl transition-all cursor-pointer flex items-center gap-2 shadow-xs"
+            className="self-start sm:self-auto px-4 py-2 bg-[#D8B454] hover:bg-[#c49f3e] text-stone-900 text-xs font-label-md font-bold rounded-xl transition-all cursor-pointer flex items-center gap-2 shadow-md"
           >
-            <Sparkles className="w-3.5 h-3.5 text-[#caa749]" />
-            <span>Phối thêm bộ mới</span>
+            <Sparkles className="w-3.5 h-3.5 text-stone-900" />
+            <span>Phối bộ mới</span>
           </button>
         </div>
 
         {/* SECTION 3: VISUAL-FIRST HERITAGE LOOKBOOK CARDS GRID */}
         {savedLookbooks.length === 0 ? (
-          <div className="bg-[#fbf9f4] border border-[#e9e8e3] rounded-3xl p-12 text-center space-y-4 shadow-xs">
-            <div className="w-16 h-16 rounded-full bg-[#caa749]/20 flex items-center justify-center mx-auto text-[#755b00]">
-              <Bookmark className="w-8 h-8" />
+          <div className="bg-[#fbf9f4] border border-[#e9e8e3] rounded-3xl p-10 text-center space-y-3.5 shadow-xs">
+            <div className="w-14 h-14 rounded-full bg-[#caa749]/20 flex items-center justify-center mx-auto text-[#755b00]">
+              <Bookmark className="w-7 h-7" />
             </div>
-            <h3 className="text-lg font-headline font-bold text-stone-900">Chưa có bộ sưu tập nào được lưu</h3>
-            <p className="text-sm text-stone-600 max-w-md mx-auto font-body-sm">
-              Hãy truy cập Phòng Phối Đồ (Styling Studio), chọn lựa các họa tiết di sản 54 dân tộc và triều đại Việt Nam rồi bấm "Lưu vào Lookbook" để hiển thị tại đây.
+            <h3 className="text-base sm:text-lg font-headline font-bold text-stone-900">Chưa có bộ sưu tập nào</h3>
+            <p className="text-xs sm:text-sm text-stone-600 max-w-md mx-auto font-body-sm">
+              Hãy phối trang phục tại Phòng Phối Đồ và bấm "Lưu bộ sưu tập" để lưu giữ tại đây.
             </p>
             <button
               onClick={() => setActiveTab('studio')}
-              className="px-6 py-3 bg-[#2d533f] hover:bg-[#456b56] text-white text-sm font-label-md font-semibold rounded-xl shadow-md transition-all cursor-pointer inline-flex items-center gap-2"
+              className="px-5 py-2.5 bg-[#2d533f] hover:bg-[#456b56] text-white text-xs font-label-md font-semibold rounded-xl shadow-sm transition-all cursor-pointer inline-flex items-center gap-2"
             >
               <Sparkles className="w-4 h-4 text-[#caa749]" />
-              <span>Khám phá phòng thiết kế ngay</span>
+              <span>Đến phòng phối đồ</span>
             </button>
           </div>
         ) : (
@@ -489,7 +449,7 @@ export const AccountView: React.FC = () => {
                         title="Nạp bộ này vào Studio để phối tiếp"
                       >
                         <Sparkles className="w-3.5 h-3.5 text-[#caa749]" />
-                        <span>Phối tiếp bộ này</span>
+                        <span>Phối tiếp</span>
                       </button>
 
                       <button
@@ -499,7 +459,7 @@ export const AccountView: React.FC = () => {
                         title="Tải thẻ Lookbook dạng ảnh PNG"
                       >
                         <Download className="w-3.5 h-3.5 text-stone-600" />
-                        <span>Tải PNG</span>
+                        <span>Tải ảnh</span>
                       </button>
 
                       <button

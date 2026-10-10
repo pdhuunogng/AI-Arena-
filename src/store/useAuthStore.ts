@@ -178,13 +178,28 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       });
       return true;
     } catch (error: any) {
-      console.error('Phone OTP Send Error:', error);
+      console.warn('Phone OTP Send Warning/Error:', error);
       let msg = 'Không thể gửi mã OTP. Vui lòng kiểm tra lại số điện thoại.';
-      if (error.code === 'auth/invalid-phone-number') {
+      const errStr = (error?.message || '') + ' ' + (error?.code || '');
+
+      if (errStr.includes('reCAPTCHA') || errStr.includes('captcha-check-failed') || errStr.includes('Timeout') || errStr.includes('timeout')) {
+        msg = 'Xác thực bảo mật quá hạn. Vui lòng thử lại hoặc chọn Tiếp tục với Google.';
+      } else if (error.code === 'auth/invalid-phone-number') {
         msg = 'Số điện thoại không hợp lệ.';
       } else if (error.code === 'auth/too-many-requests') {
-        msg = 'Quá nhiều yêu cầu. Vui lòng thử lại sau ít phút.';
+        msg = 'Quá nhiều yêu cầu. Vui lòng thử lại sau ít phút hoặc đăng nhập Google.';
+      } else if (error.code === 'auth/unauthorized-domain') {
+        msg = 'Tên miền chưa được cấp phép SMS. Vui lòng chọn Tiếp tục với Google.';
       }
+
+      // Clear verifier to halt any pending reCAPTCHA background timers
+      if (window.recaptchaVerifier) {
+        try {
+          window.recaptchaVerifier.clear();
+          window.recaptchaVerifier = undefined;
+        } catch (_) {}
+      }
+
       set({ authError: msg, isLoading: false });
       return false;
     }

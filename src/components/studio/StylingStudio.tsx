@@ -228,22 +228,36 @@ export const StylingStudio: React.FC = () => {
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
       {/* 1. Header Bar: Identity & Actions */}
-      <div className="relative rounded-3xl overflow-hidden bg-[#2D533F] text-[#FFFDF8] p-6 sm:p-8 shadow-xl border border-[#234131]">
+      <div className="relative rounded-3xl overflow-hidden bg-[#A03F30] text-[#FFFDF8] p-6 sm:p-8 shadow-xl border border-[#863528]">
+        {/* Subtle Heritage Brocade Motif */}
+        <div className="absolute inset-0 pointer-events-none opacity-20">
+          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="brocade-lattice-24" patternUnits="userSpaceOnUse" width="24" height="24">
+                <rect fill="none" height="24" stroke="#FFFDF8" strokeWidth="0.8" width="24" />
+                <path d="M12,2 L22,12 L12,22 L2,12 Z" fill="none" stroke="#FFFDF8" strokeWidth="0.8" />
+                <circle cx="12" cy="12" fill="#D8B454" fillOpacity="0.4" r="3" />
+              </pattern>
+            </defs>
+            <rect fill="url(#brocade-lattice-24)" height="100%" width="100%" />
+          </svg>
+        </div>
+
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-[11px] font-bold uppercase tracking-widest text-[#D8B454] font-mono">
-                VIỆT PHỤC REMIX · STYLING STUDIO
+                VIỆT CỔ Y PHONG AI · PHÒNG PHỐI ĐỒ
               </span>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-label-sm bg-black/30 text-[#FFFDF8] border border-white/20 font-semibold">
-                ✓ {equippedCount} món đang mặc · {aiAdvisoryResult?.cultural_accuracy_score || '96% Chuẩn Di Sản'}
+                ✓ {equippedCount} món đang mặc · {aiAdvisoryResult?.cultural_accuracy_score || '96% tương thích'}
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-serif font-bold text-white mt-1">
-              Phòng Phối Trang Phục & Phụ Kiện
+              Phòng Phối Trang Phục Di Sản
             </h1>
             <p className="text-xs sm:text-sm text-stone-100 font-sans mt-0.5 max-w-xl">
-              Chọn từng món đồ truyền thống, hoàn thiện diện mạo theo phong cách Gen Z cùng sự bảo chứng của AI
+              Phối trang phục truyền thống và giám định chuẩn xác cùng AI.
             </p>
           </div>
 
@@ -270,7 +284,7 @@ export const StylingStudio: React.FC = () => {
               onClick={clearOutfit}
               className="px-3.5 py-2 text-xs font-label-md text-white bg-white/15 hover:bg-white/25 rounded-xl transition-colors cursor-pointer border border-white/25 font-semibold"
             >
-              + Làm mới
+              Làm mới
             </button>
 
             {/* Save lookbook button */}
@@ -279,7 +293,7 @@ export const StylingStudio: React.FC = () => {
               className="flex items-center gap-1.5 px-4 py-2 text-xs font-label-md font-bold text-stone-900 bg-[#D8B454] hover:bg-[#c9a33e] rounded-xl transition-all shadow-md cursor-pointer"
             >
               <Bookmark className="w-3.5 h-3.5" />
-              <span>{saveSuccessMsg ? 'Đã lưu vào Lookbook!' : 'Lưu Lookbook'}</span>
+              <span>{saveSuccessMsg ? 'Đã lưu bộ sưu tập!' : 'Lưu bộ sưu tập'}</span>
             </button>
           </div>
         </div>
@@ -297,27 +311,27 @@ export const StylingStudio: React.FC = () => {
             }`}
           >
             <Sliders className="w-3.5 h-3.5 text-[#a03f30]" />
-            <span>Tự phối đồ (Thủ công)</span>
+            <span>Tự phối đồ</span>
           </button>
 
           <button
             onClick={() => setActiveSubTab('ai')}
             className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-full text-xs font-label-md transition-all cursor-pointer ${
               activeSubTab === 'ai'
-                ? 'bg-[#2d533f] text-white font-bold shadow-xs'
-                : 'text-[#414942] hover:text-[#2d533f]'
+                ? 'bg-[#A03F30] text-white font-bold shadow-xs'
+                : 'text-[#414942] hover:text-[#A03F30]'
             }`}
           >
             <Sparkles className="w-3.5 h-3.5 text-[#D8B454]" />
-            <span>AI hỗ trợ ✨</span>
+            <span>AI hỗ trợ</span>
           </button>
         </div>
 
         {/* Heritage Guard Status */}
         <div className="flex items-center gap-2 text-xs text-[#414942] px-3.5 py-2 rounded-xl bg-[#f5f4ef] border border-[#e9e8e3]">
-          <ShieldCheck className="w-4 h-4 text-[#2d533f] shrink-0" />
-          <span className="font-label-md font-bold text-[#1a1c1a]">Ràng buộc văn hóa:</span>
-          <span className="text-[#2d533f] font-semibold">Đang bật (Chống lai tạp nghi lễ)</span>
+          <ShieldCheck className="w-4 h-4 text-[#A03F30] shrink-0" />
+          <span className="font-label-md font-bold text-[#1a1c1a]">Chuẩn mực văn hóa:</span>
+          <span className="text-[#A03F30] font-semibold">Bảo lưu quy cách truyền thống</span>
         </div>
       </div>
 
@@ -327,12 +341,12 @@ export const StylingStudio: React.FC = () => {
         <div className="lg:col-span-7 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Layers className="w-4 h-4 text-[#2d533f]" />
-              <h2 className="font-serif font-bold text-lg text-[#1a1c1a]">
-                Các Món Đã Chọn Vào Bộ Trang Phục
+              <Layers className="w-4 h-4 text-[#D8B454]" />
+              <h2 className="font-serif font-bold text-lg text-white">
+                Trang Phục Đã Chọn
               </h2>
             </div>
-            <span className="text-[11px] font-label-sm text-[#755b00] bg-[#D8B454]/20 px-2.5 py-0.5 rounded-full border border-[#D8B454]/40 font-semibold">
+            <span className="text-[11px] font-label-sm text-[#D8B454] bg-black/30 px-2.5 py-0.5 rounded-full border border-[#D8B454]/40 font-semibold">
               {equippedCount}/8 vị trí trang phục
             </span>
           </div>
