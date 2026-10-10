@@ -91,18 +91,59 @@ export function createNeutralPlaceholder(
 }
 
 /**
- * Phân định slot trong bộ phối dựa trên category chuẩn hóa
+ * Phân định slot trong bộ phối dựa trên category chuẩn hóa và tên gọi item
  */
-export function categoryToSlot(category: string): CostumeSlot {
-  const cat = (category || '').toLowerCase();
-  if (cat.includes('áo')) return 'ao';
-  if (cat.includes('quần')) return 'quan';
-  if (cat.includes('váy')) return 'vay';
-  if (cat.includes('khăn')) return 'khan';
-  if (cat.includes('mũ')) return 'mu';
-  if (cat.includes('giày')) return 'giay';
-  if (cat.includes('trang sức')) return 'trang_suc';
-  if (cat.includes('thân dưới') || cat.includes('khố')) return 'quan';
+export function categoryToSlot(category: string, name = ''): CostumeSlot {
+  const cat = (category || '').trim();
+  const lowerName = (name || '').toLowerCase();
+
+  // 1. Mũ/khăn hoặc Khăn/mũ: phân định theo tên (khăn -> khan, mũ/mão -> mu)
+  if (cat === 'Mũ/khăn' || cat === 'Khăn/mũ') {
+    if (lowerName.includes('khăn')) return 'khan';
+    if (lowerName.includes('mũ') || lowerName.includes('mão')) return 'mu';
+    return 'khan';
+  }
+
+  // 2. Áo lót -> slot chuyên biệt ao_lot (lớp trong)
+  if (cat === 'Áo lót') return 'ao_lot';
+
+  // 3. Áo khoác, Áo lễ phục, Áo -> ao (lớp ngoài / áo chính)
+  if (cat === 'Áo khoác' || cat === 'Áo lễ phục' || cat === 'Áo') return 'ao';
+
+  // 4. Trang phục thân dưới hoặc Quần -> quan
+  if (cat === 'Trang phục thân dưới' || cat === 'Quần') return 'quan';
+
+  // 5. Váy hoặc Váy/quấn -> vay
+  if (cat === 'Váy' || cat === 'Váy/quấn') return 'vay';
+
+  // 6. Khăn -> khan
+  if (cat === 'Khăn') return 'khan';
+
+  // 7. Mũ -> mu
+  if (cat === 'Mũ') return 'mu';
+
+  // 8. Giày -> giay
+  if (cat === 'Giày') return 'giay';
+
+  // 9. Trang sức -> trang_suc
+  if (cat === 'Trang sức') return 'trang_suc';
+
+  // 10. Phụ kiện, Phụ kiện trang phục, Bộ phận trang phục -> phu_kien
+  if (cat === 'Phụ kiện trang phục' || cat === 'Phụ kiện' || cat === 'Bộ phận trang phục') {
+    return 'phu_kien';
+  }
+
+  // Fallback an toàn cho dữ liệu mở rộng
+  const lcat = cat.toLowerCase();
+  if (lcat.includes('lót') || lcat.includes('yếm')) return 'ao_lot';
+  if (lcat.includes('áo')) return 'ao';
+  if (lcat.includes('quần') || lcat.includes('thân dưới') || lcat.includes('khố')) return 'quan';
+  if (lcat.includes('váy')) return 'vay';
+  if (lcat.includes('khăn')) return 'khan';
+  if (lcat.includes('mũ') || lcat.includes('mão')) return 'mu';
+  if (lcat.includes('giày') || lcat.includes('hài') || lcat.includes('guốc')) return 'giay';
+  if (lcat.includes('trang sức')) return 'trang_suc';
+
   return 'phu_kien';
 }
 
@@ -125,10 +166,124 @@ function deriveColorHex(category: string, group: string): string {
 }
 
 /**
+ * Định nghĩa lại cross_cultural_flag:
+ * True khi item có ít nhất một compatibilityRule hoặc outfit_membership
+ * liên kết với item / outfit thuộc nhóm văn hóa khác; ngược lại false nếu chỉ thuần nội bộ.
+ */
+function determineCrossCulturalFlag(item: any): boolean {
+  const itemGroup = (item.cultural_group || '').toLowerCase().trim();
+  const rules = NORMALIZED_COMPATIBILITY_RULES.filter(
+    (r) => r.item_a_id === item.id || r.item_b_id === item.id
+  );
+  const itemsMap = new Map((NORMALIZED_CATALOG.items || []).map((i: any) => [i.id, i]));
+  const outfitsMap = new Map((NORMALIZED_CATALOG.outfits || []).map((o: any) => [o.outfit_id, o]));
+
+  for (const r of rules) {
+    const otherId = r.item_a_id === item.id ? r.item_b_id : r.item_a_id;
+    const other = itemsMap.get(otherId);
+    if (other) {
+      const otherGroup = (other.cultural_group || '').toLowerCase().trim();
+      if (itemGroup && otherGroup && itemGroup !== otherGroup) {
+        return true;
+      }
+    }
+  }
+
+  if (Array.isArray(item.outfit_memberships)) {
+    for (const m of item.outfit_memberships) {
+      const outfit = outfitsMap.get(m.outfit_id);
+      if (outfit) {
+        const outGroup = (outfit.group || '').toLowerCase().trim();
+        if (itemGroup && outGroup && itemGroup !== outGroup) {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Phân cấp mức độ nghi lễ (ritual_level):
+ * - 'sacred_ritual': tế tự, thờ cúng, chầu văn, tâm linh, hầu đồng.
+ * - 'festive': nghi lễ, cưới hỏi, lễ tết, đại lễ, cung đình, phẩm cấp.
+ * - 'daily': trang phục sinh hoạt, thường nhật.
+ */
+function determineRitualLevel(item: any): RitualLevel {
+  const text = `${item.usage || ''} ${(item.tags || []).map((t: any) => (typeof t === 'string' ? t : `${t.type} ${t.value}`)).join(' ')} ${item.notes || ''} ${item.cultural_information_note || ''} ${item.description || ''}`.toLowerCase();
+
+  if (
+    text.includes('tế tự') ||
+    text.includes('thờ cúng') ||
+    text.includes('chầu văn') ||
+    text.includes('tâm linh') ||
+    text.includes('hầu đồng')
+  ) {
+    return 'sacred_ritual';
+  }
+
+  if (
+    text.includes('nghi lễ') ||
+    text.includes('cưới') ||
+    text.includes('lễ hội') ||
+    text.includes('đại lễ') ||
+    text.includes('lễ tết') ||
+    text.includes('lễ phục') ||
+    text.includes('cung đình') ||
+    text.includes('phẩm cấp') ||
+    item.category === 'Áo lễ phục'
+  ) {
+    return 'festive';
+  }
+
+  return 'daily';
+}
+
+/**
+ * Phân định độ tương thích giới tính (gender_affinity):
+ * - 'nam': khi mô tả/sử dụng nêu rõ nam giới, cho nam, đàn ông, khố.
+ * - 'nu': khi nêu rõ nữ giới, phụ nữ, thiếu nữ, yếm, tứ thân, mệnh phụ, xiêm, váy, áo nữ.
+ * - 'all': khi dùng chung hoặc không phân biệt rõ trong nguồn tư liệu, không tự suy đoán.
+ */
+function determineGenderAffinity(item: any): 'all' | 'nam' | 'nu' {
+  const lowerName = (item.name || '').toLowerCase();
+  const text = `${lowerName} ${item.usage || ''} ${item.notes || ''} ${item.cultural_information_note || ''} ${item.description || ''}`.toLowerCase();
+
+  if (
+    item.id === 'item-kho' ||
+    text.includes('nam giới') ||
+    text.includes('cho nam ') ||
+    text.includes('dành cho nam') ||
+    text.includes('đàn ông')
+  ) {
+    return 'nam';
+  }
+
+  if (
+    text.includes('nữ giới') ||
+    text.includes('phụ nữ') ||
+    text.includes('cho nữ') ||
+    text.includes('thiếu nữ') ||
+    text.includes('dành cho nữ') ||
+    text.includes('mệnh phụ') ||
+    text.includes('yếm') ||
+    text.includes('tứ thân') ||
+    lowerName.includes('áo nữ') ||
+    lowerName.includes('xiêm') ||
+    lowerName.includes('váy')
+  ) {
+    return 'nu';
+  }
+
+  return 'all';
+}
+
+/**
  * 77 BẢN GHI ITEMS CHUẨN HÓA V2
  */
 export const NORMALIZED_ITEMS: CostumeItem[] = (NORMALIZED_CATALOG.items || []).map((item) => {
-  const slot = categoryToSlot(item.category);
+  const slot = categoryToSlot(item.category, item.name);
   const colorHex = deriveColorHex(item.category, item.cultural_group);
   const placeholderImg = createNeutralPlaceholder(
     item.name,
@@ -177,16 +332,11 @@ export const NORMALIZED_ITEMS: CostumeItem[] = (NORMALIZED_CATALOG.items || []).
     imageUrl: finalImageUrl,
     image_path: resolvedImage || null,
     imageReference: item.source_urls && item.source_urls.length > 0 ? item.source_urls[0] : null,
-    ritual_level:
-      item.usage && (item.usage.includes('nghi lễ') || item.usage.includes('cưới') || item.usage.includes('tế tự'))
-        ? 'festive'
-        : 'daily',
-    cross_cultural_flag: !(
-      item.compatibility_policy &&
-      item.compatibility_policy.includes('not automatically compatible')
-    ),
+    ritual_level: determineRitualLevel(item),
+    cross_cultural_flag: determineCrossCulturalFlag(item),
     selectable_independently: item.selectable_independently ?? true,
     is_structural_part: item.is_structural_part ?? false,
+    gender_affinity: determineGenderAffinity(item),
     variant_group: item.variant_group || '',
     outfit_memberships: item.outfit_memberships || [],
     belongs_to_outfit_ids: item.belongs_to_outfit_ids || [],
@@ -271,38 +421,59 @@ export function findCompatibilityRule(itemAId: string, itemBId: string): Compati
   );
 }
 
-/**
- * Đánh giá tính chuẩn xác và tương thích của tổ hợp trang phục đang mặc
- */
-export function evaluateEquippedOutfitCompatibility(equippedItems: CostumeItem[]): {
-  status: 'reference_match' | 'conditional_match' | 'alternative_conflict' | 'contemporary_remix';
+export interface OutfitCompatibilityEvaluation {
+  status:
+    | 'reference_match'
+    | 'conditional_match'
+    | 'alternative_conflict'
+    | 'mostly_matched'
+    | 'contemporary_remix';
   badgeTitle: string;
   badgeClass: string;
   matchedOutfit: NormalizedOutfit | null;
+  matchedCount: number;
+  totalCount: number;
+  matchedItems: CostumeItem[];
+  mismatchedItems: Array<{
+    item: CostumeItem;
+    reason: string;
+  }>;
   ruleMessages: Array<{
-    type: 'conflict' | 'condition' | 'co_member' | 'review';
+    type: 'conflict' | 'condition' | 'co_member' | 'review' | 'sacred_warning';
     itemA: string;
     itemB: string;
     message: string;
     ruleId?: string;
   }>;
   explanation: string;
-} {
+}
+
+/**
+ * Đánh giá tính chuẩn xác và tương thích của tổ hợp trang phục đang mặc
+ * Chấm điểm khớp theo bộ tham chiếu thay vì yêu cầu cứng tất cả món phải thuộc 1 bộ.
+ */
+export function evaluateEquippedOutfitCompatibility(
+  equippedItems: CostumeItem[]
+): OutfitCompatibilityEvaluation {
   const items = equippedItems.filter(Boolean);
   if (items.length < 2) {
     return {
       status: 'contemporary_remix',
       badgeTitle: 'Đang chọn món',
-      badgeClass: 'bg-stone-100 text-stone-700',
+      badgeClass: 'bg-stone-100 text-stone-700 border-stone-200',
       matchedOutfit: null,
+      matchedCount: items.length,
+      totalCount: items.length,
+      matchedItems: items,
+      mismatchedItems: [],
       ruleMessages: [],
       explanation: 'Hãy chọn thêm món để hệ thống đánh giá tương thích văn hóa.'
     };
   }
 
-  // Check pairwise rules
+  // 1. Kiểm tra quy tắc cặp (Pairwise Compatibility Rules) & Cảnh báo thiêng liêng
   const ruleMessages: Array<{
-    type: 'conflict' | 'condition' | 'co_member' | 'review';
+    type: 'conflict' | 'condition' | 'co_member' | 'review' | 'sacred_warning';
     itemA: string;
     itemB: string;
     message: string;
@@ -311,6 +482,18 @@ export function evaluateEquippedOutfitCompatibility(equippedItems: CostumeItem[]
 
   let hasAlternativeConflict = false;
   let hasConditional = false;
+
+  // Cảnh báo món tế tự / tín ngưỡng thiêng liêng (Hard Constraint)
+  items.forEach((it) => {
+    if (it.ritual_level === 'sacred_ritual') {
+      ruleMessages.push({
+        type: 'sacred_warning',
+        itemA: it.name,
+        itemB: '',
+        message: `Lưu ý thiêng liêng: Món "${it.name}" mang ý nghĩa tế tự/tín ngưỡng (sacred_ritual). Không tùy tiện phối cho sự kiện thường nhật!`
+      });
+    }
+  });
 
   for (let i = 0; i < items.length; i++) {
     for (let j = i + 1; j < items.length; j++) {
@@ -325,7 +508,7 @@ export function evaluateEquippedOutfitCompatibility(equippedItems: CostumeItem[]
             type: 'conflict',
             itemA: a.name,
             itemB: b.name,
-            message: `Xung đột: ${a.name} và ${b.name} là phương án thay thế trong cùng bộ, không nên mặc đồng thời.`,
+            message: `Xung đột biến thể: ${a.name} và ${b.name} là phương án thay thế trong cùng bộ, không nên mặc đồng thời.`,
             ruleId: rule.relationship_id
           });
         } else if (rule.status === 'conditional_in_reference_context') {
@@ -342,7 +525,7 @@ export function evaluateEquippedOutfitCompatibility(equippedItems: CostumeItem[]
             type: 'review',
             itemA: a.name,
             itemB: b.name,
-            message: `Cần xác nhận ảnh/mẫu: ${rule.explanation}`,
+            message: `Cần xác nhận tư liệu: ${rule.explanation}`,
             ruleId: rule.relationship_id
           });
         } else if (rule.status === 'co_listed_in_reference_outfit') {
@@ -358,45 +541,95 @@ export function evaluateEquippedOutfitCompatibility(equippedItems: CostumeItem[]
     }
   }
 
-  // Find if all items belong to a single reference outfit
-  const itemOutfitSets = items.map((it) => new Set(it.belongs_to_outfit_ids || []));
-  const commonOutfitIds = (items[0].belongs_to_outfit_ids || []).filter((oid) =>
-    itemOutfitSets.every((s) => s.has(oid))
-  );
+  // 2. Chấm điểm khớp theo từng bộ tham chiếu trong NORMALIZED_OUTFITS
+  let bestOutfit: NormalizedOutfit | null = null;
+  let bestMatchedItems: CostumeItem[] = [];
+  let bestMismatchedItems: Array<{ item: CostumeItem; reason: string }> = [];
+  let maxMatchedCount = 0;
 
-  const matchedOutfit = commonOutfitIds.length > 0
-    ? NORMALIZED_OUTFITS.find((o) => o.outfit_id === commonOutfitIds[0]) || null
-    : null;
+  for (const outfit of NORMALIZED_OUTFITS) {
+    const matched: CostumeItem[] = [];
+    const mismatched: Array<{ item: CostumeItem; reason: string }> = [];
 
+    for (const item of items) {
+      const belongs = (item.belongs_to_outfit_ids || []).includes(outfit.outfit_id);
+      if (belongs) {
+        matched.push(item);
+      } else {
+        let reason = `Không thuộc cấu trúc chuẩn của bộ ${outfit.normalized_name}`;
+        if (item.cultural_group && outfit.group && item.cultural_group !== outfit.group) {
+          reason = `Khác nhóm văn hóa (${item.cultural_group} so với ${outfit.group})`;
+        }
+        mismatched.push({ item, reason });
+      }
+    }
+
+    if (matched.length > maxMatchedCount) {
+      maxMatchedCount = matched.length;
+      bestOutfit = outfit;
+      bestMatchedItems = matched;
+      bestMismatchedItems = mismatched;
+    }
+  }
+
+  // 3. Phân định trạng thái tương thích
   if (hasAlternativeConflict) {
     return {
       status: 'alternative_conflict',
-      badgeTitle: '⚠️ Xung đột biến thể (Alternative Not Simultaneous)',
+      badgeTitle: '⚠️ Xung đột biến thể (Không mặc đồng thời)',
       badgeClass: 'bg-red-100 text-red-800 border-red-300',
-      matchedOutfit,
+      matchedOutfit: bestOutfit,
+      matchedCount: maxMatchedCount,
+      totalCount: items.length,
+      matchedItems: bestMatchedItems,
+      mismatchedItems: bestMismatchedItems,
       ruleMessages,
-      explanation: 'Bộ đồ đang chứa 2 món là phương án thay thế cho nhau theo tư liệu nghiên cứu.'
+      explanation: 'Bộ đồ đang chứa 2 món là phương án thay thế cho nhau trong cùng bộ tham chiếu.'
     };
   }
 
-  if (matchedOutfit) {
+  if (bestOutfit && maxMatchedCount === items.length) {
     if (hasConditional) {
       return {
         status: 'conditional_match',
-        badgeTitle: `Tương thích có điều kiện · ${matchedOutfit.normalized_name}`,
+        badgeTitle: `Tương thích có điều kiện · ${bestOutfit.normalized_name} (${maxMatchedCount}/${items.length})`,
         badgeClass: 'bg-amber-100 text-amber-900 border-amber-300',
-        matchedOutfit,
+        matchedOutfit: bestOutfit,
+        matchedCount: maxMatchedCount,
+        totalCount: items.length,
+        matchedItems: bestMatchedItems,
+        mismatchedItems: [],
         ruleMessages,
-        explanation: `Bộ trang phục khớp với tổ hợp tham chiếu ${matchedOutfit.normalized_name}. Cần lưu ý các điều kiện kết hợp chi tiết.`
+        explanation: `Tất cả ${items.length} món đều thuộc tổ hợp tham chiếu ${bestOutfit.normalized_name}. Cần lưu ý các điều kiện phối kết hợp cụ thể.`
       };
     }
     return {
       status: 'reference_match',
-      badgeTitle: `Chuẩn nguyên bản · ${matchedOutfit.normalized_name}`,
+      badgeTitle: `Khớp hoàn toàn chuẩn nguyên bản · ${bestOutfit.normalized_name} (${maxMatchedCount}/${items.length})`,
       badgeClass: 'bg-emerald-100 text-emerald-900 border-emerald-300',
-      matchedOutfit,
+      matchedOutfit: bestOutfit,
+      matchedCount: maxMatchedCount,
+      totalCount: items.length,
+      matchedItems: bestMatchedItems,
+      mismatchedItems: [],
       ruleMessages,
-      explanation: `Tất cả các món đều thuộc tổ hợp tham chiếu lịch sử: ${matchedOutfit.normalized_name}.`
+      explanation: `Tất cả ${items.length} món đang mặc đều thuộc bộ tham chiếu lịch sử: ${bestOutfit.normalized_name}.`
+    };
+  }
+
+  if (bestOutfit && maxMatchedCount >= 2) {
+    const mismatchNames = bestMismatchedItems.map((m) => m.item.name).join(', ');
+    return {
+      status: 'mostly_matched',
+      badgeTitle: `Khớp phần lớn · ${bestOutfit.normalized_name} (${maxMatchedCount}/${items.length} món)`,
+      badgeClass: 'bg-blue-100 text-blue-900 border-blue-300',
+      matchedOutfit: bestOutfit,
+      matchedCount: maxMatchedCount,
+      totalCount: items.length,
+      matchedItems: bestMatchedItems,
+      mismatchedItems: bestMismatchedItems,
+      ruleMessages,
+      explanation: `Có ${maxMatchedCount}/${items.length} món khớp với bộ ${bestOutfit.normalized_name}. Có ${bestMismatchedItems.length} món phối xen kẽ: ${mismatchNames}.`
     };
   }
 
@@ -404,7 +637,11 @@ export function evaluateEquippedOutfitCompatibility(equippedItems: CostumeItem[]
     status: 'contemporary_remix',
     badgeTitle: 'Phối cách tân / Giao thoa văn hóa',
     badgeClass: 'bg-stone-100 text-stone-800 border-stone-300',
-    matchedOutfit: null,
+    matchedOutfit: bestOutfit,
+    matchedCount: maxMatchedCount,
+    totalCount: items.length,
+    matchedItems: bestMatchedItems,
+    mismatchedItems: bestMismatchedItems,
     ruleMessages,
     explanation: 'Chưa có quan hệ đối chiếu trong cùng một bộ tư liệu tham chiếu gốc (Chế độ Phối sáng tạo / Remix đương đại).'
   };

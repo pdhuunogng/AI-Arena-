@@ -8,7 +8,7 @@ import {
   LookbookRecord,
   GarmentCategory
 } from '../types/costume';
-import { MOCK_HERITAGE_ITEMS, MOCK_COLLECTIONS } from '../data/mockHeritageData';
+import { MOCK_HERITAGE_ITEMS, MOCK_COLLECTIONS, findCompatibilityRule } from '../data/mockHeritageData';
 import {
   fetchPersonalCloset,
   uploadAndSaveGarment,
@@ -19,6 +19,12 @@ import {
 } from '../lib/closetService';
 
 export type ScreenTab = 'showcase' | 'studio' | 'archive' | 'lookbook';
+
+export interface CollectionAlternativeGroup {
+  groupName: string;
+  items: CostumeItem[];
+  selectedItemId: string;
+}
 
 interface CostumeStoreState {
   // Screen routing
@@ -34,6 +40,10 @@ interface CostumeStoreState {
   isSlotLocked: (slot: string) => boolean;
   clearOutfit: () => void;
   loadCollection: (collectionId: string) => void;
+
+  // Collection alternatives
+  activeCollectionAlternatives: CollectionAlternativeGroup[];
+  setActiveCollectionAlternativeItem: (groupName: string, itemId: string) => void;
 
   // Modals & drawers
   selectedSlotForWardrobe: string | null;
@@ -85,13 +95,15 @@ const initialItemsMap = new Map(MOCK_HERITAGE_ITEMS.map((item) => [item.id, item
 const defaultHead = initialItemsMap.get('item-khan-vanh-nhat-binh') || initialItemsMap.get('nb-head-01') || null;
 const defaultTop = initialItemsMap.get('item-ao-nhat-binh') || initialItemsMap.get('nb-top-01') || null;
 const defaultBottom = initialItemsMap.get('item-xiem-trang-nhat-binh') || initialItemsMap.get('nb-bottom-01') || null;
-const defaultFoot = initialItemsMap.get('item-quan-trang-nhat-binh') || null;
+// Mặc định Nhật Bình chỉ gồm áo, xiêm (váy), khăn vành, mũ phượng/trâm; giày để null
+const defaultFoot = null;
 const defaultAcc = initialItemsMap.get('item-tram-hoa-nhat-binh') || initialItemsMap.get('nb-acc-01') || null;
 
 const defaultOutfit: CurrentOutfitState = {
   gender: 'nu',
   slots: {
-    // 8 slots
+    // 9 slots
+    ao_lot: null,
     ao: defaultTop,
     quan: null,
     vay: defaultBottom,
@@ -116,6 +128,22 @@ export const useCostumeStore = create<CostumeStoreState>((set, get) => ({
   setActiveTab: (tab) => set({ activeTab: tab }),
 
   outfit: defaultOutfit,
+  activeCollectionAlternatives: [],
+
+  setActiveCollectionAlternativeItem: (groupName, itemId) => {
+    const item = [...get().heritageItems, ...get().customClosetItems].find((i) => i.id === itemId);
+    if (!item) return;
+
+    // Equip the item into its appropriate slot
+    get().setSlotItem(item.slot, item);
+
+    // Update the selected item in the active collection alternative group
+    set((state) => ({
+      activeCollectionAlternatives: state.activeCollectionAlternatives.map((alt) =>
+        alt.groupName === groupName ? { ...alt, selectedItemId: itemId } : alt
+      )
+    }));
+  },
 
   setGender: (gender) =>
     set((state) => ({
@@ -129,59 +157,77 @@ export const useCostumeStore = create<CostumeStoreState>((set, get) => ({
     set((state) => {
       const currentSlots = { ...state.outfit.slots };
 
-      // Handle 8 distinct slots and legacy mirrors
-      if (slotKey === 'ao' || slotKey === 'top') {
+      // Handle 9 distinct slots and legacy mirrors
+      if (slotKey === 'ao_lot') {
+        currentSlots.ao_lot = item;
+      } else if (slotKey === 'ao' || slotKey === 'top') {
         currentSlots.ao = item;
         currentSlots.top = item;
       } else if (slotKey === 'quan') {
         currentSlots.quan = item;
-        if (item) {
-          currentSlots.vay = null; // Quần and Váy are mutually alternative bottom garments
-          currentSlots.bottom = item;
-        } else if (currentSlots.bottom?.id === currentSlots.quan?.id) {
-          currentSlots.bottom = null;
+        // Bỏ chặn cứng: chỉ chặn khi dữ liệu nói là alternative_not_simultaneous
+        if (item && currentSlots.vay) {
+          const rule = findCompatibilityRule(item.id, currentSlots.vay.id);
+          if (rule?.status === 'alternative_not_simultaneous') {
+            currentSlots.vay = null;
+          }
         }
+        currentSlots.bottom = item || currentSlots.vay;
       } else if (slotKey === 'vay') {
         currentSlots.vay = item;
-        if (item) {
-          currentSlots.quan = null;
-          currentSlots.bottom = item;
-        } else if (currentSlots.bottom?.id === currentSlots.vay?.id) {
-          currentSlots.bottom = null;
+        // Bỏ chặn cứng: chỉ chặn khi dữ liệu nói là alternative_not_simultaneous
+        if (item && currentSlots.quan) {
+          const rule = findCompatibilityRule(item.id, currentSlots.quan.id);
+          if (rule?.status === 'alternative_not_simultaneous') {
+            currentSlots.quan = null;
+          }
         }
+        currentSlots.bottom = item || currentSlots.quan;
       } else if (slotKey === 'bottom') {
         currentSlots.bottom = item;
-        if (item?.category === 'Váy') {
+        if (item?.category === 'Váy' || item?.slot === 'vay') {
           currentSlots.vay = item;
-          currentSlots.quan = null;
+          if (currentSlots.quan && findCompatibilityRule(item.id, currentSlots.quan.id)?.status === 'alternative_not_simultaneous') {
+            currentSlots.quan = null;
+          }
         } else {
           currentSlots.quan = item;
-          currentSlots.vay = null;
+          if (currentSlots.vay && findCompatibilityRule(item.id, currentSlots.vay.id)?.status === 'alternative_not_simultaneous') {
+            currentSlots.vay = null;
+          }
         }
       } else if (slotKey === 'khan') {
         currentSlots.khan = item;
-        if (item) {
-          currentSlots.mu = null;
-          currentSlots.head = item;
-        } else if (currentSlots.head?.id === currentSlots.khan?.id) {
-          currentSlots.head = null;
+        // Bỏ chặn cứng: chỉ chặn khi dữ liệu nói là alternative_not_simultaneous
+        if (item && currentSlots.mu) {
+          const rule = findCompatibilityRule(item.id, currentSlots.mu.id);
+          if (rule?.status === 'alternative_not_simultaneous') {
+            currentSlots.mu = null;
+          }
         }
+        currentSlots.head = item || currentSlots.mu;
       } else if (slotKey === 'mu') {
         currentSlots.mu = item;
-        if (item) {
-          currentSlots.khan = null;
-          currentSlots.head = item;
-        } else if (currentSlots.head?.id === currentSlots.mu?.id) {
-          currentSlots.head = null;
+        // Bỏ chặn cứng: chỉ chặn khi dữ liệu nói là alternative_not_simultaneous
+        if (item && currentSlots.khan) {
+          const rule = findCompatibilityRule(item.id, currentSlots.khan.id);
+          if (rule?.status === 'alternative_not_simultaneous') {
+            currentSlots.khan = null;
+          }
         }
+        currentSlots.head = item || currentSlots.khan;
       } else if (slotKey === 'head') {
         currentSlots.head = item;
-        if (item?.category === 'Mũ') {
+        if (item?.category === 'Mũ' || item?.slot === 'mu') {
           currentSlots.mu = item;
-          currentSlots.khan = null;
+          if (currentSlots.khan && findCompatibilityRule(item.id, currentSlots.khan.id)?.status === 'alternative_not_simultaneous') {
+            currentSlots.khan = null;
+          }
         } else {
           currentSlots.khan = item;
-          currentSlots.mu = null;
+          if (currentSlots.mu && findCompatibilityRule(item.id, currentSlots.mu.id)?.status === 'alternative_not_simultaneous') {
+            currentSlots.mu = null;
+          }
         }
       } else if (slotKey === 'giay' || slotKey === 'footwear') {
         currentSlots.giay = item;
@@ -216,8 +262,8 @@ export const useCostumeStore = create<CostumeStoreState>((set, get) => ({
           currentSlots.accessories = exists
             ? currentSlots.accessories.filter((a) => a.id !== item.id)
             : [...currentSlots.accessories, item];
-          currentSlots.trang_suc = currentSlots.accessories.filter((a) => a.category === 'Trang sức');
-          currentSlots.phu_kien = currentSlots.accessories.filter((a) => a.category !== 'Trang sức');
+          currentSlots.trang_suc = currentSlots.accessories.filter((a) => a.category === 'Trang sức' || a.slot === 'trang_suc');
+          currentSlots.phu_kien = currentSlots.accessories.filter((a) => a.category !== 'Trang sức' && a.slot !== 'trang_suc');
         }
       }
 
@@ -256,6 +302,7 @@ export const useCostumeStore = create<CostumeStoreState>((set, get) => ({
       outfit: {
         ...state.outfit,
         slots: {
+          ao_lot: null,
           ao: null,
           quan: null,
           vay: null,
@@ -272,6 +319,7 @@ export const useCostumeStore = create<CostumeStoreState>((set, get) => ({
         },
         locked_slots: []
       },
+      activeCollectionAlternatives: [],
       aiAdvisoryResult: null
     })),
 
@@ -283,6 +331,7 @@ export const useCostumeStore = create<CostumeStoreState>((set, get) => ({
 
     if (col.normalized_outfit && col.normalized_outfit.components && col.normalized_outfit.components.length > 0) {
       const newSlots = {
+        ao_lot: null as CostumeItem | null,
         ao: null as CostumeItem | null,
         quan: null as CostumeItem | null,
         vay: null as CostumeItem | null,
@@ -298,36 +347,76 @@ export const useCostumeStore = create<CostumeStoreState>((set, get) => ({
         accessories: [] as CostumeItem[]
       };
 
+      const seenAltGroups = new Set<string>();
+      const altGroupItemsMap = new Map<string, CostumeItem[]>();
+      const altGroupSelectedMap = new Map<string, string>();
+
+      // Thu thập các nhóm biến thể thay thế trong bộ
+      for (const comp of col.normalized_outfit.components) {
+        const it = findItem(comp.item_id);
+        if (!it) continue;
+        if (comp.alternative_group) {
+          if (!altGroupItemsMap.has(comp.alternative_group)) {
+            altGroupItemsMap.set(comp.alternative_group, []);
+          }
+          altGroupItemsMap.get(comp.alternative_group)!.push(it);
+        }
+      }
+
       for (const comp of col.normalized_outfit.components) {
         const item = findItem(comp.item_id);
         if (!item) continue;
-        const slot = item.slot;
-        const cslot = comp.slot.toLowerCase();
 
-        if ((slot === 'ao' || cslot.includes('áo')) && !newSlots.ao) {
-          newSlots.ao = item;
-          newSlots.top = item;
-        } else if ((slot === 'vay' || cslot.includes('váy')) && !newSlots.vay) {
-          newSlots.vay = item;
-          if (!newSlots.bottom) newSlots.bottom = item;
-        } else if ((slot === 'quan' || cslot.includes('quần') || cslot.includes('thân dưới')) && !newSlots.quan) {
-          newSlots.quan = item;
-          if (!newSlots.bottom) newSlots.bottom = item;
-        } else if ((slot === 'khan' || cslot.includes('khăn')) && !newSlots.khan) {
-          newSlots.khan = item;
-          if (!newSlots.head) newSlots.head = item;
-        } else if ((slot === 'mu' || cslot.includes('mũ')) && !newSlots.mu) {
-          newSlots.mu = item;
-          if (!newSlots.head) newSlots.head = item;
-        } else if (slot === 'giay' && !newSlots.giay) {
-          newSlots.giay = item;
-          newSlots.footwear = item;
-        } else if (slot === 'trang_suc' || cslot.includes('trang sức')) {
+        // Nếu component có alternative_group, chỉ nạp 1 phương án (phương án đầu tiên)
+        if (comp.alternative_group) {
+          if (seenAltGroups.has(comp.alternative_group)) {
+            continue; // Bỏ qua phương án sau, lưu lại để người dùng đổi
+          }
+          seenAltGroups.add(comp.alternative_group);
+          altGroupSelectedMap.set(comp.alternative_group, item.id);
+        }
+
+        const slot = item.slot;
+
+        if (slot === 'ao_lot') {
+          if (!newSlots.ao_lot) newSlots.ao_lot = item;
+        } else if (slot === 'ao') {
+          if (!newSlots.ao) {
+            newSlots.ao = item;
+            newSlots.top = item;
+          }
+        } else if (slot === 'quan') {
+          if (!newSlots.quan && !newSlots.vay) {
+            newSlots.quan = item;
+            if (!newSlots.bottom) newSlots.bottom = item;
+          }
+        } else if (slot === 'vay') {
+          if (!newSlots.vay && !newSlots.quan) {
+            newSlots.vay = item;
+            if (!newSlots.bottom) newSlots.bottom = item;
+          }
+        } else if (slot === 'khan') {
+          if (!newSlots.khan && !newSlots.mu) {
+            newSlots.khan = item;
+            if (!newSlots.head) newSlots.head = item;
+          }
+        } else if (slot === 'mu') {
+          if (!newSlots.mu && !newSlots.khan) {
+            newSlots.mu = item;
+            if (!newSlots.head) newSlots.head = item;
+          }
+        } else if (slot === 'giay') {
+          if (!newSlots.giay) {
+            newSlots.giay = item;
+            newSlots.footwear = item;
+          }
+        } else if (slot === 'trang_suc') {
           if (!newSlots.trang_suc.some((t) => t.id === item.id)) {
             newSlots.trang_suc.push(item);
             newSlots.accessories.push(item);
           }
-        } else {
+        } else if (slot === 'phu_kien') {
+          // Chỉ thêm vào phu_kien nếu slot chuẩn của item là phu_kien (không nhét món cùng slot khác vào đây)
           if (!newSlots.phu_kien.some((p) => p.id === item.id)) {
             newSlots.phu_kien.push(item);
             newSlots.accessories.push(item);
@@ -335,12 +424,21 @@ export const useCostumeStore = create<CostumeStoreState>((set, get) => ({
         }
       }
 
+      const alternatives = Array.from(altGroupItemsMap.entries())
+        .filter(([_, items]) => items.length > 1)
+        .map(([groupName, items]) => ({
+          groupName,
+          items,
+          selectedItemId: altGroupSelectedMap.get(groupName) || items[0].id
+        }));
+
       set((state) => ({
         outfit: {
           ...state.outfit,
           slots: newSlots,
           locked_slots: ['ao', 'top']
         },
+        activeCollectionAlternatives: alternatives,
         activeTab: 'studio',
         aiAdvisoryResult: null
       }));
@@ -362,14 +460,15 @@ export const useCostumeStore = create<CostumeStoreState>((set, get) => ({
       outfit: {
         ...state.outfit,
         slots: {
+          ao_lot: null,
           ao: top,
           quan: isVay ? null : bottom,
           vay: isVay ? bottom : null,
           khan: isMu ? null : head,
           mu: isMu ? head : null,
           giay: foot,
-          trang_suc: accs.filter((a) => a.category === 'Trang sức'),
-          phu_kien: accs.filter((a) => a.category !== 'Trang sức'),
+          trang_suc: accs.filter((a) => a.category === 'Trang sức' || a.slot === 'trang_suc'),
+          phu_kien: accs.filter((a) => a.category !== 'Trang sức' && a.slot !== 'trang_suc'),
           head,
           top,
           bottom,
@@ -378,6 +477,7 @@ export const useCostumeStore = create<CostumeStoreState>((set, get) => ({
         },
         locked_slots: ['ao', 'top']
       },
+      activeCollectionAlternatives: [],
       activeTab: 'studio',
       aiAdvisoryResult: null
     }));
@@ -487,7 +587,9 @@ export const useCostumeStore = create<CostumeStoreState>((set, get) => ({
         if (item) {
           const isLocked = locked.includes(item.slot) || (item.category && locked.includes(item.category.toLowerCase()));
           if (!isLocked) {
-            if (item.category === 'Áo') {
+            if (item.category === 'Áo lót' || item.slot === 'ao_lot') {
+              newSlots.ao_lot = item;
+            } else if (item.category === 'Áo') {
               newSlots.ao = item;
               newSlots.top = item;
             } else if (item.category === 'Quần') {

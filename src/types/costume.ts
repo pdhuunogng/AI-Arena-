@@ -29,6 +29,7 @@ export type CostumeSlot =
   | 'head'
   | 'footwear'
   | 'accessories'
+  | 'ao_lot'
   | 'ao'
   | 'quan'
   | 'vay'
@@ -127,7 +128,8 @@ export interface CostumeItem {
 export interface CurrentOutfitState {
   gender: Gender;
   slots: {
-    // 8 Modular Garment Slots for VIỆT PHỤC REMIX
+    // 9 Modular Garment Slots for VIỆT PHỤC REMIX
+    ao_lot: CostumeItem | null;
     ao: CostumeItem | null;
     quan: CostumeItem | null;
     vay: CostumeItem | null;
@@ -190,12 +192,15 @@ export interface LookbookRecord {
     bottom: CostumeItem | null;
     footwear: CostumeItem | null;
     accessories: CostumeItem[];
+    ao_lot?: CostumeItem | null;
     ao?: CostumeItem | null;
     quan?: CostumeItem | null;
     vay?: CostumeItem | null;
     khan?: CostumeItem | null;
     mu?: CostumeItem | null;
     giay?: CostumeItem | null;
+    trang_suc?: CostumeItem[];
+    phu_kien?: CostumeItem[];
   };
   cultural_quote: string;
   curator_notes: string;

@@ -1,7 +1,7 @@
 import { doc, getDocs, collection, setDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { db, storage, auth } from './firebase';
-import { CostumeItem, GarmentCategory } from '../types/costume';
+import { CostumeItem, GarmentCategory, CostumeSlot } from '../types/costume';
 
 const LOCAL_STORAGE_KEY_PREFIX = 'viet_phuc_remix_closet_';
 
@@ -49,26 +49,13 @@ export function validateGarmentFile(file: File): { valid: boolean; error?: strin
   return { valid: true };
 }
 
+import { categoryToSlot as standardizedCategoryToSlot } from '../data/mockHeritageData';
+
 /**
- * Map GarmentCategory to legacy CostumeSlot
+ * Map GarmentCategory to standardized CostumeSlot
  */
-export function categoryToSlot(category: GarmentCategory): CostumeItem['slot'] {
-  switch (category) {
-    case 'Áo':
-      return 'top';
-    case 'Quần':
-    case 'Váy':
-      return 'bottom';
-    case 'Khăn':
-    case 'Mũ':
-      return 'head';
-    case 'Giày':
-      return 'footwear';
-    case 'Trang sức':
-    case 'Phụ kiện':
-    default:
-      return 'accessories';
-  }
+export function categoryToSlot(category: GarmentCategory, name = ''): CostumeSlot {
+  return standardizedCategoryToSlot(category, name);
 }
 
 /**
